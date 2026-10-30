@@ -1,0 +1,26 @@
+{
+  "name": "بوابة محافظة كفر الشيخ",
+  "short_name": "كفر الشيخ",
+  "description": "البوابة الإلكترونية الرسمية لمحافظة كفر الشيخ — خدماتك الحكومية ومعلومات محافظتك في مكان واحد",
+  "id": "./?source=pwa",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "dir": "rtl",
+  "lang": "ar",
+  "orientation": "any",
+  "theme_color": "#26302D",
+  "background_color": "#FFFDE1",
+  "categories": ["government", "news", "utilities"],
+  "icons": [
+    { "src": "images/pwa/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "images/pwa/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "images/pwa/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "images/pwa/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "الخدمات الإلكترونية", "short_name": "الخدمات", "url": "services?source=pwa", "icons": [{ "src": "images/pwa/icon-192.png", "sizes": "192x192" }] },
+    { "name": "الأخبار", "short_name": "الأخبار", "url": "posts?source=pwa", "icons": [{ "src": "images/pwa/icon-192.png", "sizes": "192x192" }] },
+    { "name": "تواصل معنا", "short_name": "تواصل", "url": "contact?source=pwa", "icons": [{ "src": "images/pwa/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

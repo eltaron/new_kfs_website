@@ -1,0 +1,148 @@
+/* --- Service Survey Page Styles --- */
+
+/* Page header: replaced by <x-kfs.page-hero> (public/css/kfs-hero.css). */
+
+/* --- New Creative Survey Page Styles --- */
+/* Progress Bar */
+.progress-bar-container {
+    height: 8px;
+    background-color: var(--kfs-papyrus);
+    position: sticky;
+    top: 0;
+    z-index: 1020; /* Ensure it's above the navbar if navbar is also sticky */
+}
+.progress-bar {
+    height: 100%;
+    background-color: var(--kfs-gold-deep);
+    transition: width 0.4s ease-in-out;
+    border-radius: 0 5px 5px 0;
+}
+
+/* Form Styling */
+.survey-form {
+    max-width: 900px;
+    margin: 0 auto;
+}
+.survey-card {
+    background: var(--kfs-surface);
+    padding: 2rem 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+    margin-bottom: 2.5rem;
+    border-left: 5px solid var(--kfs-gold-dark);
+}
+.survey-group-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--kfs-gold-deep);
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.survey-group-title::before {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 1.6rem;
+    display: inline-block;
+    width: 40px;
+    text-align: center;
+}
+/* Custom icons for each group title */
+.survey-card:nth-of-type(2) .survey-group-title::before {
+    content: "\f086";
+} /* comments icon */
+.survey-card:nth-of-type(3) .survey-group-title::before {
+    content: "\f2f2";
+} /* hourglass icon */
+.survey-card:nth-of-type(4) .survey-group-title::before {
+    content: "\f0c0";
+} /* users icon */
+.survey-card:nth-of-type(5) .survey-group-title::before {
+    content: "\f1ad";
+} /* building icon */
+
+.survey-question {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--kfs-papyrus);
+}
+.survey-question:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.question-text {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Custom Radio Buttons */
+.options-group-custom {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.options-group-custom .form-check-label {
+    padding: 0.8rem 1.5rem;
+    border: 2px solid rgba(40, 39, 36, .12);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    background: var(--kfs-surface);
+    min-width: 150px; /* Ensure buttons have a minimum width */
+    text-align: center;
+}
+.options-group-custom .form-check-label:hover {
+    border-color: var(--kfs-gold-dark);
+    color: var(--kfs-gold-deep);
+}
+.options-group-custom input[type="radio"]:checked + .form-check-label {
+    background-color: var(--kfs-gold-deep);
+    border-color: var(--kfs-gold-dark);
+    color: #fff;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(216, 176, 62, 0.4);
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .options-group-custom {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+/* --- Survey Submit Button Styles --- */
+.survey-form .btn-primary {
+    background-color: var(--kfs-gold-deep);
+    border-color: var(--kfs-gold-dark);
+    color: #fff;
+    font-weight: bold;
+    padding: 0.9rem 3rem; /* Taller and wider padding */
+    border-radius: 50px; /* Fully rounded capsule shape */
+    text-transform: uppercase; /* Makes text uppercase for a stronger look */
+    letter-spacing: 1px; /* Adds space between letters */
+    font-size: 1.1rem;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 5px 15px rgba(216, 176, 62, 0.3); /* Adds a subtle glow */
+}
+
+.survey-form .btn-primary:hover,
+.survey-form .btn-primary:focus {
+    background-color: var(--kfs-gold-deep); /* Use a darker gold shade if defined */
+    border-color: var(--kfs-gold-deep);
+    transform: translateY(-3px) scale(1.02); /* Slight lift and scale effect */
+    box-shadow: 0 8px 25px rgba(216, 176, 62, 0.4); /* Stronger glow on hover */
+}
+
+/* Optional: Style for the disabled state while submitting */
+.survey-form .btn-primary:disabled {
+    background-color: var(--kfs-gold-deep);
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}

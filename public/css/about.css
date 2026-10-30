@@ -1,0 +1,52 @@
+/* --- Governor's Message Page Styles --- */
+/* Page Header */
+
+.subtle-header {
+    background-color: var(--kfs-ivory-2);
+    padding: 3rem 0;
+    border-bottom: 1px solid rgba(40, 39, 36, .12);
+}
+.subtle-header h1 {
+    color: var(--kfs-text);
+    font-size: 2.5rem;
+    font-weight: 800;
+}
+
+.governor-message-wrapper {
+    background: var(--kfs-surface);
+    padding: 3rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+/* Sidebar Profile Card */
+.governor-profile-card {
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--kfs-ivory-2);
+    text-align: center;
+}
+.governor-image {
+    width: 100%;
+    height: auto;
+}
+.governor-info {
+    padding: 1.5rem;
+}
+.governor-info .name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: var(--kfs-text);
+}
+.governor-info .title {
+    color: var(--kfs-gold-deep);
+    font-weight: 600;
+    font-size: 29px;
+}
+
+/* Main Message Content */
+.message-content {
+    border-right: 3px solid var(--kfs-gold-dark); /* For RTL */
+    padding-right: 2rem;
+}

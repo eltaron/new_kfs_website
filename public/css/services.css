@@ -1,0 +1,569 @@
+/* --- Services Archive Page Styles (services.index) --- */
+/* --- Services Section (FINAL PIXEL-PERFECT STYLES to match the image) --- */
+.services-section {
+    padding: 80px 0;
+    background-color: var(--kfs-ivory-2); /* Light grey background from image */
+}
+
+/* Header styling can remain the same */
+.services-section-header {
+    display: flex; /* ... etc */
+}
+
+/* === THE CORE FIX IS HERE === */
+.service-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    border: 3px solid var(--kfs-gold-dark);
+    border-radius: 24px; /* Matches the border-radius from the image */
+    background-color: var(--kfs-surface);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    color: var(--kfs-gold-deep); /* Default text color is gold */
+}
+/* No separate :hover transform for the exact look */
+.service-card:hover {
+    background-color: var(--kfs-gold-deep);
+    color: #fff; /* White text on hover */
+}
+
+/* Card Icon Styling */
+.service-card .card-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+.service-card .card-icon i {
+    font-size: 3rem;
+    color: var(--kfs-gold-deep);
+}
+.service-card:hover .card-icon {
+    border-color: #fff;
+}
+.service-card:hover .card-icon i {
+    color: #fff;
+}
+
+/* Card Title Styling */
+.service-card .card-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+    transition: color 0.3s ease;
+}
+.service-card:hover .card-title {
+    color: #fff;
+}
+
+/* Description must be hidden */
+.service-card .card-description {
+    display: none; /* IMPORTANT: Hiding the description as per the new design */
+}
+
+/* Highlighted Card Style */
+.service-card-highlight,
+.service-card-highlight:hover {
+    /* Keep it highlighted on hover as well */
+    background-color: var(--kfs-gold-deep);
+    border-color: var(--kfs-gold-dark);
+}
+.service-card-highlight .card-title,
+.service-card-highlight:hover .card-title {
+    color: #fff;
+}
+.service-card-highlight .card-icon,
+.service-card-highlight:hover .card-icon {
+    border-color: #fff;
+}
+.service-card-highlight .card-icon i,
+.service-card-highlight:hover .card-icon i {
+    color: #fff;
+}
+/* --- Single Service Page Styles (services.show) --- */
+
+/* Service Details Content Styling */
+.service-details-content {
+    background: var(--kfs-surface);
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    /* These styles ensure rich text content looks good */
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--kfs-text);
+}
+.service-details-content h2,
+.service-details-content h3,
+.service-details-content h4 {
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: var(--kfs-text);
+}
+.service-details-content p {
+    margin-bottom: 1.25rem;
+}
+.service-details-content a {
+    color: var(--kfs-gold-deep);
+    text-decoration: underline;
+}
+.service-details-content ul,
+.service-details-content ol {
+    padding-right: 1.5rem; /* For RTL */
+    margin-bottom: 1.5rem;
+}
+.service-details-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+}
+.service-details-content table {
+    width: 100%;
+    margin-bottom: 1.5rem;
+    border-collapse: collapse;
+}
+.service-details-content th,
+.service-details-content td {
+    border: 1px solid rgba(40, 39, 36, .12);
+    padding: 0.75rem;
+}
+.service-details-content th {
+    background-color: var(--kfs-ivory-2);
+    font-weight: 600;
+}
+
+/* External Link Promotion Box */
+.external-link-promo {
+    background-color: var(--kfs-gold-deep);
+    color: #fff;
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+.external-link-promo i {
+    font-size: 2.5rem;
+    opacity: 0.5;
+}
+.external-link-promo .promo-text {
+    flex-grow: 1;
+}
+.external-link-promo h4 {
+    margin: 0 0 0.5rem 0;
+    font-weight: 700;
+}
+.external-link-promo p {
+    margin: 0;
+    opacity: 0.9;
+}
+.external-link-promo .btn-primary {
+    background-color: var(--kfs-surface) !important;
+    color: var(--kfs-gold-deep) !important;
+    border-color: #fff !important;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+/* Sidebar for Related Services */
+.sidebar-sticky {
+    position: sticky;
+    top: 2rem;
+}
+.related-services-list {
+    display: flex;
+    flex-direction: column;
+}
+.related-service-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(40, 39, 36, .12);
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+.related-service-item:first-child {
+    border-top: 1px solid rgba(40, 39, 36, .12);
+}
+.related-service-item:hover {
+    background-color: rgba(216, 176, 62, 0.05);
+}
+.related-service-item .icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-color: var(--kfs-gold-deep);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.related-service-item .title {
+    color: var(--kfs-text);
+    font-weight: 600;
+    line-height: 1.1;
+}
+.related-service-item:hover .title {
+    color: var(--kfs-gold-deep);
+}
+/* --- Single Service Page - REFINED SIDEBAR STYLES --- */
+
+.sidebar-sticky {
+    position: sticky;
+    top: 2rem;
+}
+
+/* The main widget container for "خدمات أخرى" */
+.sidebar-widget {
+    background: var(--kfs-surface);
+    padding: 2rem;
+    border-radius: 16px; /* Slightly larger border radius */
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.07);
+}
+
+.widget-title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--kfs-text-soft);
+    text-align: right;
+    border: none; /* Remove the old bottom border */
+    padding-bottom: 0;
+}
+
+/* Styling for the list of other services */
+.related-services-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.related-service-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    padding: 0; /* Remove default padding */
+    border: none; /* Remove the old bottom border */
+    background: none !important; /* Remove the hover background */
+}
+.related-service-item:hover .title {
+    color: var(--kfs-gold-deep); /* Change title color on hover */
+}
+.related-service-item:hover .icon {
+    background-color: var(--kfs-gold-deep);
+}
+
+.related-service-item .title {
+    margin: 15px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--kfs-text);
+    line-height: 1.2;
+    transition: color 0.3s;
+    flex-grow: 1; /* Allow the title to take available space */
+    text-align: right;
+}
+
+.related-service-item .icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: var(--kfs-gold-deep);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0; /* Prevent icon from shrinking */
+    transition: background-color 0.3s;
+}
+.related-service-item .icon i {
+    font-size: 1rem;
+    /* Arrow points left in the design */
+    transform: none; /* Reset the old transform */
+}
+/* --- Creative Sub-Services Card Styles --- */
+.sub-services-section .section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: var(--kfs-text);
+}
+
+.sub-service-card {
+    display: flex;
+    align-items: center;
+    text-align: right; /* RTL */
+    gap: 1rem;
+    flex-direction: column;
+    background-color: var(--kfs-ivory-2); /* Light grey background */
+    padding: 1.5rem 0;
+    border-radius: 12px;
+    text-decoration: none;
+    height: 100%; /* Make all cards equal height in a row */
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.sub-service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+    background-color: var(--kfs-surface);
+    border-color: var(--kfs-gold-dark);
+}
+
+.sub-service-card .card-icon {
+    font-size: 2rem;
+    color: var(--kfs-gold-deep);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: rgba(216, 176, 62, 0.1); /* Light gold background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.sub-service-card:hover .card-icon {
+    background-color: var(--kfs-gold-deep);
+    color: #fff;
+}
+
+.sub-service-card .card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--kfs-text);
+    margin: 0;
+    transition: color 0.3s;
+}
+
+.sub-service-card:hover .card-title {
+    color: var(--kfs-gold-deep);
+}
+/* --- Single Service Page - FINAL REFINED STYLES --- */
+/* Reusing the general .rich-text-content styles for content is a good idea */
+
+/* "Apply for Service" Promo Box */
+.apply-promo-box {
+    background-color: var(--kfs-ivory-2);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    border: 1px solid rgba(40, 39, 36, .12);
+}
+.apply-promo-box i {
+    font-size: 2.5rem;
+    color: var(--kfs-gold-deep);
+    margin-bottom: 1rem;
+}
+.apply-promo-box h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--kfs-text);
+    margin-bottom: 0.5rem;
+}
+.apply-promo-box p {
+    color: var(--kfs-text-soft);
+    margin-bottom: 1.5rem;
+}
+/* This can reuse the .btn-primary from your main styles */
+.apply-promo-box .btn-primary {
+    font-weight: bold;
+    padding: 0.8rem 2.5rem;
+    border-radius: 50px;
+}
+
+/* === THE CORE FIX: REFINED SIDEBAR WIDGET === */
+.sidebar-sticky {
+    position: sticky;
+    top: 2rem;
+}
+.sidebar-widget {
+    background: var(--kfs-surface);
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    height: 100%;
+}
+.widget-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--kfs-text-soft);
+    margin-bottom: 1.5rem;
+    text-align: right;
+    padding-bottom: 0;
+    border: none;
+    display: block;
+}
+
+.related-services-list {
+    display: flex;
+    flex-direction: column;
+}
+.related-service-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--kfs-papyrus);
+    text-decoration: none;
+}
+.related-service-item:last-child {
+    border-bottom: none;
+}
+.related-service-item .title {
+    /* font-size: 1.25rem; */
+    font-weight: bold;
+    color: var(--kfs-text);
+    line-height: 1.4;
+    transition: color 0.3s;
+}
+.related-service-item .icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--kfs-gold-deep);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    transition: background-color 0.3s;
+}
+.related-service-item .icon i {
+    transition: transform 0.3s ease-in-out;
+}
+.related-service-item:hover .icon {
+    background-color: var(--kfs-gold-deep);
+}
+.related-service-item:hover .icon i {
+    transform: translateX(4px);
+}
+.related-service-item:hover .title {
+    color: var(--kfs-gold-deep);
+}
+/* --- Service Pricing Widget Styles --- */
+.pricing-widget {
+    padding: 1.5rem;
+}
+.price-breakdown {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.price-breakdown li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px dashed rgba(40, 39, 36, .12);
+}
+.price-breakdown li:last-child {
+    border-bottom: none;
+}
+.price-breakdown span {
+    color: var(--kfs-text-soft);
+}
+.price-breakdown span.price {
+    color: var(--kfs-text);
+    font-weight: bold;
+}
+
+.total-price {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--kfs-text);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+.total-price .price {
+    color: var(--kfs-gold-deep);
+}
+.btn-submit-service {
+    width: 100%;
+    padding: 16px 24px;
+    border-radius: 999px; /* pill shape */
+    border: none;
+    background: linear-gradient(135deg, var(--kfs-gold-dark), var(--kfs-gold));
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-submit-service:hover {
+    transform: translateY(-2px);
+    /* box-shadow: 0 14px 35px var(--kfs-gold-dark); */
+    background: linear-gradient(135deg, var(--kfs-gold-dark), var(--kfs-gold));
+    color: #fff;
+}
+
+.btn-submit-service:active {
+    transform: translateY(0);
+    box-shadow: 0 6px 18px rvar(--kfs-gold-dark);
+}
+
+.btn-submit-service:disabled {
+    background: #9ec5fe;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.7;
+}
+/* تنسيق ويدجيت الأسعار */
+.pricing-widget {
+    background: var(--kfs-surface);
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.price-breakdown {
+    margin-bottom: 20px;
+    border-bottom: 2px dashed rgba(40, 39, 36, .12);
+    padding-bottom: 15px;
+}
+
+.price-breakdown li {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    color: var(--kfs-text-soft);
+    font-size: 0.95rem;
+}
+
+.vat-line {
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--kfs-text-soft) !important;
+}
+
+.total-price-footer {
+    padding: 10px 0;
+}
+
+.total-label {
+    font-weight: 800;
+    color: var(--kfs-dark);
+    font-size: 1.1rem;
+}
+
+.total-val {
+    color: var(--kfs-gold-deep); /* لون ذهبي */
+    font-size: 1.5rem;
+    font-weight: 900;
+}
+
+.payment-not-text {
+    line-height: 1.4;
+    font-size: 0.75rem;
+}

@@ -1,0 +1,257 @@
+:root {
+    --tm-gold: var(--kfs-gold);
+    --tm-navy: var(--kfs-dark);
+    --tm-light: var(--kfs-ivory-2);
+}
+
+.tourism-bg {
+    background-color: var(--tm-light);
+    font-family: var(--ff-body);
+}
+
+/* Header & Badges */
+.tourism-header {
+    background-color: var(--tm-navy);
+    color: #fff;
+    padding: 80px 0;
+    border-bottom: 5px solid var(--tm-gold);
+    position: relative;
+}
+
+.badge-gold {
+    background: var(--tm-gold);
+    color: var(--tm-navy);
+    font-weight: 800;
+    padding: 6px 20px;
+    border-radius: 50px;
+    display: inline-block;
+}
+
+/* Grid Map System */
+.tourism-interactive-grid {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    height: 600px;
+    background: var(--kfs-surface);
+    border-radius: 25px;
+    overflow: hidden;
+    direction: rtl;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.map-sidebar-tourism {
+    border-left: 1px solid var(--kfs-ivory-2);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-top {
+    padding: 20px;
+    background: var(--tm-navy);
+    color: #fff;
+    text-align: center;
+    border-bottom: 4px solid var(--tm-gold);
+}
+
+.list-container {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.landmark-side-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+    transition: 0.3s;
+}
+
+.landmark-side-item:hover,
+.landmark-side-item.active {
+    background: var(--kfs-ivory);
+    border-right: 5px solid var(--tm-gold);
+}
+
+.item-thumb {
+    width: 65px;
+    height: 65px;
+    border-radius: 12px;
+    object-fit: cover;
+    margin-left: 15px;
+}
+
+.item-info h6 {
+    font-weight: 800;
+    color: var(--tm-navy);
+    margin-bottom: 3px;
+    font-size: 0.95rem;
+}
+
+.item-info small {
+    color: var(--kfs-text-soft);
+}
+
+/* Map Canvas */
+.map-canvas-tourism {
+    position: relative;
+    height: 100%;
+}
+
+#interactiveTourismMap {
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+}
+
+.map-loader-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--kfs-surface);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Grid Cards Style */
+.section-title-premium {
+    font-weight: 900;
+    color: var(--tm-navy);
+    position: relative;
+    margin-top: 50px;
+}
+
+.section-title-premium::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: var(--tm-gold);
+    margin: 15px auto;
+    border-radius: 10px;
+}
+
+.landmark-premium-card {
+    border-radius: 25px;
+    overflow: hidden;
+    position: relative;
+    height: 320px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: 0.4s ease-in-out;
+}
+
+.landmark-premium-card:hover {
+    transform: translateY(-10px);
+}
+
+.landmark-premium-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.6s;
+}
+
+.landmark-premium-card:hover img {
+    transform: scale(1.1);
+    filter: brightness(75%);
+}
+
+.card-overlay-modern {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 50px 25px 25px;
+    background: linear-gradient(
+        to top,
+        rgba(38, 48, 45, 0.95) 0%,
+        transparent 100%
+    );
+}
+
+.btn-discover {
+    display: inline-block;
+    color: var(--tm-gold);
+    font-size: 0.85rem;
+    font-weight: 800;
+    margin-top: 10px;
+    opacity: 0.8;
+    transition: 0.3s;
+}
+
+.landmark-premium-card:hover .btn-discover {
+    opacity: 1;
+    color: #fff;
+}
+
+/* Scrollbar customization */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--tm-gold);
+    border-radius: 10px;
+}
+
+@media (max-width: 991px) {
+    .tourism-interactive-grid {
+        grid-template-columns: 1fr;
+        height: 850px;
+    }
+
+    .map-sidebar-tourism {
+        height: 350px;
+        order: 2;
+    }
+}
+
+/* 1. التأكد من أن الشبكة لا تخرج عن الارتفاع المحدد */
+.tourism-interactive-grid {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    height: 600px;
+    background: var(--kfs-surface);
+    border-radius: 25px;
+    overflow: hidden;
+    /* مهم جداً لمنع المحتوى من الهروب خارج الحدود */
+    direction: rtl;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* 2. ضبط السايدبار ليأخذ الارتفاع الكامل ويقفل عليه */
+.map-sidebar-tourism {
+    border-left: 1px solid var(--kfs-ivory-2);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* إجبار السايدبار على عدم تجاوز ارتفاع الشبكة */
+    max-height: 600px;
+    /* لضمان الالتزام بنفس الارتفاع */
+    overflow: hidden;
+    /* يمنع العناصر من الظهور خارج المربع */
+}
+
+/* 3. حاوية القائمة - هي المحرك الأساسي للـ Scroll */
+.list-container {
+    flex-grow: 1;
+    overflow-y: auto !important;
+    /* تفعيل التمرير العمودي */
+    min-height: 0;
+    /* خدعة تقنية في الفلكس بوكس للسماح للطفل بالتمرير */
+}
+
+/* 4. تحسين شكل السكرول بار ليظهر بوضوح (اختياري) */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--kfs-ivory-2);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--tm-gold);
+    border-radius: 10px;
+}

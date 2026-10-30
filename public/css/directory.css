@@ -1,0 +1,94 @@
+/* --- Phone Directory Page Styles (directory.index) --- */
+/* Page Header */
+
+.directory-category-section {
+    margin-bottom: 4rem;
+}
+
+.category-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--kfs-text);
+    text-align: right;
+    margin-bottom: 2rem;
+    position: relative;
+    padding-right: 1.5rem; /* For RTL */
+}
+
+.category-title::before {
+    content: "";
+    position: absolute;
+    right: 0; /* For RTL */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 70%;
+    background-color: var(--kfs-gold-deep);
+    border-radius: 3px;
+}
+
+.directory-card {
+    background: var(--kfs-surface);
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.07);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.directory-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 35px rgba(216, 176, 62, 0.2);
+}
+
+.directory-card .card-icon {
+    font-size: 2.5rem;
+    color: #fff;
+    background-color: var(--kfs-gold-deep);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 1.5rem auto;
+    box-shadow: 0 4px 15px rgba(216, 176, 62, 0.3);
+}
+
+.directory-card .card-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--kfs-text);
+    margin-bottom: 0.5rem;
+}
+
+.directory-card .card-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--kfs-text);
+    letter-spacing: 1px;
+    margin-bottom: 1.5rem;
+}
+
+.directory-card .call-button {
+    background: transparent;
+    border: 2px solid var(--kfs-gold-dark);
+    color: var(--kfs-gold-deep);
+    padding: 0.6rem 1rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.directory-card:hover .call-button {
+    background-color: var(--kfs-gold-deep);
+    color: #fff;
+}
+.directory-card .call-button i {
+    margin-right: 5px; /* for RTL */
+}

@@ -1,0 +1,85 @@
+/* لوحة «صلاحية الموقع» (/site-validity) — تبويبات قوائم العمل في صفحة الطلبات.
+   كل تبويب صندوق بلون المرحلة (--sv-c من ListRequests::QUEUES) مع عدّاد بارز. */
+
+.fi-tabs:has(.sv-qtab) {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: .625rem;
+    margin-inline: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    --tw-ring-shadow: 0 0 #0000;
+    overflow: visible;
+}
+
+.fi-tabs-item.sv-qtab {
+    position: relative;
+    gap: .625rem;
+    min-height: 3.25rem;
+    padding: .55rem .75rem .55rem .9rem;
+    border-radius: .75rem;
+    border: 1px solid color-mix(in srgb, var(--sv-c) 28%, transparent);
+    border-inline-start: 4px solid var(--sv-c);
+    background: color-mix(in srgb, var(--sv-c) 7%, #fff);
+    color: var(--sv-c);
+    font-weight: 700;
+    box-shadow: 0 1px 2px rgba(29, 36, 34, .06);
+    transition: background-color .15s, color .15s, box-shadow .15s, transform .15s;
+}
+.fi-tabs-item.sv-qtab:hover {
+    background: color-mix(in srgb, var(--sv-c) 13%, #fff);
+    box-shadow: 0 6px 16px -8px color-mix(in srgb, var(--sv-c) 60%, transparent);
+    transform: translateY(-1px);
+}
+.fi-tabs-item.sv-qtab .fi-tabs-item-label,
+.fi-tabs-item.sv-qtab .fi-tabs-item-icon { color: inherit; }
+.fi-tabs-item.sv-qtab .fi-tabs-item-label { font-size: .875rem; }
+
+/* العدّاد */
+.fi-tabs-item.sv-qtab .fi-badge {
+    min-width: 2rem;
+    height: 1.75rem;
+    justify-content: center;
+    padding-inline: .5rem;
+    border-radius: 999px;
+    background: var(--sv-c);
+    color: #fff;
+    font-size: .875rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    --tw-ring-shadow: 0 0 #0000;
+    box-shadow: none;
+}
+.fi-tabs-item.sv-qtab .fi-badge * { color: inherit; }
+
+/* التبويب النشط: صندوق ممتلئ بلون المرحلة */
+.fi-tabs-item.sv-qtab.fi-active {
+    background: var(--sv-c);
+    border-color: var(--sv-c);
+    color: #fff;
+    box-shadow: 0 8px 20px -10px color-mix(in srgb, var(--sv-c) 80%, transparent);
+}
+.fi-tabs-item.sv-qtab.fi-active .fi-badge { background: #fff; color: var(--sv-c); }
+
+/* قائمة فارغة: باهتة لكن قابلة للنقر */
+.fi-tabs-item.sv-qtab--empty:not(.fi-active) { opacity: .62; }
+.fi-tabs-item.sv-qtab--empty:not(.fi-active) .fi-badge {
+    background: transparent;
+    color: var(--sv-c);
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--sv-c) 45%, transparent);
+}
+
+/* الوضع الليلي */
+.dark .fi-tabs-item.sv-qtab {
+    background: color-mix(in srgb, var(--sv-c) 16%, #1D2422);
+    border-color: color-mix(in srgb, var(--sv-c) 40%, transparent);
+    color: color-mix(in srgb, var(--sv-c) 45%, #fff);
+}
+.dark .fi-tabs-item.sv-qtab:hover { background: color-mix(in srgb, var(--sv-c) 24%, #1D2422); }
+.dark .fi-tabs-item.sv-qtab.fi-active { background: var(--sv-c); color: #fff; }
+
+@media (max-width: 640px) {
+    .fi-tabs:has(.sv-qtab) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .fi-tabs-item.sv-qtab { justify-content: space-between; }
+}

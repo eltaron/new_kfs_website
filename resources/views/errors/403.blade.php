@@ -1,0 +1,7 @@
+@extends('errors.kfs')
+@section('code', '403')
+@section('title', 'غير مسموح بالوصول')
+@section('tone', '#A63A32')
+@section('icon', 'fa-solid fa-shield-halved')
+@section('heading', 'عذراً، ليست لديك صلاحية لهذه الصفحة')
+@section('message', 'حسابك لا يملك الصلاحيات اللازمة لعرض هذا المحتوى. إذا كنت ترى أن هذا خطأ، تواصل مع مسؤول النظام أو الدعم الفني.')

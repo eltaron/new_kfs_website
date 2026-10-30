@@ -1,0 +1,242 @@
+/*!
+ * KFS Motion System — بوابة محافظة كفر الشيخ
+ * ---------------------------------------------------------------
+ * Every hide-before-reveal / looping animation here is gated behind
+ * `html.kfs-motion`, which is set in <head> only when:
+ *   - JavaScript runs, AND
+ *   - the visitor did not enable «إيقاف الحركة» (kfs-a11y noanim), AND
+ *   - the OS does not ask for prefers-reduced-motion.
+ * Without that class the page is fully static and fully visible.
+ * Calm, slow, no bounce / elastic (design-system §40).
+ */
+
+/* =====================================================================
+   1. SCROLL REVEAL  — data-reveal="up|fade|start|end|zoom", data-stagger
+   ===================================================================== */
+html.kfs-motion [data-reveal] {
+    transition: opacity .6s var(--ease-out), transform .6s var(--ease-out), clip-path .8s var(--ease-out);
+    transition-delay: var(--kfs-delay, 0s);
+}
+html.kfs-motion [data-reveal]:not(.is-revealed) { opacity: 0; transform: translate3d(0, 16px, 0); }
+html.kfs-motion [data-reveal="fade"]:not(.is-revealed) { transform: none; }
+/* "start" = from the reading-start side (right in RTL), "end" = from the other side */
+html.kfs-motion [data-reveal="start"]:not(.is-revealed) { transform: translate3d(20px, 0, 0); }
+html.kfs-motion [data-reveal="end"]:not(.is-revealed) { transform: translate3d(-20px, 0, 0); }
+html.kfs-motion[dir="ltr"] [data-reveal="start"]:not(.is-revealed) { transform: translate3d(-20px, 0, 0); }
+html.kfs-motion[dir="ltr"] [data-reveal="end"]:not(.is-revealed) { transform: translate3d(20px, 0, 0); }
+html.kfs-motion [data-reveal="zoom"]:not(.is-revealed) { transform: scale(.98); }
+html.kfs-motion [data-reveal].is-revealed { opacity: 1; transform: none; }
+
+/* Stagger: children animate one after another (JS sets --i on each child) */
+html.kfs-motion [data-stagger] > * {
+    transition: opacity .55s var(--ease-out), transform .55s var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 60ms);
+}
+html.kfs-motion [data-stagger]:not(.is-revealed) > * { opacity: 0; transform: translate3d(0, 16px, 0); }
+html.kfs-motion [data-stagger="zoom"]:not(.is-revealed) > * { transform: scale(.98); }
+
+/* Image reveal: clip-path wipe + gentle scale */
+html.kfs-motion [data-img-reveal] { overflow: hidden; }
+html.kfs-motion [data-img-reveal] img { transition: transform 1.4s var(--ease-out), clip-path 1.2s var(--ease-out); }
+html.kfs-motion [data-img-reveal]:not(.is-revealed) img { clip-path: inset(0 0 100% 0); transform: scale(1.02); }
+
+/* Drawn line art (SVG paths with pathLength="1") */
+[data-draw] [pathLength] { stroke-dasharray: 1; stroke-dashoffset: 0; }
+html.kfs-motion [data-draw] [pathLength] { transition: stroke-dashoffset 1.8s var(--ease-out); }
+html.kfs-motion [data-draw] [pathLength]:nth-child(2) { transition-delay: .25s; }
+html.kfs-motion [data-draw] [pathLength]:nth-child(3) { transition-delay: .45s; }
+html.kfs-motion [data-draw] [pathLength]:nth-child(4) { transition-delay: .6s; }
+html.kfs-motion [data-draw]:not(.is-revealed) [pathLength] { stroke-dashoffset: 1; }
+
+/* =====================================================================
+   2. HERO ENTRANCE (one gentle fade-up, once) — decorative floats retired in v2
+   ===================================================================== */
+@keyframes kfs-rise { from { opacity: 0; transform: translate3d(0, 14px, 0); } to { opacity: 1; transform: none; } }
+@keyframes kfs-fade { from { opacity: 0; } to { opacity: 1; } }
+html.kfs-motion .kfs-hero-anim > * { animation: kfs-rise .7s var(--ease-out) both; }
+html.kfs-motion .kfs-hero-anim > *:nth-child(2) { animation-delay: .08s; }
+html.kfs-motion .kfs-hero-anim > *:nth-child(3) { animation-delay: .16s; }
+html.kfs-motion .kfs-hero-anim > *:nth-child(n+4) { animation-delay: .24s; }
+.kfs-float, .kfs-hero2__floats, .hero-floating-elements { display: none !important; }
+[data-parallax] { transform: none; }
+
+/* =====================================================================
+   3. ANIMATED WAVE DIVIDER  <x-kfs.wave/>
+   ===================================================================== */
+.kfs-wavebar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: clamp(34px, 5.5vw, 74px);
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 3;
+    line-height: 0;
+}
+.kfs-wavebar--top { bottom: auto; top: -1px; transform: scaleY(-1); }
+.kfs-wavebar--static { position: relative; }
+.kfs-wavebar__svg { position: absolute; top: 0; left: 0; width: 200%; max-width: none; height: 100%; display: block; }
+.kfs-wavebar__line { fill: none; stroke: var(--kfs-cyan); stroke-width: 2; opacity: .9; vector-effect: non-scaling-stroke; }
+.kfs-wavebar__line2 { fill: none; stroke: var(--kfs-cyan); stroke-width: 1; opacity: .4; vector-effect: non-scaling-stroke; }
+.kfs-wavebar.is-gold .kfs-wavebar__line, .kfs-wavebar.is-gold .kfs-wavebar__line2 { stroke: var(--kfs-gold); }
+@keyframes kfs-drift { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-50%, 0, 0); } }
+
+/* Heritage ornament <x-kfs.heritage/> + lotus */
+.kfs-heritage-orn, .kfs-lotus { display: block; fill: none; stroke: var(--kfs-gold); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; overflow: visible; }
+.kfs-heritage-orn circle { fill: var(--kfs-cyan); stroke: none; }
+.kfs-heritage-orn.is-light { stroke: var(--kfs-gold-light); }
+.kfs-lotus { color: var(--kfs-gold); stroke: currentColor; }
+
+/* =====================================================================
+   4. DROPDOWNS — short fade, no stagger
+   ===================================================================== */
+@keyframes kfs-drop { from { opacity: 0; transform: translate3d(0, 6px, 0); } to { opacity: 1; transform: none; } }
+html.kfs-motion .dropdown-menu.show,
+html.kfs-motion .kfs-nav .nav-item.dropdown:focus-within > .dropdown-menu { animation: kfs-drop .2s var(--ease-out) both; }
+.dropdown-item { transition: background-color var(--dur-1) var(--ease), color var(--dur-1); }
+
+/* =====================================================================
+   5. CARDS — hover lift lives on the card components in kfs-ds.css (§11).
+   ===================================================================== */
+.kfs-lift { transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease); }
+.kfs-lift:hover, .kfs-lift:focus-visible { transform: translateY(-3px); box-shadow: var(--e-2); }
+.kfs-shine-el, .kfs-ripple { display: none !important; }
+
+/* =====================================================================
+   7. SKELETON / SHIMMER LOADERS
+   ===================================================================== */
+.kfs-skeleton, .kfs-shimmer {
+    background: linear-gradient(100deg, var(--kfs-papyrus) 20%, var(--kfs-ivory) 40%, var(--kfs-papyrus) 60%) var(--kfs-papyrus);
+    background-size: 220% 100%;
+}
+.kfs-skeleton { border-radius: var(--r); min-height: 1em; color: transparent !important; }
+.kfs-skeleton--line { height: .9em; margin-bottom: .55em; }
+.kfs-skeleton--img { aspect-ratio: 16/10; }
+@keyframes kfs-shimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+html.kfs-motion .kfs-skeleton, html.kfs-motion .kfs-shimmer { animation: kfs-shimmer 1.4s linear infinite; }
+.kfs-shimmer > img { opacity: 0; transition: opacity .6s var(--ease); }
+.kfs-shimmer.is-loaded { background: none; animation: none; }
+.kfs-shimmer.is-loaded > img { opacity: 1; }
+
+/* =====================================================================
+   8. PAGE-LOAD PROGRESS + BACK-TO-TOP RING
+   ===================================================================== */
+.kfs-page-progress {
+    position: fixed;
+    top: 0;
+    inset-inline-start: 0;
+    height: 3px;
+    width: 0;
+    z-index: 4001;
+    pointer-events: none;
+    background: linear-gradient(90deg, var(--kfs-gold), var(--kfs-cyan));
+    box-shadow: 0 0 10px rgba(0, 191, 216, .55);
+    opacity: 0;
+}
+[dir="rtl"] .kfs-page-progress { background: linear-gradient(270deg, var(--kfs-gold), var(--kfs-cyan)); }
+.kfs-page-progress.is-active { opacity: 1; transition: width 8s cubic-bezier(.1, .7, .1, 1), opacity .2s; width: 82%; }
+.kfs-page-progress.is-done { opacity: 0; width: 100%; transition: width .3s var(--ease), opacity .5s .3s; }
+
+.kfs-back-to-top { overflow: visible; }
+.kfs-btt-ring { position: absolute; top: 0; inset-inline-end: 0; width: 52px; height: 52px; transform: rotate(-90deg); pointer-events: none; z-index: 1; }
+@media (max-width: 991.98px) { .kfs-btt-ring { width: 46px; height: 46px; } }
+.kfs-btt-ring circle { fill: none; stroke-width: 2.25; }
+.kfs-btt-ring .ring-bg { stroke: rgba(255, 253, 225, .14); }
+.kfs-btt-ring .ring-fg { stroke: var(--kfs-gold); stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset .15s linear; }
+.kfs-back-to-top i { transition: transform .35s var(--ease), color .25s; }
+.kfs-back-to-top:hover .ring-fg, .kfs-back-to-top:focus-visible .ring-fg { stroke: #fff; }
+.kfs-back-to-top:hover i { transform: translateY(-3px); }
+
+/* =====================================================================
+   9. TABS / ACCORDION / LIGHTBOX / TOAST
+   ===================================================================== */
+@keyframes kfs-fade-up { from { opacity: 0; transform: translate3d(0, 12px, 0); } to { opacity: 1; transform: none; } }
+html.kfs-motion .tab-content > .tab-pane.active,
+html.kfs-motion .tab-detail.active-detail,
+html.kfs-motion .accordion-collapse.show > .accordion-body { animation: kfs-fade-up .35s var(--ease-out) both; }
+.accordion-button::after { transition: transform .35s var(--ease); }
+.accordion-button:not(.collapsed) { box-shadow: inset 0 -1px 0 var(--line), inset 3px 0 0 var(--kfs-cyan); }
+[dir="rtl"] .accordion-button:not(.collapsed) { box-shadow: inset 0 -1px 0 var(--line), inset -3px 0 0 var(--kfs-cyan); }
+.nav-tabs .nav-link, .nav-pills .nav-link { transition: color .3s, background-color .3s, box-shadow .3s; }
+
+/* Lightbox */
+.kfs-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+    display: grid;
+    place-items: center;
+    padding: 4vh 4vw;
+    background: rgba(29, 36, 34, .92);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .35s var(--ease), visibility .35s;
+}
+.kfs-lightbox.is-open { opacity: 1; visibility: visible; }
+.kfs-lightbox__figure { margin: 0; max-width: min(1100px, 100%); text-align: center; transform: scale(.94); transition: transform .45s var(--ease-out); }
+.kfs-lightbox.is-open .kfs-lightbox__figure { transform: none; }
+.kfs-lightbox__img { max-height: 80vh; width: auto; max-width: 100%; border-radius: var(--r-lg); border: 1px solid var(--line-gold); box-shadow: 0 30px 80px rgba(0, 0, 0, .5); background: var(--kfs-dark); }
+.kfs-lightbox__cap { color: var(--kfs-on-dark); margin-top: .8rem; font-size: .95rem; }
+.kfs-lightbox__btn {
+    position: absolute;
+    width: 46px;
+    height: 46px;
+    border-radius: var(--r);
+    border: 1px solid var(--kfs-gold);
+    background: rgba(38, 48, 45, .7);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 1.1rem;
+}
+.kfs-lightbox__btn:hover { background: var(--kfs-gold); color: var(--kfs-charcoal); }
+.kfs-lightbox__close { top: 16px; inset-inline-end: 16px; }
+.kfs-lightbox__prev { top: 50%; inset-inline-start: 16px; margin-top: -23px; }
+.kfs-lightbox__next { top: 50%; inset-inline-end: 16px; margin-top: -23px; }
+
+/* Toasts */
+.kfs-toasts { position: fixed; z-index: 4500; top: calc(var(--header-h) + 12px); inset-inline-end: 16px; display: grid; gap: .6rem; width: min(360px, calc(100vw - 32px)); pointer-events: none; }
+.kfs-toast {
+    pointer-events: auto;
+    display: flex;
+    gap: .7rem;
+    align-items: flex-start;
+    padding: .85rem 1rem;
+    background: var(--kfs-dark);
+    color: var(--kfs-on-dark);
+    border-radius: var(--r-lg);
+    border-inline-start: 4px solid var(--kfs-cyan);
+    box-shadow: var(--shadow-lg);
+    font-size: .95rem;
+}
+.kfs-toast i { color: var(--kfs-cyan); margin-top: .3rem; }
+.kfs-toast--success { border-inline-start-color: #6BBF83; }
+.kfs-toast--success i { color: #6BBF83; }
+.kfs-toast--warning { border-inline-start-color: var(--kfs-gold); }
+.kfs-toast--warning i { color: var(--kfs-gold); }
+.kfs-toast--danger { border-inline-start-color: #E07A70; }
+.kfs-toast--danger i { color: #E07A70; }
+.kfs-toast__close { margin-inline-start: auto; background: none; border: 0; color: var(--kfs-on-dark-soft); padding: 0 .2rem; }
+@keyframes kfs-toast-in { from { opacity: 0; transform: translate3d(0, -14px, 0) scale(.97); } to { opacity: 1; transform: none; } }
+html.kfs-motion .kfs-toast { animation: kfs-toast-in .45s var(--ease-out) both; }
+.kfs-toast.is-leaving { opacity: 0; transform: translate3d(0, -8px, 0); transition: opacity .3s, transform .3s; }
+
+/* Counters */
+.kfs-count { font-family: var(--ff-num); font-variant-numeric: lining-nums tabular-nums; }
+
+/* =====================================================================
+   10. SAFETY NETS — reduced motion + «إيقاف الحركة»
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    [data-reveal], [data-stagger] > *, [data-img-reveal] img { opacity: 1 !important; transform: none !important; clip-path: none !important; }
+    [data-draw] [pathLength] { stroke-dashoffset: 0 !important; }
+    .kfs-wavebar__svg { animation: none !important; }
+    [data-parallax] { transform: none !important; }
+}
+html.kfs-a11y-noanim [data-reveal],
+html.kfs-a11y-noanim [data-stagger] > *,
+html.kfs-a11y-noanim [data-img-reveal] img { opacity: 1 !important; transform: none !important; clip-path: none !important; }
+html.kfs-a11y-noanim [data-draw] [pathLength] { stroke-dashoffset: 0 !important; }
+html.kfs-a11y-noanim [data-parallax] { transform: none !important; }
+html.kfs-a11y-noanim .kfs-page-progress { display: none; }

@@ -1,0 +1,130 @@
+/* الألوان والهوية */
+:root {
+    --primary-blue: var(--kfs-dark);
+    --brand-gold: var(--kfs-gold);
+    --soft-gray: #f9fbfd;
+    --text-muted: #576574;
+}
+
+/* الهيرو والطباعة */
+.about-page {
+    background: var(--soft-gray);
+    font-family: var(--ff-body);
+}
+.hero-line {
+    width: 80px;
+    height: 3px;
+    background: var(--brand-gold);
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+/* الأبنيكس والمقالات */
+.content-block {
+    background: var(--kfs-surface);
+    padding: 35px;
+    border-radius: 20px;
+    border-right: 5px solid var(--brand-gold);
+}
+.block-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    color: var(--primary-blue);
+}
+.block-header i {
+    font-size: 1.8rem;
+    color: var(--brand-gold);
+}
+.block-header h3 {
+    font-weight: 800;
+    font-size: 1.6rem;
+}
+.block-body {
+    line-height: 1.9;
+    color: var(--text-muted);
+    text-align: justify;
+    font-size: 1.1rem;
+}
+
+/* كروت الرؤية الجانبية */
+.vision-card {
+    background: var(--kfs-surface);
+    border-radius: 20px;
+    padding: 35px 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.02);
+}
+.vision-card .card-icon {
+    width: 70px;
+    height: 70px;
+    background: rgba(216, 176, 62, 0.1);
+    border-radius: 50%;
+    line-height: 70px;
+    font-size: 1.8rem;
+    color: var(--brand-gold);
+    margin: 0 auto 20px;
+}
+.vision-card.mission .card-icon {
+    background: rgba(45, 152, 218, 0.1);
+    color: #45aaf2;
+}
+
+/* شبكة المميزات (ما تشتهر به) */
+.section-title-accent {
+    font-weight: 800;
+    color: var(--primary-blue);
+}
+.feature-flip-card {
+    background: var(--kfs-surface);
+    padding: 25px;
+    text-align: center;
+    transition: 0.3s;
+    border-bottom: 3px solid transparent;
+    border-radius: 15px;
+}
+.feature-flip-card:hover {
+    transform: translateY(-5px);
+    border-bottom: 3px solid var(--brand-gold);
+}
+.icon-holder {
+    font-size: 2.5rem;
+    color: var(--brand-gold);
+    margin-bottom: 15px;
+}
+.feature-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--kfs-text-soft);
+}
+
+/* أكورديون المشاهير */
+.famous-accordion .accordion-button:not(.collapsed) {
+    background: var(--brand-gold) !important;
+    color: var(--kfs-dark);
+    font-weight: bold;
+}
+.cat-dot {
+    width: 12px;
+    height: 12px;
+    background: var(--brand-gold);
+    display: inline-block;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(216, 176, 62, 0.2);
+}
+.p-avatar {
+    width: 55px;
+    height: 55px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+.p-avatar-placeholder {
+    width: 55px;
+    height: 55px;
+    background: var(--soft-gray);
+    border-radius: 10px;
+    color: var(--brand-gold);
+    font-size: 1.5rem;
+    font-weight: bold;
+}

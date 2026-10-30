@@ -1,0 +1,99 @@
+/* --- Complaint/Suggestion Form Page Styles --- */
+/* Page Header */
+
+.form-wrapper-container .form-card {
+    background: var(--kfs-surface);
+    border-radius: var(--border-radius-large, 24px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.form-card .card-header {
+    background-color: var(--color-dark, var(--kfs-dark-soft));
+    color: #fff;
+    text-align: center;
+    padding: 2.5rem 2rem;
+}
+
+.card-header .header-icon {
+    font-size: 2rem;
+    color: var(--kfs-gold);
+    background-color: rgba(255, 255, 255, 0.1);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 1rem auto;
+}
+.card-header h3 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+/* Header sits on a dark band in both themes: the global h1–h6 rule paints
+   headings --kfs-charcoal (near-black in light) and --kfs-papyrus turns dark
+   in the dark theme, so pin both to the on-dark tokens. */
+.form-card .card-header h3 { color: var(--kfs-on-dark); }
+.card-header p {
+    color: var(--kfs-on-dark-soft);
+    font-size: 0.95rem;
+}
+
+.form-card .card-body {
+    padding: 2.5rem 3rem;
+}
+
+.form-section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    padding-right: 1rem; /* for RTL */
+    border-right: 3px solid var(--kfs-gold-dark);
+}
+
+/* General form styling from previous responses should apply */
+.form-label {
+    font-weight: 600;
+    color: var(--kfs-text);
+}
+.form-control {
+    border-radius: 8px;
+    padding: 0.75rem 1.25rem;
+    background-color: var(--kfs-ivory-2);
+    border-color: rgba(40, 39, 36, .12);
+}
+.form-control:focus {
+    background-color: var(--kfs-surface);
+    border-color: var(--kfs-gold-dark);
+    box-shadow: 0 0 0 0.25rem rgba(216, 176, 62, 0.25);
+}
+/* Style for custom file input */
+.form-control[type="file"] {
+    border-style: dashed;
+}
+.btn-primary {
+    background-color: var(--kfs-gold-deep) !important;
+    border-color: var(--kfs-gold-dark) !important;
+    font-weight: bold;
+    padding: 0.8rem;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+}
+.btn-primary:hover {
+    background-color: var(--kfs-gold-deep) !important;
+    border-color: var(--kfs-gold-deep) !important;
+}
+
+/* Enhance validation messages */
+.invalid-feedback.d-block {
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+}
+
+/* Success message styling */
+.alert-success {
+    background-color: #d1e7dd; /* Bootstrap success bg color */
+    border-color: #badbcc;
+    color: #0f5132;
+}

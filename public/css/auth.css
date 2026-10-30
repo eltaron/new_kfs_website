@@ -1,0 +1,180 @@
+/* ==============================================
+   === Citizen Registration & Form Page Styles  ===
+   ============================================== */
+
+/* --- 1. General Styles (Reusable) --- */
+
+.main-content.bg-light {
+    background-color: var(--kfs-ivory-2) !important;
+}
+
+/* --- 2. Main Form Card Styles --- */
+.form-card {
+    background: var(--kfs-surface);
+    border-radius: var(--border-radius-large, 24px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.form-card .card-header {
+    background-color: var(--color-dark, var(--kfs-dark-soft));
+    color: #fff;
+    text-align: center;
+    padding: 2.5rem 2rem;
+}
+.card-header .header-icon {
+    font-size: 2rem;
+    color: var(--kfs-gold-deep);
+    background-color: rgba(255, 255, 255, 0.1);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 1rem auto;
+}
+.card-header h3 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+.card-header p {
+    color: var(--kfs-papyrus);
+    font-size: 1rem;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-card .card-body {
+    padding: 2.5rem 3rem;
+}
+
+/* Step dividers and titles */
+.form-step {
+    padding: 1.5rem 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(40, 39, 36, .12);
+}
+.form-step:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.form-section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--kfs-gold-deep);
+}
+.form-section-title span {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 35px;
+    height: 35px;
+    background-color: var(--kfs-gold-deep);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+/* Form Controls (Inputs, Textareas, Selects) */
+.form-label {
+    font-weight: 600;
+    color: var(--color-dark-text, var(--kfs-text));
+    margin-bottom: 0.5rem;
+}
+.form-control,
+.form-select {
+    border-radius: 8px;
+    padding: 0.75rem 1.25rem;
+    background-color: var(--kfs-ivory-2);
+    border: 1px solid rgba(40, 39, 36, .12);
+    transition: all 0.2s ease-in-out;
+}
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--kfs-surface);
+    border-color: var(--kfs-gold-dark);
+    box-shadow: 0 0 0 0.25rem rgba(216, 176, 62, 0.25);
+}
+/* Style for file input */
+.form-control[type="file"] {
+    border-style: dashed;
+}
+
+/* Button styles */
+.btn-primary {
+    background-color: var(--kfs-gold-deep) !important;
+    border-color: var(--kfs-gold-dark) !important;
+    font-weight: bold;
+    padding: 0.8rem;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.btn-primary:hover {
+    background-color: var(--kfs-gold-deep) !important;
+    border-color: var(--kfs-gold-deep) !important;
+    transform: translateY(-2px);
+}
+
+/* Validation styles for Bootstrap */
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: var(--danger); /* Bootstrap danger color */
+}
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus {
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+.invalid-feedback {
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-card .card-body {
+        padding: 2rem 1.5rem;
+    }
+}
+/* --- Custom Login Page Styles --- */
+.login-card {
+    width: 100%;
+    max-width: 450px;
+    background: var(--kfs-surface);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+.login-header {
+    text-align: center;
+    padding: 2.5rem 2rem 2rem 2rem;
+    background-color: var(--kfs-ivory-2);
+    border-bottom: 1px solid rgba(40, 39, 36, .12);
+}
+.login-header .logo {
+    max-height: 60px;
+    margin-bottom: 1rem;
+}
+.login-header h3 {
+    font-weight: 700;
+}
+.login-header p {
+    color: var(--kfs-text-soft);
+}
+.login-body {
+    padding: 2.5rem;
+}
+.login-body .form-control {
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+}
+.login-body .btn-primary {
+    font-weight: bold;
+    padding: 0.8rem;
+    border-radius: 8px;
+}

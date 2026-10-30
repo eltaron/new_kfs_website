@@ -1,0 +1,97 @@
+/* --- Search Results Page Styles --- */
+
+.bg-light {
+    background-color: var(--kfs-ivory-2) !important;
+}
+
+/* No Results Styling */
+.no-results {
+    text-align: center;
+    background: var(--kfs-surface);
+    padding: 4rem 2rem;
+    border-radius: var(--r-xl);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+.no-results-icon {
+    font-size: 3rem;
+    color: var(--kfs-gold-deep);
+    background-color: rgba(216, 176, 62, 0.1);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 1.5rem auto;
+}
+.no-results h3 {
+    font-weight: 700;
+}
+.no-results p {
+    color: var(--kfs-text-soft);
+}
+
+/* Results Wrapper */
+.search-results-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+.result-category .category-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--kfs-text);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid rgba(40, 39, 36, .12);
+}
+.result-item {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: var(--kfs-surface);
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(40, 39, 36, .12);
+    margin-bottom: 1rem;
+}
+.result-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+    border-color: var(--kfs-gold-dark);
+}
+.result-item .item-icon {
+    font-size: 1.5rem;
+    color: var(--kfs-gold-deep);
+    background-color: rgba(216, 176, 62, 0.1);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+}
+.result-item .item-content {
+    flex-grow: 1;
+}
+.result-item .item-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--kfs-text);
+    margin-bottom: 0.5rem;
+}
+.result-item:hover .item-title {
+    color: var(--kfs-gold-deep);
+}
+.result-item .item-excerpt {
+    color: var(--kfs-text-soft);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+}
+.result-item .item-meta {
+    font-size: 0.85rem;
+    color: var(--kfs-muted);
+}

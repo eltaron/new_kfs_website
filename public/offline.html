@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#26302D">
+    <meta name="robots" content="noindex">
+    <title>لا يوجد اتصال — بوابة محافظة كفر الشيخ</title>
+    <link rel="icon" href="/images/pwa/icon-192.png">
+    <style>
+        :root {
+            --kfs-ivory: #FFFDE1; --kfs-papyrus: #F2EBC7; --kfs-dark: #26302D; --kfs-dark-2: #1D2422;
+            --kfs-gold: #D8B03E; --kfs-gold-deep: #8F6917; --kfs-cyan: #00BFD8; --kfs-cyan-ink: #00788A;
+            --kfs-charcoal: #282724; --kfs-text-soft: #68645A; --line: rgba(40,39,36,.11);
+        }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; min-height: 100%; }
+        body {
+            font-family: "Tajawal", "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
+            background: var(--kfs-ivory); color: var(--kfs-charcoal); line-height: 1.9;
+            display: flex; flex-direction: column; min-height: 100vh;
+        }
+        header {
+            background: var(--kfs-dark); color: #fff; padding: 14px 16px;
+            border-bottom: 1px solid rgba(216,176,62,.34); display: flex; align-items: center; gap: 12px;
+        }
+        header img { width: 44px; height: 44px; }
+        header strong { font-size: 1.05rem; }
+        main { flex: 1; display: grid; place-items: center; padding: 48px 16px; }
+        .card {
+            max-width: 560px; width: 100%; text-align: center; background: #FFFEF4;
+            border: 1px solid var(--line); border-top: 3px solid var(--kfs-cyan);
+            border-radius: 10px; padding: 40px 24px; box-shadow: 0 10px 35px rgba(40,39,36,.07);
+        }
+        .kicker { color: var(--kfs-gold-deep); font-weight: 700; letter-spacing: .5px; }
+        .kicker span { color: var(--kfs-cyan-ink); margin: 0 6px; }
+        h1 { font-size: clamp(1.5rem, 4vw, 2.1rem); margin: 8px 0 12px; font-weight: 800; }
+        p { color: var(--kfs-text-soft); margin: 0 0 24px; }
+        .wave { display: block; width: 120px; height: 12px; margin: 0 auto 24px; }
+        .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        button, a.btn {
+            font: inherit; font-weight: 700; cursor: pointer; border-radius: 6px; padding: 10px 22px;
+            border: 1px solid var(--kfs-gold); text-decoration: none; min-height: 44px;
+        }
+        button { background: var(--kfs-gold); color: var(--kfs-charcoal); }
+        button:hover { background: var(--kfs-gold-deep); color: #fff; }
+        a.btn { background: transparent; color: var(--kfs-charcoal); }
+        :focus-visible { outline: 3px solid var(--kfs-cyan); outline-offset: 3px; }
+        footer {
+            background: var(--kfs-dark-2); color: var(--kfs-ivory); text-align: center; padding: 16px;
+            font-size: .9rem; border-top: 2px solid var(--kfs-cyan);
+        }
+        @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="/images/pwa/icon-192.png" onerror="this.remove()" alt="شعار محافظة كفر الشيخ" width="44" height="44">
+        <strong>بوابة محافظة كفر الشيخ</strong>
+    </header>
+    <main id="main-content">
+        <div class="card" role="alert" aria-live="assertive">
+            <div class="kicker">01<span>|</span>وضع عدم الاتصال</div>
+            <h1>لا يوجد اتصال بالإنترنت حالياً</h1>
+            <svg class="wave" viewBox="0 0 120 12" aria-hidden="true"><path d="M0 6 q10 -6 20 0 t20 0 t20 0 t20 0 t20 0 t20 0" fill="none" stroke="#00BFD8" stroke-width="2" stroke-linecap="round"/></svg>
+            <p>تعذّر تحميل هذه الصفحة. تحقّق من اتصالك ثم أعد المحاولة. يمكنك تصفّح الصفحات التي زرتها من قبل.</p>
+            <div class="actions">
+                <button type="button" onclick="location.reload()">إعادة المحاولة</button>
+                <a class="btn" href="/">الصفحة الرئيسية</a>
+            </div>
+        </div>
+    </main>
+    <footer>جميع الحقوق محفوظة &copy; محافظة كفر الشيخ</footer>
+    <script>
+        window.addEventListener('online', function () { location.reload(); });
+    </script>
+</body>
+</html>

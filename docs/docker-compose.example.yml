@@ -1,0 +1,95 @@
+# ILLUSTRATIVE SKETCH ONLY — not wired, not used by the current deployment.
+# Target topology after extracting modules (see docs/architecture.md section 6).
+# Every "*-service" is the same Laravel codebase built with only its module provider enabled
+# (APP_MODULES=<Name>) and its own database.
+
+services:
+  gateway:
+    image: traefik:v3.1
+    command:
+      - --providers.docker=true
+      - --entrypoints.web.address=:80
+    ports: ["80:80"]
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock:ro"]
+
+  keycloak:                       # SSO (OIDC) — Identity
+    image: quay.io/keycloak/keycloak:25.0
+    command: start-dev
+    environment:
+      KC_DB: mysql
+      KC_DB_URL: jdbc:mysql://identity-db:3306/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: change-me
+    labels: ["traefik.http.routers.sso.rule=PathPrefix(`/auth`)"]
+    depends_on: [identity-db]
+
+  identity-db:
+    image: mysql:8.0
+    environment: { MYSQL_DATABASE: keycloak, MYSQL_USER: keycloak, MYSQL_PASSWORD: change-me, MYSQL_RANDOM_ROOT_PASSWORD: "yes" }
+
+  rabbitmq:                       # message broker (domain events via outbox relay)
+    image: rabbitmq:3.13-management
+    ports: ["15672:15672"]
+
+  redis:
+    image: redis:7
+
+  monolith:                       # strangler-fig shell: everything not yet extracted
+    build: { context: ., dockerfile: docker/php.Dockerfile }
+    environment:
+      APP_MODULES: Content,Citizen,Gis,RemovalGovernance,Investment,Tourism
+      DB_HOST: monolith-db
+      OIDC_ISSUER: http://keycloak:8080/realms/kfs
+      BROKER_URL: amqp://guest:guest@rabbitmq:5672
+    labels: ["traefik.http.routers.monolith.rule=PathPrefix(`/`)", "traefik.http.routers.monolith.priority=1"]
+    depends_on: [monolith-db, rabbitmq, redis]
+
+  monolith-db:
+    image: mysql:8.0
+    environment: { MYSQL_DATABASE: kfs, MYSQL_RANDOM_ROOT_PASSWORD: "yes" }
+
+  payments-service:
+    build: { context: ., dockerfile: docker/php.Dockerfile }
+    environment: { APP_MODULES: Payments, DB_HOST: payments-db, BROKER_URL: "amqp://guest:guest@rabbitmq:5672" }
+    labels: ["traefik.http.routers.payments.rule=PathPrefix(`/payments`) || PathPrefix(`/efinance`) || PathPrefix(`/receipts`)"]
+    depends_on: [payments-db, rabbitmq]
+  payments-db:
+    image: mysql:8.0
+    environment: { MYSQL_DATABASE: payments, MYSQL_RANDOM_ROOT_PASSWORD: "yes" }
+
+  marketplace-service:            # extraction step 1
+    build: { context: ., dockerfile: docker/php.Dockerfile }
+    environment: { APP_MODULES: Marketplace, DB_HOST: marketplace-db, BROKER_URL: "amqp://guest:guest@rabbitmq:5672" }
+    labels: ["traefik.http.routers.store.rule=PathPrefix(`/store`) || PathPrefix(`/vendor`) || PathPrefix(`/store-admin`)"]
+    depends_on: [marketplace-db, rabbitmq]
+  marketplace-db:
+    image: mysql:8.0
+    environment: { MYSQL_DATABASE: marketplace, MYSQL_RANDOM_ROOT_PASSWORD: "yes" }
+
+  syndicate-service:              # extraction step 2
+    build: { context: ., dockerfile: docker/php.Dockerfile }
+    environment: { APP_MODULES: Syndicate, DB_HOST: syndicate-db, BROKER_URL: "amqp://guest:guest@rabbitmq:5672" }
+    labels: ["traefik.http.routers.syndicate.rule=PathPrefix(`/syndicate`)"]
+    depends_on: [syndicate-db, rabbitmq]
+  syndicate-db:
+    image: mysql:8.0
+    environment: { MYSQL_DATABASE: syndicate, MYSQL_RANDOM_ROOT_PASSWORD: "yes" }
+
+  estidama-service:               # extraction step 3
+    build: { context: ., dockerfile: docker/php.Dockerfile }
+    environment: { APP_MODULES: Estidama, DB_HOST: estidama-db, BROKER_URL: "amqp://guest:guest@rabbitmq:5672" }
+    labels: ["traefik.http.routers.estidama.rule=PathPrefix(`/estidama`) || PathPrefix(`/estidama_panal`)"]
+    depends_on: [estidama-db, rabbitmq]
+  estidama-db:
+    image: mysql:8.0
+    environment: { MYSQL_DATABASE: estidama, MYSQL_RANDOM_ROOT_PASSWORD: "yes" }
+
+  outbox-relay:                   # publishes outbox rows of every service to RabbitMQ
+    build: { context: ., dockerfile: docker/php.Dockerfile }
+    command: php artisan outbox:relay
+    depends_on: [rabbitmq]
+
+  worker:                         # event consumers / queues
+    build: { context: ., dockerfile: docker/php.Dockerfile }
+    command: php artisan queue:work --queue=events,default
+    depends_on: [rabbitmq, redis]

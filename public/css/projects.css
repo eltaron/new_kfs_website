@@ -1,0 +1,212 @@
+/* --- Projects Archive Page Styles (projects.index) --- */
+/* New Project Card Design for Archive Page */
+.project-archive-card {
+    background-color: var(--kfs-surface);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+.project-archive-card .card-image-link {
+    display: block;
+    position: relative;
+}
+.project-archive-card .card-image {
+    height: 250px;
+    background-color: var(--kfs-ivory-2);
+    transition: all 0.4s ease;
+}
+.project-archive-card .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition:
+        transform 0.4s ease,
+        filter 0.4s ease;
+}
+/* Special style for logos to not stretch */
+.project-archive-card .card-image.is-logo img {
+    object-fit: contain;
+    padding: 2rem;
+}
+.project-archive-card:hover .card-image img {
+    transform: scale(1.08);
+    filter: brightness(0.7);
+}
+.project-archive-card .highlight-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px; /* for RTL */
+    background-color: var(--kfs-gold-deep);
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    z-index: 2;
+}
+
+.project-archive-card .card-content {
+    padding: 1.5rem;
+    text-align: center;
+    border-top: 1px solid rgba(40, 39, 36, .12);
+    background-color: var(--kfs-surface);
+}
+.project-archive-card .card-title {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+.project-archive-card .card-title a {
+    color: var(--kfs-text);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+.project-archive-card .card-title a:hover {
+    color: var(--kfs-gold-deep);
+}
+/* --- Single Project Page Styles (projects.show) --- */
+
+.project-details-wrapper {
+    background-color: var(--kfs-surface);
+    padding: 3rem;
+    border-radius: 16px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.07);
+}
+
+.project-section {
+    margin-bottom: 3.5rem;
+}
+.project-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid rgba(40, 39, 36, .12);
+    color: var(--kfs-text);
+}
+
+/* Project Gallery (Swiper.js) */
+.project-gallery-slider {
+    position: relative;
+    padding: 10px; /* Add padding for shadow and overflow visibility */
+}
+.project-gallery-slider .swiper-slide {
+    height: 250px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+.project-gallery-slider .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+.project-gallery-slider .swiper-slide:hover img {
+    transform: scale(1.08);
+}
+.project-gallery-slider .swiper-button-next,
+.project-gallery-slider .swiper-button-prev {
+    color: var(--kfs-gold-deep);
+}
+
+/* Reusing Map Wrapper style from investment page */
+.map-iframe-wrapper-fullwidth {
+    /* ... (CSS from previous response) ... */
+    background-color: var(--kfs-surface);
+    padding: 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+.map-iframe-wrapper-fullwidth iframe {
+    border-radius: 12px;
+}
+
+.map-section {
+    padding-top: 2.5rem;
+    margin-top: 2.5rem;
+    border-top: 1px solid rgba(40, 39, 36, .12);
+}
+
+.sub-section-title {
+    font-size: 2rem; /* Or 1.8rem if you prefer it smaller */
+    font-weight: 700;
+    color: var(--kfs-text);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.map-iframe-wrapper-fullwidth {
+    background-color: var(--kfs-ivory-2); /* Light grey background */
+    border-radius: var(
+        --border-radius-large,
+        24px
+    ); /* Use your theme's variable or a default value */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    margin: 0 auto; /* Center the container */
+}
+
+.map-iframe-wrapper-fullwidth iframe {
+    display: block; /* Removes any default bottom spacing */
+    width: 100% !important;
+    height: 600px !important; /* Default height, can be adjusted */
+    border: none;
+    border-radius: 12px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .map-iframe-wrapper-fullwidth iframe {
+        height: 500px;
+    }
+}
+@media (max-width: 768px) {
+    .map-iframe-wrapper-fullwidth iframe {
+        height: 400px; /* A more suitable height for mobile screens */
+    }
+}
+
+/* Sidebar Call-to-Action Widget */
+.cta-widget {
+    background: linear-gradient(145deg, var(--kfs-gold), var(--kfs-gold-dark));
+    color: #fff;
+    padding: 2.5rem;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(216, 176, 62, 0.3);
+}
+.cta-widget .cta-icon {
+    font-size: 3rem;
+    line-height: 1;
+    opacity: 0.5;
+    margin-bottom: 1.5rem;
+}
+.cta-widget h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+}
+.cta-widget .btn-light {
+    background-color: var(--kfs-surface);
+    color: var(--kfs-gold-deep);
+    border: none;
+    font-weight: bold;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+.cta-widget .btn-light:hover {
+    background-color: var(--kfs-ivory-2);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}

@@ -1,0 +1,397 @@
+/* --- Variables & Core Styles --- */
+:root {
+    --map-navy: var(--kfs-dark);
+    --map-gold: var(--kfs-gold);
+    --map-light-bg: var(--kfs-ivory-2);
+    --map-border: var(--kfs-ivory-2);
+    --map-text-main: var(--kfs-charcoal);
+    --map-text-muted: #636e72;
+}
+
+/* تخطيط الصفحة الكاملة */
+.full-map-layout {
+    display: flex;
+    height: calc(100vh - 80px); /* يملأ الشاشة مع استثناء الهيدر */
+    direction: rtl;
+    background: var(--kfs-surface);
+    overflow: hidden;
+}
+
+/* --- 1. القائمة الجانبية (Sidebar) --- */
+.map-sidebar {
+    width: min(380px, 100%);
+    background: var(--kfs-surface);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-left: 2px solid var(--map-border);
+    z-index: 1000;
+    box-shadow: -10px 0 35px rgba(0, 0, 0, 0.08);
+}
+
+.sidebar-header {
+    padding: 35px 20px;
+    background: var(--map-navy);
+    color: #fff;
+    border-bottom: 5px solid var(--map-gold);
+    text-align: center;
+}
+
+.sidebar-header h4 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.sidebar-header p {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    letter-spacing: 0.5px;
+}
+
+/* --- 2. أزرار التصفية (Filter Tabs) --- */
+.category-tabs {
+    background: var(--kfs-ivory-2);
+    padding: 12px 15px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--map-border);
+    white-space: nowrap;
+}
+
+.cat-tab {
+    padding: 10px 22px;
+    background: var(--kfs-surface);
+    color: var(--map-text-muted);
+    border: 1px solid rgba(40, 39, 36, .12);
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cat-tab:hover {
+    border-color: var(--map-gold);
+    color: var(--map-gold);
+}
+
+.cat-tab.active {
+    background: var(--map-gold);
+    color: var(--map-navy);
+    border-color: var(--map-gold);
+    box-shadow: 0 4px 12px rgba(216, 176, 62, 0.3);
+}
+
+/* --- 3. قائمة العناصر (Items List) --- */
+.items-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: var(--kfs-surface);
+}
+
+.map-item-card {
+    background: var(--kfs-surface);
+    border: 1px solid var(--map-border);
+    border-radius: 18px;
+    padding: 12px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+}
+
+.map-item-card:hover {
+    transform: translateX(-8px);
+    border-color: var(--map-gold);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.map-item-card.active {
+    background: var(--kfs-ivory);
+    border-right: 5px solid var(--map-gold);
+}
+
+.map-item-card img {
+    width: 65px;
+    height: 65px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: var(--kfs-ivory-2);
+}
+
+.map-item-card .info {
+    flex: 1;
+}
+
+.map-item-card .info h6 {
+    color: var(--map-navy);
+    font-weight: 800;
+    font-size: 0.95rem;
+    margin: 0 0 5px 0;
+}
+
+.map-item-card .info small {
+    display: inline-block;
+    background: var(--kfs-ivory-2);
+    color: var(--map-text-muted);
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+/* --- 4. منطقة الخريطة (Map Viewer) --- */
+.map-viewer {
+    flex-grow: 1;
+    position: relative;
+    background: #e5e9ec;
+}
+
+#fullInteractiveMap {
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+}
+
+/* تعديل واجهة النافذة المنبثقة للخريطة */
+.leaflet-popup-content-wrapper {
+    border-radius: 15px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.pop-content {
+    padding: 5px;
+    min-width: 180px;
+}
+
+.pop-content img {
+    width: 100%;
+    height: 110px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.pop-content h6 {
+    margin: 10px 0 5px;
+    font-weight: 800;
+    color: var(--map-navy);
+}
+
+.pop-content .btn-dark {
+    background: var(--map-navy) !important;
+    border: none;
+    font-size: 0.8rem;
+    padding: 6px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* --- 6. Responsive للهواتف --- */
+@media (max-width: 991px) {
+    .full-map-layout {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .map-sidebar {
+        width: 100%;
+        height: 450px;
+        border-left: none;
+        border-bottom: 3px solid var(--map-border);
+    }
+
+    #fullInteractiveMap {
+        height: 500px;
+    }
+
+    .sidebar-header {
+        padding: 20px;
+    }
+
+    .map-item-card:hover {
+        transform: translateY(-5px); /* حركة للأعلى في الموبايل */
+    }
+}
+/* --- إعدادات الصفحة الأساسية --- */
+.full-map-layout {
+    display: flex;
+    height: calc(100vh - 100px); /* يملأ الشاشة مع طرح ارتفاع الهيدر الرئيسي */
+    direction: rtl;
+    background: var(--kfs-surface);
+    overflow: hidden; /* لمنع سكرول الصفحة الرئيسية */
+}
+
+/* --- 1. السايدبار (Sidebar) --- */
+.map-sidebar {
+    width: min(400px, 100%);
+    background: var(--kfs-surface);
+    display: flex;
+    flex-direction: column; /* ترتيب العناصر عمودياً */
+    height: 100%;
+    border-left: 1px solid rgba(40, 39, 36, .12);
+    z-index: 1000;
+}
+
+/* الهيدر الأسود */
+.sidebar-header {
+    padding: 25px 20px;
+    background: var(--kfs-dark);
+    color: #fff;
+    flex-shrink: 0; /* منع الهيدر من التقلص */
+    border-bottom: 4px solid var(--kfs-gold);
+}
+
+/* حاوية التبويبات (هنا حل مشكلة الاختفاء) */
+.category-tabs-container {
+    padding: 10px;
+    background: var(--kfs-ivory-2);
+    border-bottom: 1px solid rgba(40, 39, 36, .12);
+    flex-shrink: 0; /* ضمان بقاء التبويبات ظاهرة دائماً */
+}
+
+.category-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.cat-tab {
+    padding: 8px 18px;
+    background: var(--kfs-surface);
+    border: 1px solid rgba(40, 39, 36, .12);
+    border-radius: 50px;
+    white-space: nowrap;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.cat-tab.active {
+    background: var(--kfs-gold);
+    border-color: var(--kfs-gold);
+    color: var(--kfs-dark);
+}
+
+/* القائمة (هنا حل مشكلة السكرول) */
+.items-list {
+    flex-grow: 1; /* جعل القائمة تأخذ كل المساحة المتبقية */
+    overflow-y: auto !important; /* تفعيل السكرول بداخل القائمة فقط */
+    padding: 15px;
+    background: var(--kfs-surface);
+}
+
+.map-item-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: var(--kfs-surface);
+    border: 1px solid var(--kfs-papyrus);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    transition: 0.3s;
+}
+
+.map-item-card:hover {
+    border-color: var(--kfs-gold);
+    transform: translateX(-5px);
+}
+
+.map-item-card img,
+.no-img-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.no-img-icon {
+    background: var(--kfs-ivory-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--kfs-gold-deep);
+    font-size: 1.5rem;
+}
+
+.info h6 {
+    margin: 0;
+    font-weight: 800;
+    font-size: 0.95rem;
+}
+.info small {
+    color: var(--kfs-text-soft);
+}
+
+/* --- الخريطة --- */
+.map-viewer {
+    flex-grow: 1;
+    height: 100%;
+}
+#fullInteractiveMap {
+    height: 100%;
+    width: 100%;
+}
+
+/* للموبايل */
+@media (max-width: 991px) {
+    .full-map-layout {
+        flex-direction: column;
+        height: auto;
+    }
+    .map-sidebar {
+        width: 100%;
+        height: 50vh;
+    }
+    .map-viewer {
+        height: 50vh;
+    }
+}
+/* حاوية التبويبات - ضمان ظهورها وعدم تقلصها */
+.category-tabs-container {
+    padding: 12px 10px;
+    background: var(--kfs-ivory-2);
+    border-bottom: 1px solid rgba(40, 39, 36, .12);
+    flex-shrink: 0;
+    width: 100%;
+    overflow: hidden; /* لمنع أي مشاكل خارج الحاوية */
+}
+
+.category-tabs {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap; /* إجبار العناصر على البقاء في سطر واحد */
+    overflow-x: auto; /* تفعيل التمرير الأفقي */
+    overflow-y: hidden;
+    gap: 8px;
+    padding-bottom: 10px; /* مساحة بسيطة للسكرول بار */
+}
+
+.cat-tab {
+    flex: 0 0 auto; /* منع الأزرار من الضغط أو التقلص */
+    padding: 8px 18px;
+    background: var(--kfs-surface);
+    border: 1px solid rgba(40, 39, 36, .12);
+    border-radius: 50px;
+    white-space: nowrap; /* منع انقسام النص داخل الزر */
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cat-tab.active {
+    background: var(--kfs-gold);
+    border-color: var(--kfs-gold);
+    color: var(--kfs-dark);
+}

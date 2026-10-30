@@ -1,0 +1,233 @@
+/*!
+ * KFS Sections (v2) — shared section-level pieces that are not cards:
+ * rich footer, legacy hero blocks, empty states, forms, tables, prose.
+ * Home-page sections and the card family now live in kfs-ds.css §10–12.
+ * Built on the tokens in kfs-ds.css; motion lives in kfs-motion.css.
+ */
+
+:root { --kfs-page-bg: var(--kfs-bg); }
+.kfs-home { overflow-x: clip; }
+
+/* =====================================================================
+   14. FOOTER (rich)
+   ===================================================================== */
+.kfs-footer--rich {
+    margin-top: 0;
+    padding-top: clamp(40px, 6vw, 70px);
+    overflow: hidden;
+}
+.kfs-footer__top { position: absolute; top: 0; left: 0; right: 0; height: clamp(34px, 5.5vw, 74px); }
+.kfs-footer__top .kfs-wavebar { height: 100%; }
+.kfs-footer__watermark { position: absolute; inset-inline-start: -60px; bottom: 40px; z-index: -1; color: var(--kfs-gold); opacity: .045; pointer-events: none; }
+.kfs-footer__watermark .kfs-lotus { stroke-width: .5; }
+.kfs-footer .footer-heading::after { transition: width .5s var(--ease); }
+.kfs-footer nav:hover .footer-heading::after { width: 56px; }
+.kfs-footer ul.footer-links a { transition: color .3s, transform .3s var(--ease); }
+.kfs-footer__socials a { transition: background-color .3s, color .3s, transform .35s var(--ease), border-color .3s; }
+
+.kfs-footer__tools button[aria-pressed="true"] { background: rgba(216, 176, 62, .16); border-color: var(--kfs-gold); color: #fff; }
+.kfs-govbar__btn[data-motion-toggle][aria-pressed="true"] { color: #fff; border-color: rgba(216, 176, 62, .45); background: rgba(216, 176, 62, .12); }
+
+/* =====================================================================
+   15. PAGE HERO — every inner page uses <x-kfs.page-hero/> (public/css/kfs-hero.css)
+   ===================================================================== */
+
+/* =====================================================================
+   16. EMPTY STATES  <x-kfs.empty-state/>
+   ===================================================================== */
+.kfs-empty {
+    text-align: center;
+    padding: clamp(32px, 5vw, 56px) 1.25rem;
+    background: var(--kfs-surface);
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--r-lg);
+    max-width: 720px;
+    margin: 0 auto;
+}
+.kfs-empty--compact { padding: 1.5rem 1rem; }
+.kfs-empty__art { width: min(200px, 60%); height: auto; margin: 0 auto 1rem; display: block; overflow: visible; }
+.kfs-empty__art .e-sun { fill: rgba(216, 176, 62, .2); }
+.kfs-empty__art .e-sun-ring { fill: none; stroke: var(--kfs-gold); stroke-width: 1; stroke-dasharray: 3 5; }
+.kfs-empty__art .e-card { fill: var(--kfs-ivory); stroke: var(--kfs-bronze-light); stroke-width: 1.5; }
+.kfs-empty__art .e-fold { fill: none; stroke: var(--kfs-bronze-light); stroke-width: 1.5; }
+.kfs-empty__art .e-mark { fill: none; stroke: var(--kfs-cyan-deep); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.kfs-empty__art .e-gold { fill: none; stroke: var(--kfs-gold); stroke-width: 3; stroke-linecap: round; }
+.kfs-empty__art .e-gold-fill { fill: var(--kfs-gold); }
+.kfs-empty__art .e-wave { fill: none; stroke: var(--kfs-cyan); stroke-width: 2; stroke-linecap: round; }
+.kfs-empty__art .e-wave--2 { opacity: .45; stroke-width: 1.5; }
+.kfs-empty__title { font-size: 1.25rem; margin-bottom: .4rem; color: var(--kfs-charcoal); }
+.kfs-empty__text { color: var(--kfs-text-soft); margin: 0 auto; max-width: 480px; }
+.kfs-empty__actions { margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; }
+
+/* =====================================================================
+   17. FORMS — focus glow, floating labels, nicer controls
+   ===================================================================== */
+.form-control, .form-select { transition: border-color .3s var(--ease), box-shadow .3s var(--ease), background-color .3s; }
+.form-control:focus, .form-select:focus { border-color: var(--kfs-cyan); box-shadow: 0 0 0 3px var(--kfs-cyan-soft); background-color: var(--kfs-surface); }
+.form-control:hover:not(:focus):not(:disabled), .form-select:hover:not(:focus):not(:disabled) { border-color: rgba(40, 39, 36, .3); }
+.form-floating > .form-control:focus ~ label, .form-floating > .form-control:not(:placeholder-shown) ~ label, .form-floating > .form-select ~ label { color: var(--kfs-cyan-ink); }
+.form-floating > label::after { background-color: transparent !important; }
+/* .kfs-ffield — floating label without Bootstrap markup: <div class="kfs-ffield"><input placeholder=" "><label></label></div> */
+.kfs-ffield { position: relative; }
+.kfs-ffield > input, .kfs-ffield > textarea, .kfs-ffield > select { width: 100%; padding: 1.35rem .9rem .45rem; border: 1px solid var(--line-strong); border-radius: var(--r); background: var(--kfs-surface); transition: border-color .3s, box-shadow .3s; }
+.kfs-ffield > label { position: absolute; top: .95rem; inset-inline-start: .9rem; color: var(--kfs-text-soft); font-weight: 500; pointer-events: none; transform-origin: right top; transition: transform .25s var(--ease), color .25s, top .25s var(--ease); }
+[dir="ltr"] .kfs-ffield > label { transform-origin: left top; }
+.kfs-ffield > :focus { outline: none; border-color: var(--kfs-cyan); box-shadow: 0 0 0 3px var(--kfs-cyan-soft); }
+.kfs-ffield > :focus ~ label, .kfs-ffield > :not(:placeholder-shown) ~ label { top: .35rem; transform: scale(.78); color: var(--kfs-cyan-ink); }
+.invalid-feedback, .text-danger.small { animation: none; }
+html.kfs-motion .is-invalid ~ .invalid-feedback { animation: kfs-fade-up .35s var(--ease-out) both; }
+.form-check-input { transition: background-color .25s, border-color .25s, box-shadow .25s; }
+.form-control[type="file"]::file-selector-button { background: var(--kfs-papyrus); color: var(--kfs-charcoal); border-inline-end: 1px solid var(--line); font-weight: 600; }
+
+/* =====================================================================
+   18. TABLES, PAGINATION, PROSE
+   ===================================================================== */
+.table { --bs-table-bg: var(--kfs-surface); }
+.table > tbody > tr { transition: background-color .25s; }
+.table-responsive { border: 1px solid var(--line); box-shadow: var(--shadow); background: var(--kfs-surface); }
+.table-responsive > .table { margin-bottom: 0; }
+.pagination { gap: .35rem; flex-wrap: wrap; justify-content: center; }
+.page-link { transition: background-color .2s, color .2s, border-color .2s; font-family: var(--ff-head); }
+.page-link:hover { border-color: var(--kfs-primary); }
+.page-item.active .page-link { background: var(--kfs-dark); border-color: var(--kfs-dark); color: #fff; }
+
+.article-inner, .block-body, .kfs-prose, .official-bio, .service-content, .landmark-details {
+    font-size: 1.06rem;
+    line-height: 2;
+    color: var(--kfs-text);
+}
+:is(.article-inner, .block-body, .kfs-prose) h2,
+:is(.article-inner, .block-body, .kfs-prose) h3 { margin: 1.8rem 0 .8rem; padding-inline-start: .85rem; border-inline-start: 3px solid var(--kfs-gold); line-height: 1.5; }
+:is(.article-inner, .block-body, .kfs-prose) p { margin-bottom: 1.15rem; }
+:is(.article-inner, .block-body, .kfs-prose) img { border-radius: var(--r-lg); margin-block: 1rem; height: auto; }
+:is(.article-inner, .block-body, .kfs-prose) a { color: var(--kfs-cyan-ink); text-decoration: underline; text-decoration-color: var(--line-cyan); text-underline-offset: 4px; }
+:is(.article-inner, .block-body, .kfs-prose) a:hover { text-decoration-color: currentColor; }
+:is(.article-inner, .block-body, .kfs-prose) blockquote { margin: 1.5rem 0; padding: 1rem 1.25rem; background: var(--kfs-papyrus); border-inline-start: 4px solid var(--kfs-cyan); border-radius: var(--r); color: var(--kfs-charcoal); }
+:is(.article-inner, .block-body, .kfs-prose) ul li::marker, :is(.article-inner, .block-body, .kfs-prose) ol li::marker { color: var(--kfs-gold-deep); }
+:is(.article-inner, .block-body, .kfs-prose) table { width: 100%; display: block; overflow-x: auto; }
+.featured-image { border-radius: var(--r-lg); }
+.post-content-card .featured-image { width: 100%; height: auto; max-height: 520px; object-fit: cover; }
+
+/* Legacy cards on inner pages: unify the hover language */
+:is(.investment-archive-card, .landmark-item, .project-card, .directory-card, .official-card, .program-card, .gis-service-card) {
+    transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease), border-color var(--dur-2);
+}
+:is(.investment-archive-card, .landmark-item, .project-card, .directory-card, .official-card, .program-card, .gis-service-card):hover { transform: translateY(-3px); box-shadow: var(--e-2); }
+
+@media print {
+    .kfs-wavebar, .kfs-float, .kfs-ticker, .kfs-page-progress, .kfs-toasts, .kfs-lightbox, .kfs-footer__top, .kfs-footer__watermark { display: none !important; }
+}
+
+.comment-form-container h3 { color: #fff; }
+
+
+/* Footer «كيف نقدر نساعدك؟» help panel — one teal card: intro + 4 quick channels separated by hairlines */
+.kfs-footer__help {
+    position: relative;
+    margin-top: 85px;
+    display: grid;
+    grid-template-columns: minmax(290px, 1.15fr) minmax(0, 3.2fr);
+    align-items: stretch;
+    border-radius: 22px;
+    overflow: hidden;
+    background: linear-gradient(120deg, #00788A 0%, #0B5A63 55%, #164249 100%);
+    box-shadow: 0 30px 60px -34px rgba(0, 0, 0, .8), inset 0 0 0 1px rgba(255, 253, 225, .10);
+    isolation: isolate;
+}
+.kfs-footer__help::before { content: ""; position: absolute; inset-inline: 0; top: 0; height: 4px; background: linear-gradient(90deg, var(--kfs-gold), var(--kfs-gold-light), var(--kfs-gold)); z-index: 1; }
+.kfs-footer__help::after { /* faint diamond pattern */
+    content: ""; position: absolute; inset: 0; z-index: -1; opacity: .08; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cpath d='M22 3 41 22 22 41 3 22Z' fill='none' stroke='%23FFFDE1' stroke-width='1'/%3E%3C/svg%3E");
+}
+.kfs-footer__help-intro {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1.8rem 1.6rem;
+    background: rgba(29, 36, 34, .28);
+    border-inline-end: 1px solid rgba(255, 253, 225, .12);
+}
+.kfs-footer__help-ico {
+    flex: none; width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center;
+    background: var(--kfs-gold); color: var(--kfs-charcoal); font-size: 1.35rem;
+    box-shadow: 0 10px 22px -10px rgba(216, 176, 62, .8);
+}
+.kfs-footer__help-title { margin: 0; font-family: var(--ff-head); font-weight: 800; font-size: 1.3rem; color: #fff; line-height: 1.3; }
+.kfs-footer__help-sub { margin: .3rem 0 0; font-size: var(--fs-sm); color: rgba(255, 253, 225, .78); line-height: 1.6; }
+
+.kfs-footer .kfs-footer__help .kfs-footer__quick {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0;
+}
+.kfs-footer .kfs-footer__help .kfs-footer__quick > li { display: flex; min-width: 0; }
+.kfs-footer .kfs-footer__help .kfs-footer__quick > li + li { border-inline-start: 1px solid rgba(255, 253, 225, .12); }
+.kfs-footer .kfs-footer__help .kfs-footer__qitem {
+    position: relative; flex: 1; min-width: 0;
+    display: flex; flex-direction: column; align-items: flex-start; gap: .75rem;
+    padding: 1.6rem 1.4rem 1.5rem;
+    color: #fff; text-decoration: none;
+    transition: background-color .3s;
+}
+.kfs-footer .kfs-footer__help .kfs-footer__qitem:hover, .kfs-footer .kfs-footer__help .kfs-footer__qitem:focus-visible { background: rgba(255, 253, 225, .08); color: #fff; }
+.kfs-footer .kfs-footer__help .kfs-footer__qitem:focus-visible { outline: 3px solid var(--kfs-gold); outline-offset: -3px; }
+.kfs-footer .kfs-footer__help .kfs-footer__qicon {
+    flex: 0 0 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--r);
+    background: rgba(0, 191, 216, .1);
+    color: var(--kfs-cyan);
+    font-size: 1.15rem;
+    border: 1px solid rgba(0, 191, 216, .3);
+    margin-right: 6px;
+    padding: 14px;
+}
+.kfs-footer .kfs-footer__help .kfs-footer__qtext { display: flex; flex-direction: column; gap: .2rem; min-width: 0; }
+.kfs-footer .kfs-footer__help .kfs-footer__qtext strong { font-family: var(--ff-head); font-size: 1.02rem; color: #fff; }
+.kfs-footer .kfs-footer__help .kfs-footer__qtext small { color: rgba(255, 253, 225, .72); font-size: .82rem; line-height: 1.5; }
+.kfs-footer .kfs-footer__help .kfs-footer__qarrow {
+    position: absolute; top: 1.6rem; inset-inline-end: 1.3rem;
+    color: var(--kfs-gold-light); font-size: .85rem; opacity: .55;
+    transition: transform .35s var(--ease), opacity .3s;
+}
+.kfs-footer .kfs-footer__help .kfs-footer__qitem:hover .kfs-footer__qarrow { opacity: 1; transform: translateX(-5px); }
+[dir="ltr"] .kfs-footer .kfs-footer__help .kfs-footer__qitem:hover .kfs-footer__qarrow { transform: translateX(5px); }
+.kfs-footer__orn { margin: clamp(28px, 4vw, 44px) auto; max-width: 100%; }
+
+@media (max-width: 1199.98px) {
+    .kfs-footer__help { grid-template-columns: 1fr; }
+    .kfs-footer__help-intro { border-inline-end: 0; border-bottom: 1px solid rgba(255, 253, 225, .12); padding: 1.3rem 1.4rem; }
+}
+@media (max-width: 767.98px) {
+    .kfs-footer .kfs-footer__help .kfs-footer__quick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .kfs-footer .kfs-footer__help .kfs-footer__quick > li:nth-child(odd) { border-inline-start: 0; }
+    .kfs-footer .kfs-footer__help .kfs-footer__quick > li:nth-child(n+3) { border-top: 1px solid rgba(255, 253, 225, .12); }
+    .kfs-footer .kfs-footer__help .kfs-footer__qitem { padding: 1.2rem 1rem; gap: .6rem; }
+    .kfs-footer .kfs-footer__help .kfs-footer__qarrow { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .kfs-footer .kfs-footer__help .kfs-footer__qitem, .kfs-footer .kfs-footer__help .kfs-footer__qarrow { transition: none !important; }
+}
+
+.kfs-footer .kfs-footer__help .kfs-footer__help-title { color: #fff; padding: 0; border: 0; white-space: nowrap; }
+.kfs-footer .kfs-footer__help .kfs-footer__help-title::after, .kfs-footer .kfs-footer__help .kfs-footer__help-title::before { display: none; content: none; }
+.kfs-footer .kfs-footer__help .kfs-footer__qicon i { width: auto; color: inherit; font-size: inherit; }
+
+
+/* Footer top: the area above the wave is transparent and the footer is pulled up by the
+   wave height, so that area overlaps the end of the page content and shows the last
+   section's own background (not the body canvas); the dark footer colour starts at the
+   wave, which is filled below its line. Clicks in the overlap fall through to the content.
+   The last content block gets a transparent bottom border of the same height (painted with
+   its own background) so the wave never covers its content. */
+:root { --kfs-footer-wave-h: clamp(34px, 5.5vw, 74px); }
+#main-content > :last-child { border-bottom: var(--kfs-footer-wave-h) solid transparent; }
+.kfs-footer.kfs-footer--rich {
+    margin-top: calc(-1 * var(--kfs-footer-wave-h));
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent 0, transparent calc(var(--kfs-footer-wave-h) - 1px), var(--kfs-footer-bg, var(--kfs-dark-2)) calc(var(--kfs-footer-wave-h) - 1px));
+}
+.kfs-footer.kfs-footer--rich > :not(.kfs-footer__top) { pointer-events: auto; }
+.kfs-footer.kfs-footer--rich::before { top: var(--kfs-footer-wave-h); }
+.kfs-footer__top { height: var(--kfs-footer-wave-h, clamp(34px, 5.5vw, 74px)); }
+.kfs-footer__top .kfs-wavebar { top: 0; bottom: auto; height: 100%; }

@@ -1,0 +1,252 @@
+/*!
+ * KFS Page Hero (v2.1) — the single inner-page hero  <x-kfs.page-hero/>
+ * Loaded after page-level @stack('css') so legacy per-page rules cannot override it.
+ * Dark-green identity band in BOTH themes (built from --kfs-dark tokens), subtle diamond lattice,
+ * optional photo under a dark-green overlay, breadcrumb pill, start-aligned title, gold/ivory
+ * type, optional meta chips + actions, static gold wave base filled with the page colour.
+ * Sizes: --default · --compact (forms, dashboards, auth) · --detail (articles, records).
+ */
+
+.kfs-page-hero {
+    --hero-ink-1: var(--kfs-dark-2, #1D2422);
+    --hero-ink-2: var(--kfs-dark, #26302D);
+    --hero-ink-3: var(--kfs-dark-soft, #34413D);
+    --hero-text: var(--kfs-on-dark, #FFFDE1);
+    --hero-text-soft: color-mix(in srgb, var(--kfs-on-dark, #FFFDE1) 80%, transparent);
+    --hero-pad-top: clamp(28px, 4.2vw, 56px);
+    --hero-pad-bottom: clamp(40px, 5.6vw, 76px);
+    --hero-wave-h: clamp(22px, 3vw, 40px);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    color: var(--hero-text);
+    background: var(--hero-ink-2);
+    padding: var(--hero-pad-top) 0 calc(var(--hero-pad-bottom) + var(--hero-wave-h) * .5);
+    margin-bottom: clamp(28px, 4vw, 48px);
+    border: 0;
+    text-align: start;
+}
+.kfs-page-hero:not(.has-wave) { border-bottom: 3px solid var(--kfs-gold); padding-bottom: var(--hero-pad-bottom); }
+.kfs-page-hero--compact { --hero-pad-top: clamp(22px, 3vw, 36px); --hero-pad-bottom: clamp(28px, 3.6vw, 48px); }
+.kfs-page-hero--detail { --hero-pad-top: clamp(24px, 3.6vw, 48px); --hero-pad-bottom: clamp(36px, 4.6vw, 64px); }
+
+/* ---- Background layers: brand gradient → photo → overlay → lattice ---- */
+.kfs-page-hero > .kfs-page-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(60% 120% at 0% 0%, rgba(0, 191, 216, .14), transparent 60%),
+        radial-gradient(50% 90% at 100% 100%, rgba(216, 176, 62, .10), transparent 65%),
+        linear-gradient(135deg, var(--hero-ink-1) 0%, var(--hero-ink-2) 55%, var(--hero-ink-3) 100%);
+}
+.kfs-page-hero__img {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: saturate(.85);
+}
+/* dark-green overlay: strongest behind the (start-aligned) text, lighter toward the end */
+.kfs-page-hero__bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(to left,
+        color-mix(in srgb, var(--hero-ink-1) 96%, transparent) 0%,
+        color-mix(in srgb, var(--hero-ink-2) 90%, transparent) 45%,
+        color-mix(in srgb, var(--hero-ink-2) 78%, transparent) 100%);
+    opacity: 0;
+}
+.kfs-page-hero.has-image .kfs-page-hero__bg::before { opacity: 1; }
+/* subtle diamond lattice, fades out toward the text side */
+.kfs-page-hero__bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background-image:
+        repeating-linear-gradient(45deg, rgba(216, 176, 62, .07) 0 1px, transparent 1px 28px),
+        repeating-linear-gradient(-45deg, rgba(216, 176, 62, .07) 0 1px, transparent 1px 28px);
+    -webkit-mask-image: linear-gradient(to left, transparent 15%, #000 85%);
+    mask-image: linear-gradient(to left, transparent 15%, #000 85%);
+}
+.kfs-page-hero.has-image .kfs-page-hero__bg::after { opacity: .6; }
+
+.kfs-page-hero__container { position: relative; z-index: 2; }
+
+/* ---- Breadcrumb pill ---- */
+.kfs-page-hero__nav { margin: 0 0 clamp(14px, 2vw, 22px); }
+.kfs-page-hero .breadcrumb {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: .15rem 0;
+    max-width: 100%;
+    margin: 0;
+    padding: .32rem .9rem;
+    font-size: var(--fs-sm, .875rem);
+    line-height: 1.6;
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(255, 255, 255, .11);
+    border-radius: 999px;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+.kfs-page-hero .breadcrumb-item { color: var(--hero-text-soft); }
+.kfs-page-hero .breadcrumb-item + .breadcrumb-item::before { color: var(--kfs-gold); }
+.kfs-page-hero .breadcrumb a { color: var(--kfs-cyan-light, #39D9E8); text-decoration: none; }
+.kfs-page-hero .breadcrumb a:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+.kfs-page-hero .breadcrumb a:focus-visible { outline: 2px solid var(--kfs-gold); outline-offset: 2px; border-radius: 4px; }
+.kfs-page-hero .breadcrumb-item.active {
+    color: var(--hero-text-soft);
+    max-width: 38ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---- Title block ---- */
+.kfs-page-hero__inner { display: flex; align-items: center; gap: clamp(14px, 2vw, 22px); }
+.kfs-page-hero__text { flex: 1 1 0%; min-width: min(100%, 220px); }
+.kfs-page-hero__icon {
+    flex: 0 0 auto;
+    width: 64px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--r-lg, 12px);
+    background: linear-gradient(145deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .03));
+    border: 1px solid rgba(216, 176, 62, .38);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 10px 24px -14px rgba(0, 0, 0, .7);
+    color: var(--kfs-gold-light, #F0D878);
+    font-size: 1.55rem;
+}
+.kfs-page-hero__kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    color: var(--kfs-gold);
+    font-family: var(--ff-head);
+    font-weight: 700;
+    font-size: var(--fs-sm, .875rem);
+    letter-spacing: .01em;
+    margin-bottom: .3rem;
+}
+.kfs-page-hero__kicker::before { content: ""; width: 22px; height: 2px; border-radius: 2px; background: currentColor; }
+.kfs-page-hero .kfs-page-hero__title,
+.kfs-page-hero h1 {
+    color: #fff;
+    font-family: var(--ff-head);
+    font-weight: 800;
+    font-size: var(--fs-2xl);
+    line-height: 1.3;
+    margin: 0;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+    text-shadow: 0 1px 18px rgba(0, 0, 0, .25);
+}
+.kfs-page-hero--compact .kfs-page-hero__title { font-size: var(--fs-xl); }
+.kfs-page-hero--detail .kfs-page-hero__title { font-size: clamp(1.5rem, 2.8vw, 2.25rem); line-height: 1.4; max-width: 30ch; }
+.kfs-page-hero .kfs-page-hero__lead {
+    color: var(--hero-text-soft) !important;
+    max-width: 720px;
+    margin: .5rem 0 0;
+    font-size: var(--fs-md, 1.0625rem);
+    line-height: 1.8;
+    opacity: 1;
+}
+.kfs-page-hero--compact .kfs-page-hero__lead { font-size: var(--fs-base, 1rem); margin-top: .35rem; }
+
+/* ---- Meta chips (detail pages) ---- */
+.kfs-page-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem .6rem;
+    margin-top: .9rem;
+    font-size: var(--fs-sm, .875rem);
+    color: var(--hero-text-soft);
+}
+.kfs-page-hero__meta > * {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .22rem .7rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .07);
+    border: 1px solid rgba(255, 255, 255, .1);
+    color: inherit;
+    text-decoration: none;
+}
+.kfs-page-hero__meta > * > i { color: var(--kfs-gold); }
+.kfs-page-hero__meta a:hover { color: #fff; border-color: rgba(216, 176, 62, .5); }
+
+/* ---- Actions ---- */
+.kfs-page-hero__actions { flex: 0 0 auto; display: flex; flex-wrap: wrap; gap: .6rem; align-self: flex-end; }
+.kfs-page-hero__actions .btn { white-space: nowrap; }
+.kfs-page-hero__actions .btn-kfs-outline {
+    background: rgba(255, 255, 255, .06);
+    color: var(--hero-text);
+    border-color: rgba(255, 255, 255, .3);
+}
+.kfs-page-hero__actions .btn-kfs-outline:hover { background: rgba(255, 255, 255, .14); color: #fff; border-color: var(--kfs-gold); }
+.kfs-page-hero__ghost,
+.kfs-page-hero__actions .btn-outline-light {
+    --bs-btn-color: var(--hero-text);
+    --bs-btn-bg: rgba(255, 255, 255, .06);
+    --bs-btn-border-color: rgba(255, 255, 255, .28);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: rgba(255, 255, 255, .14);
+    --bs-btn-hover-border-color: var(--kfs-gold);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: rgba(255, 255, 255, .18);
+}
+
+/* ---- Wave base (static: v2 has no moving wave in heroes) ---- */
+.kfs-page-hero > .kfs-page-hero__wave.kfs-wavebar {
+    display: block !important;
+    position: absolute;
+    inset: auto 0 -1px 0;
+    height: var(--hero-wave-h);
+    z-index: 3;
+}
+.kfs-page-hero__wave .kfs-wavebar__svg { width: 100%; animation: none !important; }
+.kfs-page-hero__wave .kfs-wavebar__line { stroke-width: 2.5; opacity: 1; }
+.kfs-page-hero__wave .kfs-wavebar__line2 { stroke: var(--kfs-cyan); opacity: .45; }
+
+/* ---- Entrance (only with html.kfs-motion; kfs-motion.css gates .kfs-hero-anim) ---- */
+html.kfs-motion .kfs-page-hero__nav { animation: kfs-fade .6s var(--ease-out, ease-out) both; }
+html.kfs-a11y-noanim .kfs-page-hero *,
+html.kfs-a11y-noanim .kfs-page-hero { animation: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+    .kfs-page-hero, .kfs-page-hero * { animation: none !important; transition: none !important; }
+}
+
+
+/* ---- Responsive ---- */
+@media (max-width: 767.98px) {
+    .kfs-page-hero__inner { flex-wrap: wrap; }
+    .kfs-page-hero__actions { flex: 1 1 100%; align-self: auto; }
+    .kfs-page-hero .breadcrumb-item.active { max-width: 22ch; }
+}
+@media (max-width: 575.98px) {
+    .kfs-page-hero { --hero-pad-top: 20px; --hero-pad-bottom: 30px; --hero-wave-h: 20px; }
+    .kfs-page-hero__inner { align-items: flex-start; gap: 12px; }
+    .kfs-page-hero__icon { width: 46px; height: 46px; font-size: 1.15rem; border-radius: var(--r, 8px); margin-top: .2rem; }
+    .kfs-page-hero .breadcrumb { padding: .25rem .75rem; font-size: var(--fs-xs, .8125rem); }
+    .kfs-page-hero .kfs-page-hero__title { font-size: 1.5rem; }
+    .kfs-page-hero--compact .kfs-page-hero__title, .kfs-page-hero--detail .kfs-page-hero__title { font-size: 1.35rem; }
+    .kfs-page-hero .kfs-page-hero__lead { font-size: var(--fs-base, 1rem); line-height: 1.7; }
+    .kfs-page-hero__actions .btn { flex: 1 1 auto; }
+}
+
+@media print {
+    .kfs-page-hero { background: none !important; color: #000; padding: 0 0 12px; margin-bottom: 12px; border-bottom: 2px solid #000; }
+    .kfs-page-hero__bg, .kfs-page-hero__wave, .kfs-page-hero__nav, .kfs-page-hero__icon, .kfs-page-hero__actions { display: none !important; }
+    .kfs-page-hero .kfs-page-hero__title { color: #000; text-shadow: none; }
+    .kfs-page-hero .kfs-page-hero__lead { color: #333 !important; }
+}

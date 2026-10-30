@@ -1,0 +1,376 @@
+openapi: 3.0.3
+info:
+  title: واجهة تكامل نقابة المهندسين — محافظة كفر الشيخ
+  version: 1.0.0
+  description: |
+    واجهة برمجة لتبادل طلبات وشهادات **الإشراف على المواقع** و**إلغاء الإشراف** بين
+    مجالس المدن / الوحدات المحلية بمحافظة كفر الشيخ ونقابة المهندسين.
+
+    **الأمان**
+    - توكن Sanctum لحساب تكامل (وليس لمستخدم بشري) بالقدرة `syndicate` — يُنشأ بالأمر
+      `php artisan syndicate:token "<الاسم>" --ips=<IP/CIDR> --expires=<أيام>`.
+    - قائمة سماح IP عامة (`SYNDICATE_API_ALLOWED_IPS`) + قائمة خاصة بكل حساب.
+    - حد معدل لكل حساب (`SYNDICATE_API_RATE_LIMIT`، افتراضياً 60 طلب/دقيقة) ⇒ 429.
+    - كل استدعاء (بما فيه المرفوض) يُسجل في `syndicate_api_logs`.
+
+    **Idempotency**: أرسل الترويسة `Idempotency-Key` مع كل POST. تكرار نفس المفتاح بنفس الجسم
+    يعيد الاستجابة المخزنة مع `Idempotent-Replayed: true` دون تنفيذ ثانٍ؛ ونفس المفتاح بجسم مختلف ⇒ 422.
+
+    **الترقيم**: `SYN-REQ-YYYY-NNNNNN` طلب إشراف، `SYN-CRQ-YYYY-NNNNNN` طلب إلغاء،
+    `SYN-SUP-YYYY-NNNNNN` شهادة إشراف، `SYN-CAN-YYYY-NNNNNN` شهادة إلغاء، `SYN-PRJ-YYYY-NNNNNN` مشروع.
+
+    **آلة الحالات**
+    - المشروع: `pending` ⇒ (شهادة إشراف) ⇒ `active` ⇒ (شهادة إلغاء) ⇒ `suspended` ⇒ (شهادة إشراف جديدة) ⇒ `active`.
+    - الطلب: `submitted` ⇒ `under_review` ⇒ (`approved`) ⇒ `completed` | `rejected`.
+    - شهادة الإشراف: `active` ⇒ `cancelled` (بشهادة إلغاء) | `superseded` (بشهادة إشراف أحدث). شهادة سارية واحدة فقط لكل مشروع.
+servers:
+  - url: /api/syndicate/v1
+security:
+  - bearerAuth: []
+tags:
+  - name: الطلبات
+  - name: الشهادات
+  - name: المشروعات
+  - name: دليل المهندسين
+paths:
+  /requests:
+    get:
+      tags: [الطلبات]
+      summary: قائمة الطلبات (مع تصفية)
+      operationId: listRequests
+      parameters:
+        - { name: status, in: query, schema: { $ref: '#/components/schemas/RequestStatus' } }
+        - { name: type, in: query, schema: { type: string, enum: [supervision, cancellation] } }
+        - { name: center, in: query, description: المركز / المدينة, schema: { type: string } }
+        - { name: per_page, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 25 } }
+        - { name: page, in: query, schema: { type: integer, minimum: 1 } }
+      responses:
+        '200':
+          description: صفحة من الطلبات
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/RequestResource' } }
+                  meta:
+                    type: object
+                    properties:
+                      page: { type: object, properties: { current: { type: integer }, per_page: { type: integer }, total: { type: integer }, last: { type: integer } } }
+                  links: { type: object, properties: { first: { type: string }, prev: { type: string, nullable: true }, next: { type: string, nullable: true }, last: { type: string } } }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+        '429': { $ref: '#/components/responses/Error' }
+  /requests/{transaction_number}:
+    get:
+      tags: [الطلبات]
+      summary: البحث عن طلب برقم المعاملة
+      description: يعيد الطلب مع المشروع (included) وشهادة الإشراف المطلوب إلغاؤها إن كان طلب إلغاء.
+      operationId: showRequest
+      parameters: [{ $ref: '#/components/parameters/TransactionNumber' }]
+      responses:
+        '200':
+          description: الطلب
+          content:
+            application/json:
+              schema: { type: object, properties: { data: { $ref: '#/components/schemas/RequestResource' } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /requests/{transaction_number}/status:
+    post:
+      tags: [الطلبات]
+      summary: تحديث حالة الطلب (مراجعة / اعتماد / رفض)
+      operationId: updateRequestStatus
+      parameters: [{ $ref: '#/components/parameters/TransactionNumber' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [under_review, approved, rejected] }
+                reason: { type: string, maxLength: 2000, description: مطلوب عند الرفض }
+      responses:
+        '200': { description: الطلب بعد التحديث, content: { application/json: { schema: { type: object, properties: { data: { $ref: '#/components/schemas/RequestResource' } } } } } }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /certificates:
+    post:
+      tags: [الشهادات]
+      summary: إصدار شهادة إشراف على الموقع
+      description: |
+        يصدر شهادة إشراف لطلب إشراف مفتوح ويعيّن المهندس / المكتب. أي شهادة سارية سابقة على نفس المشروع
+        تصبح `superseded`، ويصبح المشروع `active`. يُخطر المالك والمهندس ومجلس المدينة
+        (والمهندس السابق إن وجد). المهندس يُضاف/يُحدّث في دليل المهندسين تلقائياً.
+      operationId: issueSupervision
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [transaction_number, engineer]
+              properties:
+                transaction_number: { type: string, example: SYN-REQ-2026-000123 }
+                engineer:
+                  type: object
+                  required: [syndicate_number]
+                  properties:
+                    syndicate_number: { type: string, example: KFS-10231 }
+                    name: { type: string, description: مطلوب إن لم يكن المهندس في الدليل }
+                    national_id: { type: string, pattern: '^\d{14}$' }
+                    phone: { type: string }
+                    email: { type: string, format: email }
+                    specialization: { type: string }
+                    registration_number: { type: string }
+                    address: { type: string }
+                office:
+                  type: object
+                  properties:
+                    name: { type: string }
+                    registration_number: { type: string }
+                notes: { type: string, maxLength: 2000 }
+      responses:
+        '201':
+          description: تم الإصدار
+          headers:
+            Location: { schema: { type: string } }
+            Idempotent-Replayed: { schema: { type: string, enum: ['true'] }, description: عند إعادة تشغيل استجابة مخزنة }
+          content:
+            application/json:
+              schema: { type: object, properties: { data: { $ref: '#/components/schemas/CertificateResource' } } }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /certificates/{number}:
+    get:
+      tags: [الشهادات]
+      summary: الاستعلام عن شهادة برقمها
+      operationId: showCertificate
+      parameters:
+        - { name: number, in: path, required: true, schema: { type: string, example: SYN-SUP-2026-000045 } }
+      responses:
+        '200': { description: الشهادة مع المشروع, content: { application/json: { schema: { type: object, properties: { data: { $ref: '#/components/schemas/CertificateResource' } } } } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /cancellations/{transaction_number}/certificate:
+    post:
+      tags: [الشهادات]
+      summary: إصدار شهادة إلغاء إشراف
+      description: |
+        لطلب إلغاء مفتوح (`SYN-CRQ-…`). تُلغى شهادة الإشراف السارية، ويصبح المشروع
+        **`suspended` (موقوف - بدون إشراف)** مع إخطار المالك والمهندس ومجلس المدينة بوجوب إيقاف الأعمال.
+      operationId: issueCancellation
+      parameters: [{ $ref: '#/components/parameters/TransactionNumber' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object, properties: { notes: { type: string, maxLength: 2000 } } }
+      responses:
+        '201':
+          description: تم إصدار شهادة الإلغاء
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: '#/components/schemas/CertificateResource' }
+                  meta: { type: object, properties: { project_work_status: { type: string, enum: [suspended] } } }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+  /projects/{id}/timeline:
+    get:
+      tags: [المشروعات]
+      summary: الخط الزمني للمشروع
+      description: '`id` هو المعرف الرقمي أو كود المشروع (SYN-PRJ-…).'
+      operationId: projectTimeline
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: الأحداث (الأحدث أولاً) مع بيانات المشروع في meta
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/EventResource' } }
+                  meta: { type: object, properties: { project: { $ref: '#/components/schemas/ProjectResource' } } }
+        '404': { $ref: '#/components/responses/Error' }
+  /engineers/sync:
+    post:
+      tags: [دليل المهندسين]
+      summary: مزامنة دليل المهندسين من النقابة (upsert برقم العضوية)
+      operationId: syncEngineers
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [engineers]
+              properties:
+                engineers:
+                  type: array
+                  maxItems: 500
+                  items:
+                    type: object
+                    required: [syndicate_number, name]
+                    properties:
+                      syndicate_number: { type: string }
+                      name: { type: string }
+                      national_id: { type: string, pattern: '^\d{14}$' }
+                      phone: { type: string }
+                      email: { type: string, format: email }
+                      specialization: { type: string }
+                      grade: { type: string }
+                      registration_number: { type: string }
+                      office_name: { type: string }
+                      office_registration_number: { type: string }
+                      membership_status: { type: string, enum: [active, suspended, expired] }
+      responses:
+        '200': { description: عدد السجلات, content: { application/json: { schema: { type: object, properties: { data: { type: object, properties: { type: { type: string }, attributes: { type: object, properties: { synced: { type: integer } } } } } } } } } }
+        '422': { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, description: 'توكن Sanctum بالقدرة syndicate' }
+  parameters:
+    TransactionNumber:
+      name: transaction_number
+      in: path
+      required: true
+      schema: { type: string, example: SYN-REQ-2026-000123 }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema: { type: string, maxLength: 100 }
+  responses:
+    Error:
+      description: خطأ موحد (JSON:API)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Errors' }
+          examples:
+            unauthenticated: { value: { errors: [{ status: '401', code: unauthenticated, title: غير مصرح }] } }
+            missing_ability: { value: { errors: [{ status: '403', code: missing_ability, title: صلاحية غير كافية }] } }
+            ip_not_allowed: { value: { errors: [{ status: '403', code: ip_not_allowed, title: عنوان IP غير مسموح له }] } }
+            invalid_state: { value: { errors: [{ status: '409', code: invalid_state, title: تعذر تنفيذ العملية, detail: 'لا يمكن إصدار شهادة لطلب حالته: مكتمل - صدرت الشهادة.' }] } }
+            validation: { value: { errors: [{ status: '422', code: validation_failed, title: بيانات غير صحيحة, source: { pointer: /engineer/syndicate_number } }] } }
+  schemas:
+    RequestStatus: { type: string, enum: [submitted, under_review, approved, rejected, completed] }
+    Errors:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              status: { type: string }
+              code:
+                type: string
+                enum: [unauthenticated, forbidden, missing_ability, ip_not_allowed, too_many_requests, validation_failed, request_not_found,
+                  certificate_not_found, project_not_found, invalid_state, open_request_exists, engineer_not_active, engineer_required,
+                  invalid_national_id, idempotency_key_reused, invalid_idempotency_key]
+              title: { type: string }
+              detail: { type: string }
+              source: { type: object, properties: { pointer: { type: string } } }
+    ResourceRef:
+      type: object
+      nullable: true
+      properties: { type: { type: string }, id: { type: string } }
+    ProjectResource:
+      type: object
+      properties:
+        type: { type: string, enum: [projects] }
+        id: { type: string }
+        attributes:
+          type: object
+          properties:
+            code: { type: string }
+            owner: { type: object, properties: { name: { type: string }, national_id: { type: string }, phone: { type: string }, address: { type: string } } }
+            address: { type: string }
+            center: { type: string }
+            village: { type: string }
+            plot_number: { type: string }
+            license: { type: object, properties: { number: { type: string }, date: { type: string, format: date }, authority: { type: string } } }
+            works_type: { type: string, enum: [execution, demolition] }
+            execution_sub_type: { type: string, enum: [creation, elevation], nullable: true }
+            works_value: { type: string }
+            work_status: { type: string, enum: [pending, active, suspended] }
+            work_status_label: { type: string, example: موقوف - بدون إشراف }
+            work_status_changed_at: { type: string, format: date-time }
+            suspended_at: { type: string, format: date-time, nullable: true }
+            active_certificate_number: { type: string, nullable: true }
+    RequestResource:
+      type: object
+      properties:
+        type: { type: string, enum: [requests] }
+        id: { type: string, description: رقم المعاملة }
+        attributes:
+          type: object
+          properties:
+            transaction_number: { type: string }
+            type: { type: string, enum: [supervision, cancellation] }
+            status: { $ref: '#/components/schemas/RequestStatus' }
+            status_label: { type: string }
+            requested_by: { type: string, enum: [citizen, engineer, council] }
+            channel: { type: string, enum: [counter, online, api] }
+            applicant: { type: object, properties: { name: { type: string }, national_id: { type: string }, phone: { type: string }, email: { type: string } } }
+            reason: { type: string, nullable: true }
+            rejection_reason: { type: string, nullable: true }
+            submitted_at: { type: string, format: date-time }
+            completed_at: { type: string, format: date-time, nullable: true }
+        relationships:
+          type: object
+          properties:
+            project: { type: object, properties: { data: { $ref: '#/components/schemas/ResourceRef' } } }
+            target_certificate: { type: object, properties: { data: { $ref: '#/components/schemas/ResourceRef' } } }
+            certificate: { type: object, properties: { data: { $ref: '#/components/schemas/ResourceRef' } } }
+        included: { type: array, items: { type: object } }
+    CertificateResource:
+      type: object
+      properties:
+        type: { type: string, enum: [certificates] }
+        id: { type: string, description: رقم الشهادة }
+        attributes:
+          type: object
+          properties:
+            number: { type: string }
+            kind: { type: string, enum: [supervision, cancellation] }
+            status: { type: string, enum: [active, cancelled, superseded] }
+            issued_at: { type: string, format: date-time }
+            engineer: { type: object, properties: { name: { type: string }, syndicate_number: { type: string }, national_id: { type: string }, specialization: { type: string }, phone: { type: string }, email: { type: string } } }
+            office: { type: object, properties: { name: { type: string }, registration_number: { type: string } } }
+            owner: { type: object, properties: { name: { type: string }, national_id: { type: string } } }
+            project_address: { type: string }
+        relationships:
+          type: object
+          properties:
+            project: { type: object, properties: { data: { $ref: '#/components/schemas/ResourceRef' } } }
+            request: { type: object, properties: { data: { $ref: '#/components/schemas/ResourceRef' } } }
+            cancels: { type: object, properties: { data: { $ref: '#/components/schemas/ResourceRef' } } }
+        links: { type: object, properties: { self: { type: string }, verify: { type: string, description: صفحة التحقق العامة } } }
+    EventResource:
+      type: object
+      properties:
+        type: { type: string, enum: [events] }
+        id: { type: string }
+        attributes:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [project_registered, project_updated, request_submitted, request_under_review, request_rejected, supervision_issued,
+                certificate_superseded, cancellation_issued, work_suspended, work_resumed]
+            title: { type: string }
+            description: { type: string }
+            actor: { type: object, properties: { type: { type: string, enum: [user, api, system] }, name: { type: string } } }
+            request: { type: string, nullable: true }
+            certificate: { type: string, nullable: true }
+            occurred_at: { type: string, format: date-time }

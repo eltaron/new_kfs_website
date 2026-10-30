@@ -1,0 +1,155 @@
+/* الألوان والهوية */
+:root {
+    --dash-navy: var(--kfs-dark);
+    --dash-gold: var(--kfs-gold);
+    --dash-bg: var(--kfs-ivory-2);
+}
+
+body {
+    background-color: var(--dash-bg);
+    font-family: var(--ff-body);
+}
+
+.post-category {
+    background: var(--dash-gold);
+    color: var(--dash-navy);
+    padding: 5px 20px;
+    border-radius: 50px;
+    font-weight: 800;
+    text-decoration: none;
+    font-size: 0.85rem;
+}
+
+.post-title {
+    font-weight: 800;
+    font-size: 2.2rem;
+    margin-top: 15px;
+    line-height: 1.5;
+}
+.post-meta {
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+/* 2. المحتوى الرئيسي */
+.main-content {
+    margin-top: -30px;
+}
+
+.post-content-card {
+    background: var(--kfs-surface);
+    border-radius: 20px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.post-content-card .featured-image {
+    width: 100%;
+    object-fit: cover;
+    max-height: 600px;
+}
+.article-inner {
+    padding: 40px;
+    text-align: justify;
+    line-height: 2;
+    color: var(--kfs-charcoal);
+    font-size: 1.15rem;
+}
+
+/* 3. السايدبار (الأدوات) */
+.sidebar-widget {
+    background: var(--kfs-surface);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 1px solid #edf2f6;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+}
+
+.widget-title {
+    font-weight: 800;
+    color: var(--dash-navy);
+    font-size: 1.1rem;
+    border-bottom: 2px solid var(--kfs-ivory-2);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+.widget-title::after {
+    content: "";
+    height: 2px;
+    width: 40px;
+    background: var(--dash-gold);
+    position: absolute;
+    margin-top: 32px;
+}
+
+/* أزرار المشاركة */
+.share-buttons-grid {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.share-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dash-navy);
+    background: var(--kfs-gold);
+    transition: 0.3s;
+    text-decoration: none !important;
+}
+.share-btn:hover {
+    background: var(--dash-gold);
+    transform: translateY(-3px);
+}
+
+/* أخبار ذات صلة */
+.related-item {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    text-decoration: none !important;
+    color: inherit;
+    align-items: center;
+}
+.related-item img {
+    width: 70px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+.related-item h6 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0;
+    transition: 0.2s;
+}
+.related-item:hover h6 {
+    color: var(--dash-gold);
+}
+
+/* الكلمات الدالة والتعليقات */
+.tags-section {
+    color: var(--kfs-text-soft);
+    font-size: 0.9rem;
+}
+.comment-form-container {
+    background: var(--kfs-dark);
+    color: #fff;
+    border-radius: 25px;
+    padding: 40px;
+}
+.btn-publish {
+    background: var(--dash-gold);
+    color: var(--kfs-dark);
+    border: none;
+    padding: 12px 40px;
+    border-radius: 50px;
+    font-weight: 800;
+}

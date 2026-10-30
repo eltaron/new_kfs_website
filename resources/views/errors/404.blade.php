@@ -1,0 +1,7 @@
+@extends('errors.kfs')
+@section('code', '404')
+@section('title', 'الصفحة غير موجودة')
+@section('tone', '#00788A')
+@section('icon', 'fa-solid fa-compass')
+@section('heading', 'عفواً.. تهت في الطريق')
+@section('message', 'الصفحة التي تبحث عنها قد تكون حُذفت أو انتقلت لرابط آخر داخل بوابة كفر الشيخ الرقمية. جرّب البحث أو اختر وجهتك من الروابط بالأسفل.')

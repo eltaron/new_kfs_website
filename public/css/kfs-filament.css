@@ -1,0 +1,382 @@
+/* ==========================================================================
+   KFS Identity for Filament panels (admin · gis · estidama · syndicate ·
+   council · vendor · store-admin).  Source of truth: docs/kfs-design-system.md
+   Loaded by App\Support\Filament\KfsBranding (HEAD_END render hook).
+   RTL-first: logical properties only. Light + .dark tokens.
+   ========================================================================== */
+
+:root {
+    --kfs-gold: #D8B03E;
+    --kfs-gold-dark: #B88920;
+    --kfs-gold-deep: #8F6917;
+    --kfs-gold-light: #F0D878;
+    --kfs-cyan: #00BFD8;
+    --kfs-cyan-deep: #008FA5;
+    --kfs-cyan-ink: #006B7C;
+    --kfs-ivory: #FFFDE1;
+    --kfs-ivory-2: #FAF6D7;
+    --kfs-papyrus: #F2EBC7;
+    --kfs-bronze: #795329;
+    --kfs-olive: #657342;
+    --kfs-charcoal: #282724;
+    --kfs-text: #393733;
+    --kfs-text-soft: #68645A;
+    --kfs-dark: #26302D;
+    --kfs-dark-2: #1D2422;
+    --kfs-dark-soft: #34413D;
+
+    --kfs-line: rgba(40, 39, 36, .10);
+    --kfs-line-gold: rgba(216, 176, 62, .34);
+    --kfs-r: 6px;
+    --kfs-r-lg: 10px;
+    --kfs-r-xl: 14px;
+    --kfs-shadow: 0 1px 2px rgba(40, 39, 36, .04), 0 10px 30px -12px rgba(40, 39, 36, .12);
+    --kfs-shadow-lg: 0 25px 70px rgba(40, 39, 36, .16);
+    --kfs-ease: cubic-bezier(.22, .61, .36, 1);
+
+    /* surface tokens (light) */
+    --kfs-page-bg: #FCFAEF;
+    --kfs-card-bg: #FFFEF8;
+    --kfs-card-accent: linear-gradient(90deg, var(--kfs-gold) 0%, var(--kfs-gold-light) 55%, var(--kfs-cyan) 100%);
+    --kfs-heading: var(--kfs-charcoal);
+    --kfs-sidebar-bg: linear-gradient(180deg, var(--kfs-dark) 0%, var(--kfs-dark-2) 100%);
+    --kfs-sidebar-header-bg: var(--kfs-dark-2);
+    --kfs-focus: var(--kfs-cyan-ink);
+    --kfs-row-hover: var(--kfs-ivory-2);
+
+    --kfs-ff-head: "Tajawal", var(--font-family, "IBM Plex Sans Arabic"), system-ui, sans-serif;
+    --kfs-ff-num: "Playfair Display", var(--font-family, "IBM Plex Sans Arabic"), Georgia, serif;
+
+    --kfs-heritage: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='8' viewBox='0 0 120 8'%3E%3Crect width='120' height='1' fill='%23D8B03E'/%3E%3Crect y='7' width='120' height='1' fill='%23D8B03E' opacity='.7'/%3E%3Crect x='58' y='2' width='4' height='4' transform='rotate(45 60 4)' fill='%23D8B03E' opacity='.65'/%3E%3C/svg%3E");
+    --kfs-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 90' preserveAspectRatio='none'%3E%3Cpath d='M0 46 C120 22 240 22 360 46 S600 70 720 46 960 22 1080 46 1320 70 1440 46' fill='none' stroke='%2300BFD8' stroke-width='2' opacity='.8'/%3E%3Cpath d='M0 62 C120 38 240 38 360 62 S600 86 720 62 960 38 1080 62 1320 86 1440 62' fill='none' stroke='%23D8B03E' stroke-width='1.2' opacity='.55'/%3E%3C/svg%3E");
+}
+
+.dark {
+    --kfs-page-bg: #1D2422;
+    --kfs-card-bg: #26302D;
+    --kfs-heading: #FFFDE1;
+    --kfs-sidebar-bg: linear-gradient(180deg, #19201E 0%, #131917 100%);
+    --kfs-sidebar-header-bg: #131917;
+    --kfs-focus: var(--kfs-gold-light);
+    --kfs-row-hover: rgba(255, 253, 225, .04);
+    --kfs-line: rgba(255, 253, 225, .08);
+}
+
+/* --------------------------------------------------------------- base ---- */
+.fi-body {
+    background-color: var(--kfs-page-bg);
+    color: var(--kfs-text);
+    -webkit-font-smoothing: antialiased;
+}
+.dark .fi-body { color: #E9E6D6; }
+
+.fi-header-heading,
+.fi-simple-header-heading,
+.fi-section-header-heading,
+.fi-modal-heading,
+.fi-ta-header-heading,
+.fi-wi-widget h2 {
+    font-family: var(--kfs-ff-head);
+    color: var(--kfs-heading);
+    letter-spacing: 0;
+}
+.fi-header-heading { font-weight: 800; }
+
+/* Heritage line ornament under page headings */
+.fi-header-heading::after {
+    content: "";
+    display: block;
+    width: 120px;
+    height: 8px;
+    margin-block-start: .6rem;
+    background: var(--kfs-heritage) no-repeat center / 120px 8px;
+}
+
+.fi-breadcrumbs a { transition: color .2s var(--kfs-ease); }
+.fi-breadcrumbs a:hover { color: var(--kfs-cyan-deep); }
+.fi-breadcrumbs svg { color: var(--kfs-gold) !important; }
+
+/* ------------------------------------------------------------ sidebar ---- */
+.fi-body .fi-sidebar {
+    background: var(--kfs-sidebar-bg) !important;
+    border-inline-end: 1px solid var(--kfs-line-gold);
+}
+.fi-body .fi-sidebar-header {
+    background: var(--kfs-sidebar-header-bg) !important;
+    box-shadow: none !important;
+    border-block-end: 1px solid var(--kfs-line-gold);
+}
+.fi-sidebar-header .fi-logo {
+    background: var(--kfs-ivory);
+    border-radius: 8px;
+    padding: 2px 8px;
+    box-sizing: content-box;
+}
+.fi-sidebar-header .fi-icon-btn { color: rgba(255, 253, 225, .65); }
+.fi-sidebar-header .fi-icon-btn:hover { color: var(--kfs-gold-light); background: rgba(255, 253, 225, .06); }
+
+.fi-sidebar-nav { scrollbar-color: rgba(216, 176, 62, .35) transparent; scrollbar-width: thin; }
+
+.fi-sidebar-group-label,
+.fi-sidebar-group-button .fi-sidebar-group-label {
+    font-family: var(--kfs-ff-head);
+    font-weight: 700;
+    font-size: .78rem;
+    color: rgba(240, 216, 120, .72) !important;
+}
+.fi-sidebar-group-icon,
+.fi-sidebar-group-collapse-button,
+.fi-sidebar-group-collapse-button svg { color: rgba(255, 253, 225, .45) !important; }
+
+.fi-sidebar-item-button {
+    position: relative;
+    border-radius: var(--kfs-r) !important;
+    transition: background-color .25s var(--kfs-ease), color .25s var(--kfs-ease);
+}
+.fi-sidebar-item-label { color: rgba(255, 253, 225, .86) !important; }
+.fi-sidebar-item-icon { color: rgba(255, 253, 225, .5) !important; transition: color .25s var(--kfs-ease); }
+
+.fi-body .fi-sidebar-item-button:hover,
+.fi-body .fi-sidebar-item-button:focus-visible { background: rgba(255, 253, 225, .07) !important; }
+.fi-sidebar-item-button:hover .fi-sidebar-item-icon { color: var(--kfs-cyan) !important; }
+
+/* Active item: gold tint + gold indicator bar on the inline-start edge */
+.fi-body .fi-sidebar-item.fi-active > .fi-sidebar-item-button {
+    background: linear-gradient(270deg, rgba(216, 176, 62, .20), rgba(216, 176, 62, .06)) !important;
+}
+[dir="ltr"] .fi-body .fi-sidebar-item.fi-active > .fi-sidebar-item-button {
+    background: linear-gradient(90deg, rgba(216, 176, 62, .20), rgba(216, 176, 62, .06)) !important;
+}
+.fi-sidebar-item.fi-active > .fi-sidebar-item-button::before {
+    content: "";
+    position: absolute;
+    inset-block: 6px;
+    inset-inline-start: -2px;
+    width: 3px;
+    border-radius: 3px;
+    background: var(--kfs-gold);
+    box-shadow: 0 0 10px rgba(216, 176, 62, .55);
+}
+.fi-sidebar-item.fi-active .fi-sidebar-item-label { color: var(--kfs-gold-light) !important; font-weight: 600; }
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon { color: var(--kfs-gold) !important; }
+
+/* sub-navigation connector lines / dots */
+.fi-sidebar-item-grouped-border > div { background-color: rgba(255, 253, 225, .18) !important; }
+.fi-sidebar-item.fi-active .fi-sidebar-item-grouped-border > div.relative,
+.fi-sidebar-item.fi-active .fi-sidebar-item-grouped-border > div:last-child { background-color: var(--kfs-gold) !important; }
+
+/* Anything else rendered into the dark sidebar (e.g. GIS user card) */
+.fi-sidebar .fi-sidebar-user-info { border-color: rgba(255, 253, 225, .1) !important; }
+.fi-sidebar .text-gray-900,
+.fi-sidebar .text-gray-950,
+.fi-sidebar .text-gray-700 { color: #FFFDE1 !important; }
+.fi-sidebar .text-gray-500,
+.fi-sidebar .text-gray-400 { color: rgba(255, 253, 225, .6) !important; }
+
+/* ------------------------------------------------------------- topbar ---- */
+.fi-topbar > nav {
+    background: rgba(255, 254, 248, .92) !important;
+    backdrop-filter: saturate(1.2) blur(8px);
+    box-shadow: none !important;
+    border-block-end: 1px solid var(--kfs-line-gold);
+}
+.dark .fi-topbar > nav { background: rgba(29, 36, 34, .92) !important; }
+
+/* -------------------------------------------------------------- cards ---- */
+.fi-section:not(.fi-section .fi-section):not(.fi-section-not-contained),
+.fi-ta-ctn,
+.fi-wi-stats-overview-stat,
+.fi-fo-wizard,
+.fi-in-section {
+    background-color: var(--kfs-card-bg) !important;
+    background-image: var(--kfs-card-accent);
+    background-repeat: no-repeat;
+    background-size: 100% 3px;
+    background-position: top;
+    border-radius: var(--kfs-r-lg) !important;
+    box-shadow: var(--kfs-shadow), 0 0 0 1px var(--kfs-line) !important;
+    transition: box-shadow .35s var(--kfs-ease), transform .35s var(--kfs-ease);
+}
+.fi-section .fi-section { background-image: none; }
+.fi-section-header { padding-block-start: 1.1rem; }
+
+.fi-dropdown-panel,
+.fi-modal-window {
+    border-radius: var(--kfs-r-lg) !important;
+    background-color: var(--kfs-card-bg);
+}
+.fi-modal-window { background-image: var(--kfs-card-accent); background-repeat: no-repeat; background-size: 100% 3px; }
+
+/* ------------------------------------------------------- stat widgets ---- */
+.fi-wi-stats-overview-stat:hover { transform: translateY(-2px); box-shadow: var(--kfs-shadow-lg), 0 0 0 1px var(--kfs-line-gold) !important; }
+.fi-wi-stats-overview-stat-value {
+    font-family: var(--kfs-ff-num);
+    font-variant-numeric: lining-nums tabular-nums;
+    font-weight: 600;
+    color: var(--kfs-heading) !important;
+    letter-spacing: 0;
+}
+.fi-wi-stats-overview-stat-label { color: var(--kfs-text-soft); font-weight: 500; }
+.dark .fi-wi-stats-overview-stat-label { color: rgba(255, 253, 225, .7); }
+
+/* -------------------------------------------------------------- tables --- */
+.fi-ta-table > thead > tr,
+.fi-ta-table > thead > tr > th {
+    background-color: var(--kfs-dark) !important;
+}
+.dark .fi-ta-table > thead > tr,
+.dark .fi-ta-table > thead > tr > th { background-color: #151B19 !important; }
+.fi-ta-table > thead .fi-ta-header-cell-label,
+.fi-ta-table > thead th,
+.fi-ta-table > thead .fi-ta-header-cell button,
+.fi-ta-table > thead .fi-ta-header-cell svg { color: var(--kfs-ivory) !important; }
+.fi-ta-table > thead .fi-ta-header-cell-label { font-family: var(--kfs-ff-head); font-weight: 700; }
+.fi-ta-table > thead .fi-ta-header-cell button:hover svg { color: var(--kfs-gold-light) !important; }
+.fi-ta-table > thead .fi-checkbox-input { background-color: transparent; border-color: rgba(255, 253, 225, .55); }
+
+.fi-ta-row { transition: background-color .2s var(--kfs-ease); }
+.fi-body .fi-ta-row:hover { background-color: var(--kfs-row-hover) !important; }
+.fi-ta-row.fi-selected,
+.fi-ta-row:has(.fi-checkbox-input:checked) { background-color: rgba(216, 176, 62, .08) !important; }
+
+.fi-ta-header-toolbar,
+.fi-ta-header { border-color: var(--kfs-line) !important; }
+.fi-pagination-item-button[aria-current="page"],
+.fi-pagination-item.fi-active .fi-pagination-item-button { color: var(--kfs-gold-deep) !important; font-weight: 700; }
+
+/* -------------------------------------------------------------- badges --- */
+.fi-badge {
+    border-radius: var(--kfs-r) !important;
+    font-weight: 600;
+    letter-spacing: 0;
+    padding-inline: .55rem;
+}
+
+/* ------------------------------------------------------------- buttons --- */
+.fi-btn {
+    border-radius: var(--kfs-r) !important;
+    font-weight: 600;
+    transition: background-color .25s var(--kfs-ease), box-shadow .25s var(--kfs-ease), transform .25s var(--kfs-ease), color .25s var(--kfs-ease);
+}
+.fi-btn.fi-color-custom:not(.fi-btn-outlined):hover,
+.fi-btn[style*="--c-500"]:not(.fi-btn-outlined):hover {
+    box-shadow: 0 8px 22px -8px rgba(var(--c-500), .65), 0 0 0 1px rgba(var(--c-400), .35);
+    transform: translateY(-1px);
+}
+/* gold (warning) buttons: charcoal text whenever the light gold is the background */
+.dark .fi-btn.fi-color-warning:not(.fi-btn-outlined),
+.dark .fi-btn.fi-color-warning:not(.fi-btn-outlined) *,
+.fi-btn.fi-color-warning:not(.fi-btn-outlined):hover,
+.fi-btn.fi-color-warning:not(.fi-btn-outlined):hover * { color: var(--kfs-charcoal) !important; }
+.fi-btn.fi-color-gray:hover { box-shadow: 0 6px 18px -10px rgba(40, 39, 36, .35); }
+.fi-btn:active { transform: translateY(0); }
+.fi-icon-btn { border-radius: var(--kfs-r) !important; transition: background-color .2s var(--kfs-ease), color .2s var(--kfs-ease); }
+
+/* -------------------------------------------------------------- forms ---- */
+.fi-input-wrp { border-radius: var(--kfs-r) !important; transition: box-shadow .2s var(--kfs-ease); }
+.fi-input-wrp:not(.dark *) { background-color: #FFFEF8; }
+.fi-fo-field-wrp-label span { font-weight: 600; }
+
+/* tabs */
+.fi-tabs-item { border-radius: var(--kfs-r) !important; transition: background-color .2s var(--kfs-ease); }
+.fi-tabs-item.fi-active,
+.fi-tabs-item[aria-selected="true"] { box-shadow: inset 0 -2px 0 var(--kfs-gold); }
+
+/* ------------------------------------------------- focus (a11y, WCAG) ---- */
+.fi-body :where(a, button, summary, [role="button"], [role="tab"], [tabindex]:not([tabindex="-1"])):focus-visible {
+    outline: 3px solid var(--kfs-focus) !important;
+    outline-offset: 2px !important;
+    border-radius: var(--kfs-r);
+}
+.fi-body :where(input, select, textarea):focus-visible {
+    outline: 2px solid var(--kfs-focus);
+    outline-offset: 2px;
+}
+.fi-body .fi-input-wrp:focus-within {
+    box-shadow: 0 0 0 2px var(--kfs-cyan-deep), 0 0 0 5px rgba(0, 191, 216, .18) !important;
+}
+.dark .fi-body .fi-input-wrp:focus-within,
+.dark .fi-input-wrp:focus-within {
+    box-shadow: 0 0 0 2px var(--kfs-gold), 0 0 0 5px rgba(216, 176, 62, .2) !important;
+}
+/* gold ring inside the dark sidebar (cyan-ink would vanish there) */
+.fi-sidebar :where(a, button, [tabindex]):focus-visible { outline-color: var(--kfs-gold-light) !important; }
+
+/* skip-to-content style helper: never hide focus behind sticky topbar */
+.fi-body { scroll-padding-block-start: 5rem; }
+
+/* ============================================================ login ===== */
+.fi-body:has(.fi-simple-layout) { background: var(--kfs-dark-2); }
+.fi-simple-layout {
+    position: relative;
+    isolation: isolate;
+    background:
+        var(--kfs-wave) no-repeat bottom 28px center / 100% 90px,
+        url("../images/kfs/kfs-pattern-faint.svg") repeat 0 0 / 160px 160px,
+        linear-gradient(120deg, rgba(38, 48, 45, .98) 0%, rgba(38, 48, 45, .93) 55%, rgba(0, 143, 165, .78) 100%),
+        var(--kfs-dark-2);
+}
+.fi-simple-layout::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--kfs-cyan), var(--kfs-gold-light) 50%, var(--kfs-gold));
+    z-index: 1;
+}
+.fi-simple-main {
+    position: relative;
+    background-color: #FFFDEC !important;
+    background-image: var(--kfs-card-accent);
+    background-repeat: no-repeat;
+    background-size: 100% 4px;
+    border-radius: var(--kfs-r-xl) !important;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .35), 0 0 0 1px var(--kfs-line-gold) !important;
+    animation: kfs-rise .7s var(--kfs-ease) both;
+}
+.dark .fi-simple-main { background-color: var(--kfs-dark) !important; }
+.fi-simple-header .fi-logo {
+    height: 5.5rem !important;
+    width: auto;
+    margin-block-end: .25rem;
+}
+.fi-simple-header-heading { font-weight: 800; }
+.fi-simple-header-heading::after {
+    content: "";
+    display: block;
+    width: 120px;
+    height: 8px;
+    margin: .7rem auto 0;
+    background: var(--kfs-heritage) no-repeat center / 120px 8px;
+}
+.fi-simple-header-subheading { color: var(--kfs-text-soft); }
+.fi-simple-main .fi-btn[type="submit"] { min-height: 2.75rem; font-size: 1rem; }
+/* links/text rendered directly on the dark background (outside the card) */
+.fi-simple-layout > :not(.fi-simple-main-ctn) a,
+.fi-simple-layout > :not(.fi-simple-main-ctn) { color: rgba(255, 253, 225, .8); }
+
+@keyframes kfs-rise {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: none; }
+}
+
+/* ================================================= reduced motion ====== */
+@media (prefers-reduced-motion: reduce) {
+    .fi-body *,
+    .fi-body *::before,
+    .fi-body *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+    .fi-wi-stats-overview-stat:hover,
+    .fi-btn:hover { transform: none !important; }
+}
+
+/* ================================================= forced colors ======= */
+@media (forced-colors: active) {
+    .fi-sidebar-item.fi-active > .fi-sidebar-item-button::before { background: Highlight; }
+    .fi-body :where(a, button):focus-visible { outline-color: Highlight !important; }
+}

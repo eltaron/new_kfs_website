@@ -1,0 +1,189 @@
+/* ============================================================
+   Grid Tabs – قرارات الإزالة (نسخة مبهجة وملونة)
+   ============================================================ */
+
+/* 1) شيل خلفية الحاوية الأب الأصلية بتاعة فيلامنت */
+.fi-tabs,
+.fi-tabs-list,
+.fi-resource-tabs {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 0 1.5rem 0 !important;
+}
+
+/* 2) الشبكة نفسها: توسيط + مسافات مريحة */
+[role="tablist"] {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: 1rem;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 1.25rem 0 1.75rem !important;
+    margin: 0 !important;
+}
+
+/* 3) شكل كل مربع */
+[role="tablist"] [role="tab"] {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-sizing: border-box;
+    width: 152px;
+    min-width: 152px;
+    height: auto;
+    min-height: 120px;
+    padding: 1rem 0.6rem;
+    border-radius: 1.25rem;
+    border: none !important;
+    font-weight: 800;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 6px 16px rgb(0 0 0 / 0.14);
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+    cursor: pointer;
+    overflow: visible;
+}
+
+[role="tablist"] [role="tab"]:hover {
+    transform: translateY(-4px) scale(1.02);
+    filter: brightness(1.08);
+    box-shadow: 0 12px 26px rgb(0 0 0 / 0.22);
+}
+
+[role="tablist"] [role="tab"][aria-selected="true"] {
+    outline: 3px solid rgba(255,255,255,0.85);
+    outline-offset: 2px;
+    transform: translateY(-2px);
+}
+
+/* 4) ضمان إن النص كله يفضل جوه الكارت (يكسر السطر بدل ما يطلع بره) */
+[role="tablist"] [role="tab"] *:not(svg):not(.fi-badge) {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+}
+
+[role="tablist"] [role="tab"] span:not(.fi-badge) {
+    display: block;
+    width: 100%;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* الأيقونة */
+[role="tablist"] [role="tab"] svg {
+    width: 1.9rem !important;
+    height: 1.9rem !important;
+    flex-shrink: 0;
+}
+
+/* 5) العداد (البادج) */
+[role="tablist"] [role="tab"] .fi-badge {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    min-width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 900;
+    background: #fff !important;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.25);
+    border: 2px solid rgb(255 255 255 / 0.9);
+    white-space: nowrap !important;
+}
+
+/* ============================================================
+   6) ألوان الخلفية لكل تاب بالترتيب:
+   1-all 2-new 3-engineering_review 4-spatial_pending
+   5-spatial_dimensioned 6-pdf_ready 7-systems_processing
+   8-local_unit_approval 9-visa_pending 10-completed
+   ============================================================ */
+[role="tablist"] [role="tab"]:nth-child(1)  { background: linear-gradient(145deg, #64748b, #334155); }
+[role="tablist"] [role="tab"]:nth-child(2)  { background: linear-gradient(145deg, #fde047, #f59e0b); }
+[role="tablist"] [role="tab"]:nth-child(3)  { background: linear-gradient(145deg, #fb923c, #ea580c); }
+[role="tablist"] [role="tab"]:nth-child(4)  { background: linear-gradient(145deg, #67e8f9, #0891b2); }
+[role="tablist"] [role="tab"]:nth-child(5)  { background: linear-gradient(145deg, #818cf8, #4f46e5); }
+[role="tablist"] [role="tab"]:nth-child(6)  { background: linear-gradient(145deg, #94a3b8, #475569); }
+[role="tablist"] [role="tab"]:nth-child(7)  { background: linear-gradient(145deg, #c084fc, #9333ea); }
+[role="tablist"] [role="tab"]:nth-child(8)  { background: linear-gradient(145deg, #2dd4bf, #0d9488); }
+[role="tablist"] [role="tab"]:nth-child(9)  { background: linear-gradient(145deg, #818cf8, #4338ca); }
+[role="tablist"] [role="tab"]:nth-child(10) { background: linear-gradient(145deg, #34d399, #059669); }
+
+/* 7) لون النص: أبيض مع ظل خفيف على الخلفيات الغامقة، وكحلي غامق على الخلفيات الفاتحة (أصفر/سماوي) */
+[role="tablist"] [role="tab"] {
+    color: #fff !important;
+    text-shadow: 0 1px 3px rgb(0 0 0 / 0.35);
+}
+[role="tablist"] [role="tab"] svg { color: #fff !important; filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.3)); }
+
+/* الكاردين الفاتحين (الأصفر - الجديدة | السماوي - تحديد مسؤول البعد المكاني) يحتاجوا نص غامق للتباين */
+[role="tablist"] [role="tab"]:nth-child(2),
+[role="tablist"] [role="tab"]:nth-child(4) {
+    color: #1e293b !important;
+    text-shadow: none;
+}
+[role="tablist"] [role="tab"]:nth-child(2) svg,
+[role="tablist"] [role="tab"]:nth-child(4) svg {
+    color: #1e293b !important;
+    filter: none;
+}
+
+/* لون البادج (رقم العداد) يتماشى مع لون كل مربع */
+[role="tablist"] [role="tab"]:nth-child(1)  .fi-badge { color: #334155; }
+[role="tablist"] [role="tab"]:nth-child(2)  .fi-badge { color: #d97706; }
+[role="tablist"] [role="tab"]:nth-child(3)  .fi-badge { color: #ea580c; }
+[role="tablist"] [role="tab"]:nth-child(4)  .fi-badge { color: #0891b2; }
+[role="tablist"] [role="tab"]:nth-child(5)  .fi-badge { color: #4f46e5; }
+[role="tablist"] [role="tab"]:nth-child(6)  .fi-badge { color: #475569; }
+[role="tablist"] [role="tab"]:nth-child(7)  .fi-badge { color: #9333ea; }
+[role="tablist"] [role="tab"]:nth-child(8)  .fi-badge { color: #0d9488; }
+[role="tablist"] [role="tab"]:nth-child(9)  .fi-badge { color: #4338ca; }
+[role="tablist"] [role="tab"]:nth-child(10) .fi-badge { color: #059669; }
+
+/* ============================================================
+   8) الوضع الداكن
+   ============================================================ */
+.dark [role="tablist"] [role="tab"] {
+    box-shadow: 0 6px 18px rgb(0 0 0 / 0.45);
+}
+.dark [role="tablist"] [role="tab"]:hover {
+    box-shadow: 0 14px 30px rgb(0 0 0 / 0.55);
+}
+.dark [role="tablist"] [role="tab"] .fi-badge {
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.5);
+}
+
+/* ============================================================
+   9) الموبايل
+   ============================================================ */
+@media (max-width: 640px) {
+    [role="tablist"] [role="tab"] {
+        width: 130px;
+        min-width: 130px;
+        min-height: 108px;
+    }
+    [role="tablist"] [role="tab"] span:not(.fi-badge) {
+        font-size: 0.76rem;
+    }
+}
+
+[role="tablist"] [role="tab"] .truncate {
+    color: #000 !important;
+}
+
+[role="tablist"] [role="tab"] span:not(.fi-badge) {
+    color: #fff ;
+}

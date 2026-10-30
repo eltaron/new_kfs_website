@@ -1,0 +1,314 @@
+/* ==============================================
+   Estidama Page — Expert Redesign
+   Navy (var(--kfs-dark)) + Gold (var(--kfs-gold))
+   ============================================== */
+
+.estidama-page {
+    font-family: var(--ff-body);
+    overflow-x: hidden;
+}
+
+/* --- 1. Hero: now <x-kfs.page-hero> (public/css/kfs-hero.css); only the logo mark lives here --- */
+.est-hero-mark { display: block; height: clamp(64px, 7vw, 96px); width: auto; padding: 8px; background: #fff; border-radius: var(--r-lg, 12px); box-shadow: 0 10px 24px -14px rgba(0,0,0,.7); }
+
+/* --- Shared --- */
+.est-section { padding: 5rem 0; }
+
+.est-badge {
+    display: inline-block;
+    background: rgba(216, 176, 62,0.12);
+    color: var(--kfs-gold-deep);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 6px 18px;
+    border-radius: 50px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+.est-section-title {
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: var(--kfs-dark);
+    margin-bottom: 10px;
+}
+.est-section-sub {
+    color: var(--kfs-text-soft);
+    font-size: 1.05rem;
+    max-width: 520px;
+    margin: 0 auto;
+}
+.est-section-label {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--kfs-gold-deep);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    position: relative;
+    padding-right: 44px;
+}
+.est-section-label::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 3px;
+    background: var(--kfs-gold);
+    border-radius: 2px;
+}
+
+/* --- 2. About --- */
+.est-about {
+    padding: 3rem 0 4rem;
+}
+.est-about-image {
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(38, 48, 45,0.12);
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+.est-about-image:hover {
+    transform: scale(1.01);
+    box-shadow: 0 35px 80px rgba(38, 48, 45,0.2);
+}
+.est-about-image img {
+    width: 100%;
+    display: block;
+}
+.est-about-title {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: var(--kfs-dark);
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+.est-about-features ul {
+    list-style: none;
+    padding: 0;
+}
+.est-about-features ul li {
+    position: relative;
+    padding-right: 32px;
+    margin-bottom: 14px;
+    line-height: 1.8;
+    color: var(--kfs-text-soft);
+    font-weight: 600;
+    font-size: 1rem;
+}
+.est-about-features ul li::before {
+    content: "\f058";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    right: 0;
+    top: 4px;
+    color: var(--kfs-gold-deep);
+    font-size: 1.15rem;
+}
+
+/* --- 3. Gallery --- */
+.est-gallery {
+    padding: 0 0 4rem;
+}
+.est-gallery-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+.est-gallery-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(38, 48, 45,0.08);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.est-gallery-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(38, 48, 45,0.15);
+}
+.est-gallery-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.6s ease;
+}
+.est-gallery-card:hover img {
+    transform: scale(1.03);
+}
+.est-gallery-tag {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    background: rgba(38, 48, 45,0.75);
+    backdrop-filter: blur(6px);
+    color: var(--kfs-gold-deep);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 5px 16px;
+    border-radius: 50px;
+    border: 1px solid rgba(216, 176, 62,0.25);
+}
+
+/* --- 4. Program Cards --- */
+.est-program-card {
+    background: var(--kfs-surface);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(38, 48, 45,0.06);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.est-program-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(38, 48, 45,0.12);
+}
+.est-program-img {
+    height: 200px;
+    overflow: hidden;
+}
+.est-program-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+.est-program-card:hover .est-program-img img {
+    transform: scale(1.08);
+}
+.est-program-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+.est-program-center {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--kfs-gold-deep);
+    margin-bottom: 6px;
+    display: block;
+}
+.est-program-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--kfs-dark);
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+.est-program-desc {
+    color: var(--kfs-text-soft);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    flex-grow: 1;
+    margin-bottom: 16px;
+}
+
+/* --- Buttons --- */
+.est-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.88rem;
+    padding: 12px 28px;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+.est-btn-gold {
+    background: var(--kfs-gold);
+    color: var(--kfs-dark);
+    border-color: var(--kfs-gold);
+}
+.est-btn-gold:hover {
+    background: transparent;
+    color: var(--kfs-gold-deep);
+    border-color: var(--kfs-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(216, 176, 62,0.25);
+}
+.est-btn-outline {
+    background: transparent;
+    color: var(--kfs-dark);
+    border-color: var(--kfs-dark);
+}
+.est-btn-outline:hover {
+    background: var(--kfs-dark);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* --- 6. Stats --- */
+.est-stats {
+    padding: 5rem 0;
+    background: var(--kfs-dark);
+    border-radius: 24px;
+    margin: 3rem 0;
+}
+.est-stat-card {
+    text-align: center;
+    padding: 2rem 1.5rem;
+}
+.est-stat-num {
+    font-size: 3.8rem;
+    font-weight: 900;
+    color: var(--kfs-gold-deep);
+    display: block;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+.est-stat-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.7);
+    margin: 0;
+}
+
+/* --- 7. Events --- */
+.est-events-slider {
+    padding-bottom: 3rem;
+}
+.est-event-card {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    height: 300px;
+    box-shadow: 0 8px 30px rgba(38, 48, 45,0.08);
+    transition: transform 0.4s ease;
+}
+.est-event-card:hover {
+    transform: translateY(-6px);
+}
+.est-event-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.est-event-caption {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: linear-gradient(0deg, rgba(38, 48, 45,0.85) 0%, transparent 100%);
+    color: #fff;
+    padding: 1.5rem 1.2rem 1rem;
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: right;
+}
+
+/* --- Mobile --- */
+@media (max-width: 991px) {
+    .est-section-title { font-size: 1.8rem; }
+    .est-gallery-grid { grid-template-columns: 1fr; gap: 16px; }
+}
+@media (max-width: 576px) {
+    .est-stat-num { font-size: 2.6rem; }
+}

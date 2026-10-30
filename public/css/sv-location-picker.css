@@ -1,0 +1,16 @@
+/* منتقي موقع الأرض (sv-location-picker.js) */
+.sv-picker { position: relative; }
+.sv-picker__map { height: 340px; border-radius: 10px; border: 1px solid rgba(0, 0, 0, .12); z-index: 0; }
+.sv-picker__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 6px; font-size: .8rem; color: #68645A; }
+.sv-picker__bar b { color: #1D2422; font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+.sv-picker__bar .is-set { color: #3D7A50; font-weight: 700; }
+.dark .sv-picker__bar b, :root[data-theme="dark"] .sv-picker__bar b { color: #ECE8D6; }
+.sv-pin { background: none; border: 0; }
+.sv-pin span {
+    display: block; width: 28px; height: 28px; margin: 0 auto;
+    border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+    background: #D8B03E; border: 3px solid #fff; box-shadow: 0 3px 10px rgba(0, 0, 0, .45);
+}
+.sv-pin span::after { content: ""; position: absolute; inset: 7px; border-radius: 50%; background: #1D2422; }
+.sv-pick-ctl a { font-size: 17px; line-height: 30px; font-weight: 700; color: #1D2422; }
+@media (max-width: 640px) { .sv-picker__map { height: 280px; } }
