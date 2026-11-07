@@ -102,6 +102,7 @@ class RemovalOrder extends Model implements Payable
     const STAGE_PDF_READY            = 'pdf_ready';
     const STAGE_SYSTEMS_PROCESSING   = 'systems_processing';
     const STAGE_LOCAL_UNIT_APPROVAL  = 'local_unit_approval';
+    const STAGE_GIS_PENDING          = 'gis_pending';   // بعد اعتماد الوحدة المحلية: رؤساء الأقسام يوجّهون للاعتماد
     const STAGE_VISA_PENDING         = 'visa_pending';
     const STAGE_COMPLETED            = 'completed';
 
@@ -115,6 +116,7 @@ class RemovalOrder extends Model implements Payable
             self::STAGE_PDF_READY            => 'مراجعة المركز الرئيسي',
             self::STAGE_SYSTEMS_PROCESSING   => 'التحليل المكاني',
             self::STAGE_LOCAL_UNIT_APPROVAL  => 'الاعتماد من الوحدة المحلية',
+            self::STAGE_GIS_PENDING          => 'التوجيه للاعتماد',
             self::STAGE_VISA_PENDING         => 'الاعتماد من السلطة المختصة',
             self::STAGE_COMPLETED            => 'منتهية',
         ];

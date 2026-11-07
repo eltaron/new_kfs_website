@@ -1,398 +1,223 @@
 @extends('layouts.app')
-@section('title', $landmark->name)
+@section('title', trim($landmark->name) . ' | السياحة والمعالم')
+@section('description', \Illuminate\Support\Str::limit(trim(html_entity_decode(strip_tags((string) $landmark->details), ENT_QUOTES | ENT_HTML5, 'UTF-8')), 155) ?: 'معلم سياحي في محافظة كفر الشيخ')
+@if ($landmark->thumbnail)
+    @section('og_image', asset(Storage::url($landmark->thumbnail)))
+@endif
 
 @push('css')
-    <link rel="stylesheet" href="{{ asset('css/landmarks.css') }}?v={{ @filemtime(public_path('css/landmarks.css')) }}">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-    <style>
-        :root {
-            --primary-color: var(--kfs-primary);
-            --primary-dark: var(--kfs-primary-hover);
-            --secondary-color: var(--kfs-charcoal);
-            --accent-color: var(--kfs-bg-alt);
-        }
-
-        /* معرض الصور */
-        .gallery-section {
-            margin: 3rem 0;
-        }
-
-
-        .project-gallery-slider {
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .project-gallery-slider .swiper-slide {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .project-gallery-slider img {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            transition: transform 0.3s;
-        }
-
-        .project-gallery-slider img:hover {
-            transform: scale(1.05);
-        }
-
-        /* كيفية الوصول */
-        .directions-card {
-            background: #fff;
-            border: 1px solid var(--line);
-            border-radius: var(--r-lg);
-            padding: clamp(20px, 3vw, 36px);
-            box-shadow: var(--e-1);
-            margin: 2.5rem 0;
-        }
-
-        .directions-card h4 {
-            color: var(--secondary-color);
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.4rem;
-        }
-
-        .directions-card h4 svg {
-            color: var(--primary-color);
-        }
-
-        .info-box {
-            background: var(--accent-color);
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border-inline-start: 4px solid var(--kfs-gold);
-        }
-
-        .info-box strong {
-            color: var(--primary-color);
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .info-box p {
-            margin: 0;
-            color: #555;
-            line-height: 1.8;
-        }
-
-        .map-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--primary-color);
-            color: #fff;
-            padding: 12px 28px;
-            border-radius: 8px;
-            text-decoration: none;
-            transition: all 0.3s;
-            margin: 8px;
-            font-weight: 600;
-            border: 2px solid var(--primary-color);
-        }
-
-        .map-btn:hover {
-            background: var(--primary-dark);
-            border-color: var(--primary-dark);
-            color: #fff;
-        }
-
-        .map-btn.secondary {
-            background: transparent;
-            color: var(--primary-color);
-        }
-
-        .map-btn.secondary:hover {
-            background: var(--primary-color);
-            color: #fff;
-        }
-
-        .map-container {
-            margin-top: 2rem;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .map-container iframe {
-            width: 100%;
-            height: 400px;
-            border: none;
-        }
-
-        #directionsMapContainer {
-            margin-top: 2rem;
-        }
-
-        #directionsMapLeaflet {
-            height: 500px;
-            border-radius: 12px;
-            z-index: 1;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        /* Virtual Tour Section */
-        .virtual-tour-section {
-            margin: 3rem 0;
-        }
-
-        .map-iframe-wrapper-fullwidth {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .map-iframe-wrapper-fullwidth iframe {
-            width: 100%;
-            height: 450px;
-            border: none;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .directions-card {
-                padding: 2rem 1.5rem;
-            }
-
-            .booking-header h3 {
-                font-size: 1.4rem;
-            }
-
-            .map-btn {
-                display: flex;
-                margin: 8px 0;
-                justify-content: center;
-            }
-
-            #directionsMapLeaflet {
-                height: 400px;
-            }
-        }
-    </style>
+    @if ($landmark->latitude && $landmark->longitude)
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    @endif
+    <link rel="stylesheet" href="{{ asset('css/kfs-landmark.css') }}?v={{ @filemtime(public_path('css/kfs-landmark.css')) }}">
 @endpush
 
 @section('content')
-    <main class="main-content">
-        {{-- Header --}}
-        <x-kfs.page-hero :title="$landmark->name" kicker="معلم سياحي" icon="fa-solid fa-monument"
-            :image="$landmark->thumbnail ? Storage::url($landmark->thumbnail) : asset('images/bg/terosim.jpg')"
-            :crumbs="['السياحة والمعالم' => route('landmarks.index')]" />
+    @php
+        $name = trim($landmark->name);
+        $cover = $landmark->thumbnail ? Storage::url($landmark->thumbnail) : asset('images/bg/terosim.jpg');
+        // Gallery = cover first (when set) + attached images, without duplicates.
+        $photos = collect($landmark->thumbnail ? [['src' => $cover, 'caption' => $name]] : [])
+            ->concat($landmark->images->map(fn ($img) => ['src' => Storage::url($img->path), 'caption' => $img->caption ?: $name]))
+            ->unique('src')->values();
+        $mosaic = $photos->take(5);
+        $extra = $photos->count() - $mosaic->count();
+        $hasCoords = $landmark->latitude && $landmark->longitude;
+        $address = trim((string) $landmark->address);
+        $directions = $hasCoords ? 'https://www.google.com/maps/dir/?api=1&destination=' . $landmark->latitude . ',' . $landmark->longitude : null;
+        $bookUrl = \App\Support\EServices::visible('tour-bookings.create') ? route('tour-bookings.create') : null;
+        $details = trim((string) $landmark->details);
+    @endphp
 
-        <div class="container pb-5">
-            {{-- التفاصيل --}}
-            <article class="rich-text-content kfs-panel">
-                {!! clean($landmark->details, 'cms') !!}
-            </article>
+    <main class="klm">
+        <x-kfs.page-hero :title="$name" kicker="معلم سياحي" icon="fa-solid fa-monument" :image="$cover"
+            :crumbs="['السياحة والمعالم' => route('landmarks.index')]">
+            <x-slot:meta>
+                @if ($address)
+                    <span><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ $address }}</span>
+                @endif
+                @if ($photos->count() > 1)
+                    <span><i class="fa-solid fa-images" aria-hidden="true"></i> {{ $photos->count() }} صورة</span>
+                @endif
+            </x-slot:meta>
+        </x-kfs.page-hero>
 
-            {{-- معرض الصور --}}
-            @if ($landmark->images->isNotEmpty())
-                <div class="gallery-section">
-                    <x-kfs.section-title title="معرض الصور" />
-                    <div class="swiper project-gallery-slider">
-                        <div class="swiper-wrapper">
-                            @foreach ($landmark->images as $image)
-                                <div class="swiper-slide">
-                                    <a href="{{ Storage::url($image->path) }}" data-fslightbox="landmark-gallery">
-                                        <img src="{{ Storage::url($image->path) }}"
-                                            alt="{{ $image->caption ?? $landmark->name }}">
-                                    </a>
-                                </div>
+        <div class="container klm__wrap">
+            <div class="klm__layout">
+                {{-- ===== Main column ===== --}}
+                <div class="klm__main">
+                    {{-- Gallery mosaic --}}
+                    @if ($photos->isNotEmpty())
+                        <section class="klm-gallery klm-gallery--n{{ min($mosaic->count(), 5) }}" aria-label="معرض الصور">
+                            @foreach ($mosaic as $i => $photo)
+                                <a href="{{ $photo['src'] }}" class="klm-gallery__item" data-fslightbox="landmark"
+                                    data-caption="{{ $photo['caption'] }}" aria-label="عرض الصورة {{ $i + 1 }} من {{ $photos->count() }}">
+                                    <img src="{{ $photo['src'] }}" alt="{{ $photo['caption'] }}" @if ($i > 0) loading="lazy" @endif>
+                                    @if ($loop->last && $extra > 0)
+                                        <span class="klm-gallery__more"><i class="fa-solid fa-images" aria-hidden="true"></i> +{{ $extra }} صورة</span>
+                                    @endif
+                                </a>
                             @endforeach
-                        </div>
-                        <div class="swiper-button-next"></div>
-                        <div class="swiper-button-prev"></div>
-                    </div>
-                </div>
-            @endif
-
-            {{-- كيفية الوصول --}}
-            @if($landmark->latitude && $landmark->longitude)
-                <div class="directions-card">
-                    <h4>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0-2.5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
-                        </svg>
-                        كيفية الوصول للمعلم
-                    </h4>
-
-                    @if($landmark->address)
-                        <div class="info-box">
-                            <strong>📍 العنوان:</strong>
-                            <p>{{ $landmark->address }}</p>
-                        </div>
+                            {{-- Remaining photos: part of the lightbox set, not shown in the mosaic --}}
+                            @foreach ($photos->slice($mosaic->count()) as $photo)
+                                <a href="{{ $photo['src'] }}" data-fslightbox="landmark" data-caption="{{ $photo['caption'] }}" hidden tabindex="-1" aria-hidden="true"></a>
+                            @endforeach
+                            @if ($photos->count() > 1)
+                                <button type="button" class="klm-gallery__all" data-open-gallery>
+                                    <i class="fa-solid fa-grip" aria-hidden="true"></i> عرض كل الصور
+                                </button>
+                            @endif
+                        </section>
                     @endif
 
-                    <div class="text-center my-4">
-                        <button type="button" 
-                                class="map-btn"
-                                onclick="showDirectionsMap()">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.654.689-1.782.886-3.112.752-1.234-.124-2.503-.523-3.388-.893V2.828zM7.5 1.916v.688c.588-.069 1.19-.093 1.788-.071.61.023 1.21.105 1.788.246V1.5a.5.5 0 0 1 .5-.5h.5a.5.5 0 0 1 .5.5v1.293c.578.141 1.178.223 1.788.246.598.022 1.2-.002 1.788-.071v-.688c-.588.069-1.19.093-1.788.071a12.5 12.5 0 0 0-1.788-.246V1.5a.5.5 0 0 1 .5-.5h.5a.5.5 0 0 1 .5.5v1.293c.578.141 1.178.223 1.788.246.598.022 1.2-.002 1.788-.071v-.688c-.588.069-1.19.093-1.788.071a12.5 12.5 0 0 0-1.788-.246V1.5a.5.5 0 0 1 .5-.5h.5a.5.5 0 0 1 .5.5v1.293c.578.141 1.178.223 1.788.246.598.022 1.2-.002 1.788-.071zM8 5.993c.588-.069 1.19-.093 1.788-.071.61.023 1.21.105 1.788.246V15a.5.5 0 0 1-.5.5h-.5a.5.5 0 0 1-.5-.5V6.164c-.578.141-1.178.223-1.788.246-.598.022-1.2-.002-1.788-.071V5.993z"/>
-                            </svg>
-                            اعرض خريطة الطريق من موقعي
-                        </button>
+                    {{-- About --}}
+                    <section class="klm-card klm-about" aria-labelledby="klmAboutTitle">
+                        <h2 class="klm-card__title" id="klmAboutTitle">
+                            <span class="klm-card__icon" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span>
+                            عن المعلم
+                        </h2>
+                        @if ($details !== '')
+                            <div class="klm-prose">{!! clean($details, 'cms') !!}</div>
+                        @else
+                            <p class="klm-muted">لا يوجد وصف لهذا المعلم حتى الآن.</p>
+                        @endif
+                    </section>
 
-                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ $landmark->latitude }},{{ $landmark->longitude }}" 
-                           target="_blank" 
-                           class="map-btn secondary">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                            </svg>
-                            احسب المسار من موقعي الحالي
-                        </a>
-                    </div>
-
-                    {{-- خريطة الاتجاهات --}}
-                    <div id="directionsMapContainer" style="display: none;">
-                        <div class="alert alert-info" role="alert" id="mapLoading">
-                            <div class="d-flex align-items-center justify-content-center">
-                                <div class="spinner-border spinner-border-sm me-2" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                                <span>جاري تحديد موقعك وعرض الطريق...</span>
+                    {{-- Location map --}}
+                    @if ($hasCoords)
+                        <section class="klm-card klm-location" aria-labelledby="klmMapTitle">
+                            <div class="klm-location__head">
+                                <h2 class="klm-card__title" id="klmMapTitle">
+                                    <span class="klm-card__icon" aria-hidden="true"><i class="fa-solid fa-map-location-dot"></i></span>
+                                    الموقع على الخريطة
+                                </h2>
+                                @if (Route::has('governorate.map'))
+                                    <a href="{{ route('governorate.map') }}" class="klm-link">الخريطة التفاعلية <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+                                @endif
                             </div>
+                            <div class="klm-map" id="klmMap" role="region" aria-label="خريطة موقع {{ $name }}"
+                                data-lat="{{ $landmark->latitude }}" data-lng="{{ $landmark->longitude }}" data-name="{{ $name }}"></div>
+                        </section>
+                    @endif
+                </div>
+
+                {{-- ===== Aside ===== --}}
+                <aside class="klm__aside" aria-label="معلومات الزيارة">
+                    <div class="klm-info">
+                        <h2 class="klm-info__title">معلومات الزيارة</h2>
+                        <dl class="klm-info__list">
+                            <div>
+                                <dt><i class="fa-solid fa-tag" aria-hidden="true"></i> التصنيف</dt>
+                                <dd>معلم سياحي</dd>
+                            </div>
+                            @if ($address)
+                                <div>
+                                    <dt><i class="fa-solid fa-location-dot" aria-hidden="true"></i> العنوان</dt>
+                                    <dd>{{ $address }}</dd>
+                                </div>
+                            @endif
+                            <div>
+                                <dt><i class="fa-solid fa-map-pin" aria-hidden="true"></i> المحافظة</dt>
+                                <dd>كفر الشيخ</dd>
+                            </div>
+                            @if ($photos->count())
+                                <div>
+                                    <dt><i class="fa-solid fa-camera" aria-hidden="true"></i> الصور</dt>
+                                    <dd>{{ $photos->count() }}</dd>
+                                </div>
+                            @endif
+                        </dl>
+
+                        <div class="klm-info__actions">
+                            @if ($directions)
+                                <a href="{{ $directions }}" target="_blank" rel="noopener" class="klm-btn klm-btn--primary">
+                                    <i class="fa-solid fa-diamond-turn-right" aria-hidden="true"></i><span>الاتجاهات من موقعي</span>
+                                </a>
+                            @endif
+                            @if ($bookUrl)
+                                <a href="{{ $bookUrl }}" class="klm-btn klm-btn--gold">
+                                    <i class="fa-solid fa-route" aria-hidden="true"></i><span>احجز رحلة</span>
+                                </a>
+                            @endif
+                            <button type="button" class="klm-btn" id="klmShare" data-title="{{ $name }}">
+                                <i class="fa-solid fa-share-nodes" aria-hidden="true"></i><span>مشاركة</span>
+                            </button>
                         </div>
-                        <div id="mapError" style="display: none;"></div>
-                        <div id="directionsMapLeaflet" style="display: none;"></div>
+                        <p class="klm-info__toast" id="klmShareToast" role="status" hidden>تم نسخ الرابط</p>
                     </div>
 
-                </div>
+                    <a href="{{ route('landmarks.index') }}" class="klm-back">
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i> كل المعالم السياحية
+                    </a>
+                </aside>
+            </div>
+
+            {{-- ===== More landmarks ===== --}}
+            @if ($related->isNotEmpty())
+                <section class="klm-related" aria-labelledby="klmRelatedTitle">
+                    <x-kfs.section-title id="klmRelatedTitle" title="معالم أخرى تستحق الزيارة" :link="route('landmarks.index')" linkText="كل المعالم" />
+                    <div class="klm-related__grid">
+                        @foreach ($related as $item)
+                            <a href="{{ route('landmarks.show', $item->id) }}" class="klm-related__card">
+                                <span class="klm-related__img">
+                                    <img src="{{ $item->thumbnail ? Storage::url($item->thumbnail) : asset('images/bg/terosim.jpg') }}" alt="" loading="lazy">
+                                </span>
+                                <span class="klm-related__body">
+                                    <strong>{{ trim($item->name) }}</strong>
+                                    @if (trim((string) $item->address))
+                                        <small><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ trim($item->address) }}</small>
+                                    @endif
+                                </span>
+                            </a>
+                        @endforeach
+                    </div>
+                </section>
             @endif
-
-
         </div>
     </main>
 @endsection
+
 @push('scripts')
-    {{-- FSLightbox (رابط مستقر) --}}
     <script src="https://cdn.jsdelivr.net/npm/fslightbox@3.4.1/index.js"></script>
-
-    {{-- Swiper --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
-    {{-- Leaflet & Routing --}}
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-
+    @if ($hasCoords)
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    @endif
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Gallery Slider
-            const gallerySlider = document.querySelector('.project-gallery-slider');
-            if (gallerySlider) {
-                new Swiper('.project-gallery-slider', {
-                    loop: true,
-                    spaceBetween: 20,
-                    grabCursor: true,
-                    slidesPerView: 1,
-                    breakpoints: { 768: { slidesPerView: 2 }, 992: { slidesPerView: 3 } },
-                    navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }
-                });
-            }
-
-            // FSLightbox Safe Init
-            if (typeof refreshFsLightbox === 'function') {
-                try { refreshFsLightbox(); } catch(e) {}
-            }
-
-            // Date Input Min
-            const dateInput = document.getElementById('visit_date');
-            if (dateInput) dateInput.min = new Date().toISOString().split('T')[0];
-
-            // Form Submit Loading
-            const form = document.getElementById('bookingForm');
-            const btn = document.getElementById('submitBtn');
-            form?.addEventListener('submit', () => {
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>جاري الإرسال...';
-                btn.disabled = true;
-            });
+    (function () {
+        // Gallery: "عرض كل الصور" opens the lightbox at the first photo.
+        document.querySelector('[data-open-gallery]')?.addEventListener('click', () => {
+            if (window.fsLightboxInstances && fsLightboxInstances.landmark) fsLightboxInstances.landmark.open(0);
+            else document.querySelector('.klm-gallery__item')?.click();
         });
 
-        function showDirectionsMap() {
-            const container = document.getElementById('directionsMapContainer');
-            const loading = document.getElementById('mapLoading');
-            const errorDiv = document.getElementById('mapError');
-            const mapDiv = document.getElementById('directionsMapLeaflet');
-            
-            container.style.display = 'block';
-            loading.style.display = 'block';
-            errorDiv.style.display = 'none';
-            mapDiv.style.display = 'none';
+        // Location map (static view, OpenStreetMap tiles — no API key).
+        const mapEl = document.getElementById('klmMap');
+        if (mapEl && window.L) {
+            const ll = [parseFloat(mapEl.dataset.lat), parseFloat(mapEl.dataset.lng)];
+            const map = L.map(mapEl, { scrollWheelZoom: false, zoomControl: true }).setView(ll, 14);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+            }).addTo(map);
+            const pin = L.divIcon({ className: 'klm-pin-wrap', html: '<span class="klm-pin"><i class="fa-solid fa-monument" aria-hidden="true"></i></span>', iconSize: [40, 48], iconAnchor: [20, 46] });
+            const marker = L.marker(ll, { icon: pin, title: mapEl.dataset.name }).addTo(map);
+            const label = document.createElement('strong');
+            label.textContent = mapEl.dataset.name;
+            marker.bindTooltip(label, { direction: 'top', offset: [0, -44], permanent: true, className: 'klm-tip' });
+        }
 
-            if (!navigator.geolocation) {
-                showError('المتصفح لا يدعم تحديد الموقع الجغرافي');
-                return;
-            }
-
-            // تعريف الدوال بشكل صريح لمنع تعارض الـ Wrappers
-            const onSuccess = (pos) => {
-                const uLat = pos.coords.latitude, uLng = pos.coords.longitude;
-                const dLat = {{ $landmark->latitude }}, dLng = {{ $landmark->longitude }};
-                
-                loading.style.display = 'none';
-                mapDiv.style.display = 'block';
-
-                const map = L.map('directionsMapLeaflet').setView([uLat, uLng], 13);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-                L.marker([uLat, uLng]).addTo(map).bindPopup('موقعك الحالي').openPopup();
-                L.marker([dLat, dLng]).addTo(map).bindPopup('{{ $landmark->name }}');
-
-                L.Routing.control({
-                    waypoints: [L.latLng(uLat, uLng), L.latLng(dLat, dLng)],
-                    routeWhileDragging: false,
-                    // language: 'ar',
-                    showAlternatives: true,
-                    addWaypoints: false,
-                    draggableWaypoints: false,
-                    fitSelectedRoutes: true,
-                    show: false,
-                    lineOptions: { styles: [{ color: '#c9a226', opacity: 0.8, weight: 5 }] }
-                }).addTo(map);
-            };
-
-            const onError = (err) => {
-                let msg = 'فشل تحديد الموقع: ';
-                if (err.code === 1) msg += 'تم رفض إذن الوصول للموقع.';
-                else if (err.code === 2) msg += 'الموقع غير متاح حالياً.';
-                else if (err.code === 3) msg += 'انتهت مهلة الانتظار.';
-                else msg += 'خطأ غير معروف.';
-                showError(msg);
-            };
-
+        // Share: native sheet when available, otherwise copy the link.
+        const share = document.getElementById('klmShare');
+        const toast = document.getElementById('klmShareToast');
+        share?.addEventListener('click', async () => {
+            const data = { title: share.dataset.title, url: location.href };
             try {
-                // نمرر دالة خطأ صريحة حتى لو فاضية، عشان الـ Wrapper ميتكسرش
-                navigator.geolocation.getCurrentPosition(onSuccess, onError || function(){}, {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
-                });
-            } catch (e) {
-                // Fallback لو الـ Wrapper قفل الـ API خالص
-                loading.style.display = 'none';
-                errorDiv.innerHTML = `
-                    <div class="alert alert-warning">
-                        تعذر تفعيل الخريطة التفاعلية بسبب تعارض مع إضافة المتصفح. 
-                        يمكنك استخدام <a href="https://www.google.com/maps/dir/?api=1&destination={{ $landmark->latitude }},{{ $landmark->longitude }}" target="_blank" class="fw-bold">رابط خرائط جوجل المباشر</a> للوصول للمعلم.
-                    </div>`;
-                errorDiv.style.display = 'block';
-            }
-        }
-
-        function showError(msg) {
-            // document.getElementById('mapLoading').style.display = 'none';
-            // const errDiv = document.getElementById('mapError');
-            // errDiv.innerHTML = `<div class="alert alert-danger">⚠️ ${msg}</div>`;
-            // errDiv.style.display = 'block';
-        }
+                if (navigator.share) { await navigator.share(data); return; }
+                await navigator.clipboard.writeText(location.href);
+                toast.hidden = false;
+                setTimeout(() => { toast.hidden = true; }, 2200);
+            } catch (e) { /* user cancelled */ }
+        });
+    })();
     </script>
 @endpush

@@ -35,6 +35,10 @@ class FinancialTransactions extends Page implements Tables\Contracts\HasTable
 
     public static function canAccess(): bool
     {
+        // خاصة بطلبات الخدمات المكانية: تظهر فقط عند «إتاحة التقديم على الخدمات المكانية» (الإعدادات العامة)
+        if (! \App\Support\EServices::gisServicesOpen()) {
+            return false;
+        }
         return auth()->user()->hasAnyRole(['super_admin', 'Admin', 'مدير المركز', 'رؤوساء الاقسام']);
     }
 

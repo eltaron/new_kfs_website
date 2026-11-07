@@ -9,7 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('exam_results', function (Blueprint $table) {
-            $table->string('adminstration')->nullable()->after('school')->comment('الإدارة التعليمية');
+            if (! Schema::hasColumn('exam_results', 'adminstration')) {
+                $table->string('adminstration')->nullable()->after('school')->comment('الإدارة التعليمية');
+            }
         });
     }
 

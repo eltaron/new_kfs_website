@@ -11,18 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('exam_results', function (Blueprint $table) {
-            $table->id();
-            $table->string('seat_number', 20)->unique()->comment('رقم الجلوس');
-            $table->string('student_name')->comment('اسم الطالب');
-            $table->string('school')->nullable()->comment('المدرسة');
-            $table->string('academic_year')->nullable()->comment('العام الدراسي');
-            $table->decimal('total_grade', 6, 2)->nullable()->comment('المجموع الكلي');
-            $table->json('subjects')->nullable()->comment('المواد: {name, grade}');
-            $table->string('status')->default('pass')->comment('النتيجة: pass/fail');
-            $table->text('notes')->nullable();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('exam_results')) {
+            Schema::create('exam_results', function (Blueprint $table) {
+                $table->id();
+                $table->string('seat_number', 20)->unique()->comment('رقم الجلوس');
+                $table->string('student_name')->comment('اسم الطالب');
+                $table->string('school')->nullable()->comment('المدرسة');
+                $table->string('academic_year')->nullable()->comment('العام الدراسي');
+                $table->decimal('total_grade', 6, 2)->nullable()->comment('المجموع الكلي');
+                $table->json('subjects')->nullable()->comment('المواد: {name, grade}');
+                $table->string('status')->default('pass')->comment('النتيجة: pass/fail');
+                $table->text('notes')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

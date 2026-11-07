@@ -1,12 +1,14 @@
 @extends('layouts.app')
 @push('css')
+    <link rel="stylesheet" href="{{ asset('css/kfs-home-search.css') }}?v={{ @filemtime(public_path('css/kfs-home-search.css')) }}">
     @if ($guideCategories->isNotEmpty())
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     @endif
 @endpush
 @section('content')
     @php
-        $kfsRoute = fn (string $name, array $params = []) => \Illuminate\Support\Facades\Route::has($name) ? route($name, $params) : null;
+        // Hidden-from-admin e-services resolve to null, so every guarded link disappears.
+        $kfsRoute = fn (string $name, array $params = []) => \App\Support\EServices::visible($name) ? route($name, $params) : null;
         $kfsImg = fn ($path, $fallback = 'images/kfs.png') => $path ? Storage::url($path) : asset($fallback);
         $kfsLogoUrl = !empty($settings['site_logo_header']) ? Storage::url($settings['site_logo_header']) : asset('logo.png');
         $kfsPlain = fn ($html, $limit = 140) => \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string) $html), ENT_QUOTES | ENT_HTML5, 'UTF-8'))), $limit);
@@ -16,7 +18,6 @@
         $kfsQuick = collect([
             ['services.index', 'fa-solid fa-hand-holding-hand', 'دليل الخدمات', 'كل الخدمات الحكومية وشروطها ومستنداتها', null],
             ['requests.index', 'fa-solid fa-file-pen', 'الشكاوى والبلاغات', 'قدّم شكواك أو بلاغك وتابع حالتها', null],
-            ['gis.index', 'fa-solid fa-map-location-dot', 'الخدمات الجغرافية', 'خدمات المساحة والمواقع والتراخيص', null],
             ['site-validity.landing', 'fa-solid fa-ruler-combined', 'طلب صلاحية الموقع', 'معاينة ورفع مساحي وملف نهائي إلكترونياً', null],
             ['citizen-lookup', 'fa-solid fa-helmet-safety', 'الإشراف الهندسي', 'استعلام عن شهادات الإشراف', null],
             ['exam-results.index', 'fa-solid fa-graduation-cap', 'نتائج الامتحانات', 'استعلم عن نتيجتك برقم الجلوس', null],
@@ -105,7 +106,7 @@
                     <div class="kfs-hs__content">
                         <div class="container">
                             <div class="kfs-hs__text kfs-hero-anim">
-                                <span class="kfs-hs__badge">البوابة الإلكترونية الرسمية</span>
+                                <span class="kfs-hs__badge">الموقع الرسمي</span>
                                 <h1 class="kfs-hs__title">محافظة كفر الشيخ</h1>
                                 <p class="kfs-hs__lead">خدماتك الحكومية ومعلومات محافظتك في مكان واحد — أرض الماء والزراعة والتنمية.</p>
                                 <div class="kfs-hs__actions">
@@ -117,16 +118,64 @@
                     </div>
                 </div>
             @endif
-        </section>
 
-        {{-- Quick search overlapping the hero --}}
-        <div class="container kfs-quick">
-            <form action="{{ route('search') }}" class="kfs-quick__form" role="search">
-                <label for="kfsHomeSearch" class="kfs-quick__label"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> ابحث في البوابة</label>
-                <input type="search" id="kfsHomeSearch" name="query" placeholder="خدمة، خبر، مشروع، رقم هاتف..." autocomplete="off">
-                <button type="submit" class="btn-kfs" aria-label="بحث"><i class="fa-solid fa-magnifying-glass d-md-none" aria-hidden="true"></i><span>بحث</span></button>
-            </form>
-        </div>
+            {{-- ===== Search console (inside the hero) ===== --}}
+            @php
+                $kfsSuggest = collect([
+                    ['services.index', 'fa-solid fa-hand-holding-hand', 'دليل الخدمات', 'صفحة'],
+                    ['posts.index', 'fa-solid fa-newspaper', 'الأخبار', 'صفحة'],
+                    ['projects.index', 'fa-solid fa-diagram-project', 'المشروعات القومية', 'صفحة'],
+                    ['investments.index', 'fa-solid fa-chart-line', 'الاستثمار', 'صفحة'],
+                    ['landmarks.index', 'fa-solid fa-monument', 'السياحة والمعالم', 'صفحة'],
+                    ['governorate.map', 'fa-solid fa-map-location-dot', 'الخريطة التفاعلية', 'صفحة'],
+                    ['about', 'fa-solid fa-landmark-flag', 'عن المحافظة', 'صفحة'],
+                    ['about.governor', 'fa-solid fa-feather-pointed', 'كلمة المحافظ', 'صفحة'],
+                    ['contact.index', 'fa-solid fa-headset', 'تواصل معنا', 'صفحة'],
+                ])->map(fn ($q) => ['t' => $q[2], 'u' => $kfsRoute($q[0]), 'i' => $q[1], 'k' => $q[3]])
+                  ->concat($kfsQuick->map(fn ($q) => ['t' => $q['title'], 'u' => $q['url'], 'i' => $q['icon'], 'k' => 'خدمة إلكترونية', 'd' => $q['desc']]))
+                  ->concat($services->map(fn ($svc) => ['t' => trim(strip_tags($svc->title ?: trim($svc->title_line_1 . ' ' . $svc->title_line_2))), 'u' => $svc->publicUrl(), 'i' => $svc->icon ?: 'fa-solid fa-file-lines', 'k' => 'خدمة']))
+                  ->filter(fn ($q) => $q['u'] && $q['t'])->unique('u')->values();
+                $kfsExamples = ['رخصة بناء', 'نتائج الامتحانات', 'تقديم شكوى', 'المعالم السياحية', 'دليل الهاتف', 'الفرص الاستثمارية'];
+                $kfsPopular = $kfsQuick->reject(fn ($q) => $q['title'] === 'دليل الخدمات')->take(5);
+            @endphp
+            <div class="khs">
+                <div class="container">
+                    <form action="{{ route('search') }}" method="GET" class="khs__panel" role="search" id="khsForm" autocomplete="off">
+                        <div class="khs__top">
+                            <label for="khsInput" class="khs__q">
+                                <span class="khs__q-icon" aria-hidden="true"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                بماذا يمكننا مساعدتك اليوم؟
+                            </label>
+                        </div>
+
+                        <div class="khs__field">
+                            <i class="fa-solid fa-magnifying-glass khs__field-icon" aria-hidden="true"></i>
+                            <input type="search" name="query" id="khsInput" class="khs__input"
+                                placeholder="ابحث عن خدمة، خبر، مشروع، رقم هاتف…"
+                                data-examples="{{ json_encode($kfsExamples, JSON_UNESCAPED_UNICODE) }}"
+                                role="combobox" aria-expanded="false" aria-controls="khsList" aria-autocomplete="list">
+                            <button type="button" class="khs__clear" id="khsClear" hidden aria-label="مسح"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+                            <button type="submit" class="khs__submit">
+                                <span>ابحث</span><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                            </button>
+                            <ul class="khs__list" id="khsList" role="listbox" aria-label="اقتراحات" hidden></ul>
+                        </div>
+
+                        @if ($kfsPopular->isNotEmpty())
+                            <div class="khs__popular">
+                                <span class="khs__popular-label"><i class="fa-solid fa-fire" aria-hidden="true"></i> الأكثر طلباً:</span>
+                                <div class="khs__chips">
+                                    @foreach ($kfsPopular as $q)
+                                        <a href="{{ $q['url'] }}" class="khs__chip"><i class="{{ $q['icon'] }}" aria-hidden="true"></i> {{ $q['title'] }}</a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    </form>
+                </div>
+            </div>
+            <script type="application/json" id="khsData">@json($kfsSuggest)</script>
+        </section>
 
         {{-- ======================= 2. VALUES (secondary hero) ======================= --}}
         @if (!empty($settings['secondary_hero_title']))
@@ -268,8 +317,8 @@
                 @if ($services->isNotEmpty())
                     <div class="kfs-grid kfs-grid--3 mb-4" data-stagger>
                         @foreach ($services as $service)
-                            <a href="{{ $service->link ? $service->link : route('services.show', $service) }}"
-                                @if ($service->link) target="_blank" rel="noopener" @endif
+                            <a href="{{ $service->publicUrl() }}"
+                                @if ($service->opensExternally()) target="_blank" rel="noopener" @endif
                                 class="kfs-svc kfs-svc--feature">
                                 <span class="kfs-svc__icon" aria-hidden="true"><i class="{{ $service->icon ?: 'fa-solid fa-file-lines' }}"></i></span>
                                 <span class="kfs-svc__body">
@@ -375,11 +424,11 @@
                             <a href="{{ route('landmarks.index') }}" class="kfs-tourx__btn kfs-tourx__btn--gold">
                                 <i class="fa-solid fa-compass" aria-hidden="true"></i> دليل المعالم
                             </a>
-                            @if (Route::has('tour-bookings.create'))
+                            @if (\App\Support\EServices::visible('tour-bookings.create'))
                                 <a href="{{ route('tour-bookings.create') }}" class="kfs-tourx__btn">
                                     <i class="fa-solid fa-route" aria-hidden="true"></i> احجز رحلة
                                 </a>
-                            @elseif (Route::has('tour-bookings.index'))
+                            @elseif (\App\Support\EServices::visible('tour-bookings.index'))
                                 <a href="{{ route('tour-bookings.index') }}" class="kfs-tourx__btn">
                                     <i class="fa-solid fa-route" aria-hidden="true"></i> احجز رحلة
                                 </a>
@@ -654,6 +703,7 @@
     </main>
 @endsection
 @push('scripts')
+    <script src="{{ asset('js/kfs-home-search.js') }}?v={{ @filemtime(public_path('js/kfs-home-search.js')) }}" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var rtl = (document.documentElement.getAttribute('dir') || 'rtl') === 'rtl';

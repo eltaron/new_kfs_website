@@ -10,6 +10,7 @@ use App\Filament\Gis\Widgets\GisStatsOverview;
 use App\Filament\Gis\Widgets\RemovalStatsWidget;
 use App\Filament\Gis\Widgets\ViolationChart;
 use App\Filament\Gis\Widgets\RequestsStatusChart;
+use App\Filament\Gis\Widgets\RemovalWorkflowOverview;
 
 class Dashboard extends BaseDashboard
 {
@@ -46,27 +47,31 @@ class Dashboard extends BaseDashboard
 
         // الإدارة الممتدة: رؤوساء الأقسام ومدير المركز يشوفوا الإحصائيات كاملة
         if ($user->hasAnyRole(['super_admin', 'Admin', 'مدير المركز', 'رؤوساء الاقسام'])) {
-            return [
-                GisPerformanceWidget::class,
-                GisStatsOverview::class,
+            // لوحة حوكمة قرارات الإزالة فقط؛ إحصائيات طلبات الخدمات المكانية تظهر عند إتاحتها
+            $gisRequests = \App\Support\EServices::gisServicesOpen();
+
+            return array_values(array_filter([
+                RemovalWorkflowOverview::class,
                 RemovalStatsWidget::class,
                 ViolationChart::class,
-                RequestsStatusChart::class,
-            ];
+                $gisRequests ? GisPerformanceWidget::class : null,
+                $gisRequests ? GisStatsOverview::class : null,
+                $gisRequests ? RequestsStatusChart::class : null,
+            ]));
         }
 
         // قيادات المركز: الإحصائيات والرسوم مقيدة بمركز كل منهم
         if ($user->hasAnyRole(['مدير الادارة الهندسية', 'مدير المتغيرات', 'عضو المتغيرات'])) {
             return [
-                GisWelcomeWidget::class,
+                RemovalWorkflowOverview::class,
                 RemovalStatsWidget::class,
                 ViolationChart::class,
             ];
         }
 
-        // باقي الأدوار: الترحيب والروابط السريعة حسب الدور
+        // باقي الأدوار: لوحة مسار القرارات لمن يتعامل مع القرارات، وإلا الترحيب والروابط السريعة
         return [
-            GisWelcomeWidget::class,
+            RemovalWorkflowOverview::canView() ? RemovalWorkflowOverview::class : GisWelcomeWidget::class,
         ];
     }
 }

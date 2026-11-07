@@ -54,10 +54,7 @@ class GisWelcomeWidget extends Widget
                 'color' => 'info',
                 'icon' => 'heroicon-o-pencil-square',
                 'quickLinks' => [
-                    ['label' => 'سير العمل', 'url' => '/gis/workflow-dashboard', 'icon' => 'heroicon-o-arrow-path'],
-                    ['label' => 'الوارد اليومي', 'url' => '/gis/new-gis-submissions', 'icon' => 'heroicon-o-document-plus'],
-                    ['label' => 'قيد المراجعة', 'url' => '/gis/pending-gis-submissions', 'icon' => 'heroicon-o-arrow-path'],
-                    ['label' => 'جملة الطلبات', 'url' => '/gis/gis-submissions', 'icon' => 'heroicon-o-document-magnifying-glass'],
+                    ['label' => 'جملة الطلبات', 'url' => '/gis/removal-orders', 'icon' => 'heroicon-o-document-magnifying-glass'],
                 ],
             ],
             'مدير التنظيم' => [
@@ -66,10 +63,7 @@ class GisWelcomeWidget extends Widget
                 'color' => 'primary',
                 'icon' => 'heroicon-o-clipboard-document-check',
                 'quickLinks' => [
-                    ['label' => 'الوارد اليومي', 'url' => '/gis/new-gis-submissions', 'icon' => 'heroicon-o-document-plus'],
-                    ['label' => 'سجل التقارير', 'url' => '/gis/removal-reports', 'icon' => 'heroicon-o-clipboard-document-list'],
-                    ['label' => 'إحصائيات وتحليلات', 'url' => '/gis/removal-analytics', 'icon' => 'heroicon-o-presentation-chart-line'],
-                    ['label' => 'تقارير عامة', 'url' => '/gis/gis-general-reports', 'icon' => 'heroicon-o-presentation-chart-bar'],
+                    ['label' => 'جملة الطلبات', 'url' => '/gis/removal-orders', 'icon' => 'heroicon-o-document-magnifying-glass'],
                 ],
             ],
             'مدير المتغيرات' => [
@@ -88,7 +82,6 @@ class GisWelcomeWidget extends Widget
                 'icon' => 'heroicon-o-map-pin',
                 'quickLinks' => [
                     ['label' => 'سير العمل', 'url' => '/gis/workflow-dashboard', 'icon' => 'heroicon-o-arrow-path'],
-                    ['label' => 'قرارات الإزالة', 'url' => '/gis/removal-orders', 'icon' => 'heroicon-o-document-text'],
                 ],
             ],
             'أخصائي النظم' => [
@@ -114,11 +107,14 @@ class GisWelcomeWidget extends Widget
                 'message' => 'من هنا يمكنك الوصول للخدمات المخصصة لدورك الوظيفي.',
                 'color' => 'primary',
                 'icon' => 'heroicon-o-globe-alt',
-                'quickLinks' => [
+                'quickLinks' => array_values(array_filter([
                     ['label' => 'الملف الشخصي', 'url' => '/gis/profile', 'icon' => 'heroicon-o-user-circle'],
-                    ['label' => 'جملة الطلبات', 'url' => '/gis/gis-submissions', 'icon' => 'heroicon-o-document-magnifying-glass'],
-                    ['label' => 'الخدمات التفصيلية', 'url' => '/gis/gis-sub-services', 'icon' => 'heroicon-o-adjustments-vertical'],
-                ],
+                    ['label' => 'جملة الطلبات', 'url' => '/gis/removal-orders', 'icon' => 'heroicon-o-document-magnifying-glass'],
+                    // صفحة الخدمات التفصيلية تظهر فقط عند إتاحة الخدمات المكانية
+                    \App\Support\EServices::gisServicesOpen()
+                        ? ['label' => 'الخدمات التفصيلية', 'url' => '/gis/gis-sub-services', 'icon' => 'heroicon-o-adjustments-vertical']
+                        : null,
+                ])),
             ],
         ];
 

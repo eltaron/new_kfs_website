@@ -1,0 +1,83 @@
+/* ==========================================================================
+   KFS — Project detail (resources/views/projects/show.blade.php)
+   Builds on kfs-landmark.css (shared .klm-* detail layout); adds the
+   per-category tone, read-more, investment CTA and iframe map fallback.
+   ========================================================================== */
+
+.kpj { --tone: var(--kfs-primary); --tone-tint: var(--kfs-primary-soft); }
+.kpj--olive { --tone: var(--kfs-olive); --tone-tint: var(--kfs-olive-tint); }
+.kpj--gold { --tone: var(--kfs-gold-deep); --tone-tint: var(--kfs-gold-tint); }
+.kpj--bronze { --tone: var(--kfs-bronze); --tone-tint: var(--kfs-bronze-soft); }
+:root[data-theme="dark"] .kpj { --tone: var(--kfs-cyan-light); --tone-tint: color-mix(in srgb, var(--kfs-cyan) 16%, transparent); }
+:root[data-theme="dark"] .kpj--olive { --tone: var(--kfs-olive); --tone-tint: color-mix(in srgb, var(--kfs-olive) 22%, transparent); }
+:root[data-theme="dark"] .kpj--gold,
+:root[data-theme="dark"] .kpj--bronze { --tone: var(--kfs-gold); --tone-tint: color-mix(in srgb, var(--kfs-gold) 18%, transparent); }
+
+.kpj .kpj-icon { background: var(--tone-tint); color: var(--tone); }
+.kpj .klm-info { border-top-color: var(--tone); }
+.kpj .klm-info__list dt i { color: var(--tone); }
+.kpj .klm-info__list dd a { color: var(--kfs-cyan-ink); text-decoration: none; }
+.kpj .klm-info__list dd a:hover { text-decoration: underline; }
+.kpj .kpj-pin { background: var(--tone); }
+
+.kpj-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 4px 12px;
+    margin-bottom: var(--sp-3);
+    border-radius: var(--r-pill);
+    background: var(--tone-tint);
+    color: var(--tone);
+    font-size: var(--fs-xs); font-weight: 700;
+}
+
+/* read more */
+.kpj-readmore { position: relative; }
+.kpj-readmore.is-collapsed { max-height: 420px; overflow: hidden; }
+.kpj-readmore.is-collapsed::after {
+    content: "";
+    position: absolute; inset-inline: 0; bottom: 0;
+    height: 120px;
+    background: linear-gradient(to bottom, transparent, var(--kfs-surface));
+    pointer-events: none;
+}
+.kpj-readmore__btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: var(--sp-3);
+    padding: 8px 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-pill);
+    background: var(--kfs-surface);
+    color: var(--kfs-text);
+    font-weight: 700; font-size: var(--fs-sm);
+}
+.kpj-readmore__btn:hover { border-color: var(--tone); color: var(--tone); }
+.kpj-readmore__btn[aria-expanded="true"] i { transform: rotate(180deg); }
+
+/* iframe map fallback */
+.kpj-embed { border-radius: var(--r-lg); overflow: hidden; border: 1px solid var(--line); }
+.kpj-embed iframe { display: block; width: 100%; height: 340px; border: 0; }
+
+/* investment CTA (aside) */
+.kpj-cta {
+    padding: var(--sp-5);
+    border-radius: var(--r-xl);
+    background: var(--kfs-dark) var(--kfs-pattern-faint);
+    color: var(--kfs-on-dark);
+    text-align: center;
+    box-shadow: var(--e-2);
+}
+.kpj-cta__icon {
+    display: inline-grid; place-items: center;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: rgba(216, 176, 62, .16);
+    color: var(--kfs-gold);
+    font-size: 1.2rem;
+    margin-bottom: var(--sp-3);
+}
+.kpj-cta__text { margin: 0 0 var(--sp-4); font-weight: 700; line-height: 1.8; color: #fff; }
+.kpj-cta .klm-btn { width: 100%; }
+
+/* related kind label */
+.kpj-related__kind { color: var(--kfs-text-soft); font-weight: 600; }
+.kpj .klm-related__body small.kpj-related__kind i { color: var(--kfs-gold-dark); }

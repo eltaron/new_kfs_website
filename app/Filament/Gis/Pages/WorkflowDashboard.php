@@ -82,6 +82,7 @@ class WorkflowDashboard extends Page implements Tables\Contracts\HasTable
                         RemovalOrder::STAGE_PDF_READY => 'secondary',
                         RemovalOrder::STAGE_SYSTEMS_PROCESSING => 'purple',
                         RemovalOrder::STAGE_LOCAL_UNIT_APPROVAL => 'teal',
+                        RemovalOrder::STAGE_GIS_PENDING => 'purple',
                         RemovalOrder::STAGE_VISA_PENDING => 'indigo',
                         RemovalOrder::STAGE_COMPLETED => 'success',
                         default => 'gray',
@@ -143,6 +144,56 @@ class WorkflowDashboard extends Page implements Tables\Contracts\HasTable
                         fn(RemovalOrder $record) =>
                         auth()->user()->hasAnyRole(['أخصائي النظم', 'محللي النظم']) &&
                             $record->stage === RemovalOrder::STAGE_SPATIAL_DIMENSIONED
+                    ),
+                // محضر عدم تنفيذ قرار الإزالة (فني التنظيم - بعد اعتماد المحافظ)
+                Action::make('failure_to_execute_the_demolition_order')
+                    ->label('محضر عدم تنفيذ قرار الإزالة')
+                    ->icon('heroicon-o-document-minus')
+                    ->color('info')
+                    ->modalHeading('رفع محضر عدم تنفيذ قرار الإزالة')
+                    ->form([
+                        Forms\Components\FileUpload::make('failure_to_execute_the_demolition_order_file')
+                            ->label('ملف محضر عدم التنفيذ')
+                            ->directory('removal-orders/legal')
+                            ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
+                            ->maxSize(10240)
+                            ->required(),
+                    ])
+                    ->action(function (array $data, RemovalOrder $record) {
+                        $record->update([
+                            'failure_to_execute_the_demolition_order_file' => $data['failure_to_execute_the_demolition_order_file'],
+                        ]);
+                        Notification::make()->success()->title('تم رفع محضر عدم التنفيذ بنجاح')->send();
+                    })
+                    ->visible(
+                        fn(RemovalOrder $record) =>
+                        auth()->user()->hasRole('فني التنظيم') &&
+                            $record->stage === RemovalOrder::STAGE_COMPLETED
+                    ),
+                // إخطار الإيرادات بتحصيل 1% (فني التنظيم - بعد اعتماد المحافظ)
+                Action::make('notification_to_the_revenue_department')
+                    ->label('إخطار الإيرادات بتحصيل 1%')
+                    ->icon('heroicon-o-banknotes')
+                    ->color('info')
+                    ->modalHeading('رفع إخطار الإيرادات بتحصيل 1%')
+                    ->form([
+                        Forms\Components\FileUpload::make('notification_to_the_revenue_department_file')
+                            ->label('ملف إخطار الإيرادات')
+                            ->directory('removal-orders/legal')
+                            ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/webp'])
+                            ->maxSize(10240)
+                            ->required(),
+                    ])
+                    ->action(function (array $data, RemovalOrder $record) {
+                        $record->update([
+                            'notification_to_the_revenue_department_file' => $data['notification_to_the_revenue_department_file'],
+                        ]);
+                        Notification::make()->success()->title('تم رفع إخطار الإيرادات بنجاح')->send();
+                    })
+                    ->visible(
+                        fn(RemovalOrder $record) =>
+                        auth()->user()->hasRole('فني التنظيم') &&
+                            $record->stage === RemovalOrder::STAGE_COMPLETED
                     ),
                 // إخطار المواطن (فني التنظيم - بعد اعتماد المحافظ)
                 Action::make('notify_citizen')
@@ -248,8 +299,10 @@ class WorkflowDashboard extends Page implements Tables\Contracts\HasTable
             return RemovalOrder::query();
         }
 
-        if ($user->hasRole('مدير الادارة الهندسية')) {
-            return RemovalOrder::query();
+        // مدير الادارة الهندسية / مدير المتغيرات / عضو المتغيرات: قرارات مركزهم فقط،
+        // ولو مفيش مركز مسجل للمستخدم -> مفيش قرارات تظهر
+        if ($user->hasAnyRole(['مدير الادارة الهندسية', 'مدير المتغيرات', 'عضو المتغيرات'])) {
+            return $this->applyCenterScope(RemovalOrder::query(), $user);
         }
 
         if ($user->hasRole('فني التنظيم')) {
@@ -260,14 +313,6 @@ class WorkflowDashboard extends Page implements Tables\Contracts\HasTable
 
         if ($user->hasRole('مهندس التنظيم')) {
             return RemovalOrder::query();
-        }
-
-        if ($user->hasRole('مدير المتغيرات')) {
-            return RemovalOrder::query();
-        }
-
-        if ($user->hasRole('عضو المتغيرات')) {
-            return RemovalOrder::where('spatial_member_id', $user->id);
         }
 
         if ($user->hasRole('محللي النظم')) {
@@ -292,6 +337,13 @@ class WorkflowDashboard extends Page implements Tables\Contracts\HasTable
         }
 
         return RemovalOrder::where('assigned_to', $user->id);
+    }
+
+    private function applyCenterScope(Builder $query, User $user): Builder
+    {
+        return $user->center
+            ? $query->where('center', $user->center)
+            : $query->whereRaw('1 = 0');
     }
 
     private function getWorkflowActions(User $user): array

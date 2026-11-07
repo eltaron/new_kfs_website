@@ -44,8 +44,8 @@
                             <x-kfs.section-title title="الخدمات الفرعية المتاحة" subtitle="اختر الخدمة المطلوبة للاطلاع على شروطها وتقديم الطلب." />
                             <div class="kfs-grid kfs-grid--2" data-stagger>
                                 @foreach ($service->children as $subService)
-                                    <a href="{{ $subService->link ? $subService->link : route('services.show', $subService) }}"
-                                        class="kfs-svc" @if ($subService->link) target="_blank" rel="noopener" @endif>
+                                    <a href="{{ $subService->publicUrl() }}"
+                                        class="kfs-svc" @if ($subService->opensExternally()) target="_blank" rel="noopener" @endif>
                                         <span class="kfs-svc__icon" aria-hidden="true"><i class="{{ $subService->icon ?? 'fa-solid fa-file-lines' }}"></i></span>
                                         <span class="kfs-svc__body">
                                             <span class="kfs-svc__title">{{ strip_tags($subService->title) }}</span>

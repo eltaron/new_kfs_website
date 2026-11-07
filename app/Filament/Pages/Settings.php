@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Support\EServices;
 use Modules\Content\Models\Setting;
 use Filament\Actions\Action;
 use Filament\Forms;
@@ -36,6 +37,8 @@ class Settings extends Page implements HasForms
     {
         // Load settings from DB. The keys must match the `make()` names in the form schema.
         $settings = Setting::all()->pluck('value', 'key')->toArray();
+        $settings[EServices::SETTING_KEY] = EServices::decode($settings[EServices::SETTING_KEY] ?? null);
+        $settings[EServices::GIS_OPEN_KEY] = in_array($settings[EServices::GIS_OPEN_KEY] ?? null, ['1', 1, true, 'true'], true);
         $this->form->fill($settings);
     }
 
@@ -87,6 +90,19 @@ class Settings extends Page implements HasForms
                                 Forms\Components\Textarea::make('footer_description')->label('وصف الفوتر المختصر'),
                                 Forms\Components\TextInput::make('copyright_text')->label('نص حقوق النشر'),
                             ]),
+                        Forms\Components\Tabs\Tab::make('الخدمات الإلكترونية')
+                            ->icon('heroicon-o-eye-slash')
+                            ->schema([
+                                Forms\Components\CheckboxList::make(EServices::SETTING_KEY)
+                                    ->label('الخدمات المخفية')
+                                    ->helperText('الخدمات المحددة لا تظهر في كروت الخدمات الإلكترونية بالصفحة الرئيسية ولا في قائمة «الخدمات الإلكترونية» بالهيدر.')
+                                    ->options(EServices::options())
+                                    ->columns(3)
+                                    ->bulkToggleable(),
+                                Forms\Components\Toggle::make(EServices::GIS_OPEN_KEY)
+                                    ->label('إتاحة التقديم على الخدمات المكانية')
+                                    ->helperText('عند الإيقاف: فتح أي خدمة من «منظومة الخدمات المكانية» يعرض صفحة «قريباً» بدلاً من تفاصيل الخدمة ونموذج التقديم.'),
+                            ]),
                         Forms\Components\Tabs\Tab::make('صفحات عن المحافظة')
                             ->icon('heroicon-o-building-library')
                             ->schema([
@@ -126,11 +142,18 @@ class Settings extends Page implements HasForms
                 if ($value === null && $this->form->getComponent($key) instanceof Forms\Components\FileUpload) {
                     continue;
                 }
+                if (is_bool($value)) {
+                    $value = $value ? '1' : '0';
+                }
+                if (is_array($value)) {
+                    $value = json_encode(array_values($value), JSON_UNESCAPED_UNICODE);
+                }
                 Setting::updateOrCreate(['key' => $key], ['value' => $value ?? '']);
             }
 
             // Clear the cache to make sure the new settings are loaded on the frontend
             Cache::forget('site_settings');
+            EServices::flush();
 
             Notification::make()
                 ->title('تم تحديث الإعدادات بنجاح!')

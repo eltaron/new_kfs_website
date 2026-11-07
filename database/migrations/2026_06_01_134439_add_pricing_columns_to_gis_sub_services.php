@@ -12,9 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('gis_sub_services', function (Blueprint $table) {
-            $table->boolean('has_vat')->default(false)->after('pricing_settings');
-            $table->decimal('martyr_stamp_fee', 8, 2)->default(5.00)->after('has_vat');
-            $table->decimal('sms_fee', 8, 2)->default(10.00)->after('martyr_stamp_fee');
+            if (! Schema::hasColumn('gis_sub_services', 'has_vat')) {
+                $table->boolean('has_vat')->default(false)->after('pricing_settings');
+            }
+            if (! Schema::hasColumn('gis_sub_services', 'martyr_stamp_fee')) {
+                $table->decimal('martyr_stamp_fee', 8, 2)->default(5.00)->after('has_vat');
+            }
+            if (! Schema::hasColumn('gis_sub_services', 'sms_fee')) {
+                $table->decimal('sms_fee', 8, 2)->default(10.00)->after('martyr_stamp_fee');
+            }
         });
     }
 

@@ -26,6 +26,10 @@ class GisSubServiceResource extends Resource
 
     public static function canAccess(): bool
     {
+        // صفحات طلبات الخدمات المكانية تظهر فقط عند «إتاحة التقديم على الخدمات المكانية» (الإعدادات العامة)
+        if (! \App\Support\EServices::gisServicesOpen()) {
+            return false;
+        }
         $user = auth()->user();
         return $user && $user->hasAnyRole(['super_admin', 'Admin', 'مدير المركز', 'مدير الادارة الهندسية', 'رؤوساء الاقسام']);
     }

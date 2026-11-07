@@ -25,6 +25,10 @@ class GisGeneralReports extends Page
 
     public static function canAccess(): bool
     {
+        // خاصة بطلبات الخدمات المكانية: تظهر فقط عند «إتاحة التقديم على الخدمات المكانية» (الإعدادات العامة)
+        if (! \App\Support\EServices::gisServicesOpen()) {
+            return false;
+        }
         // يمكنك هنا وضع أسماء الأدوار التي يحق لها دخول هذه الصفحة تحديداً
         return auth()->user()->hasAnyRole([
            'super_admin', 

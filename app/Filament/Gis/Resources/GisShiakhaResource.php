@@ -21,7 +21,7 @@ class GisShiakhaResource extends Resource
     protected static ?string $modelLabel = 'وحدة محلية';
     protected static ?string $pluralModelLabel = 'الوحدات المحلية ';
     protected static ?int $navigationSort = 2;
-    // protected static ?string $navigationGroup = 'الخدمات المكانية والمساحية';
+    protected static ?string $navigationGroup = 'البيانات المرجعية';
 
     public static function canAccess(): bool
     {

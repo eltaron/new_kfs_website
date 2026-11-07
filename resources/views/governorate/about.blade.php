@@ -1,121 +1,217 @@
 @extends('layouts.app')
 @section('title', 'عن محافظة كفر الشيخ')
+@section('description', 'تعرّف على محافظة كفر الشيخ: تاريخها وسبب تسميتها، رؤيتها ورسالتها، مواردها وصناعاتها، ورموزها في كل المجالات.')
 
 @push('css')
-    <link rel="stylesheet" href="{{ asset('css/about-governorate.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/kfs-about.css') }}?v={{ @filemtime(public_path('css/kfs-about.css')) }}">
 @endpush
 
 @section('content')
-    <main class="about-page">
-        {{-- هيرو السكشن --}}
-        <x-kfs.page-hero tag="section" title="كفر الشيخ: سلة غذاء مصر" subtitle="حكاية عراقة.. ورؤية مستقبل" kicker="عن المحافظة" icon="fa-solid fa-landmark-flag" :image="asset('images/places/i3.png')" />
+    @php
+        $block = fn (string $key) => $info[$key] ?? null;
+        $faIcon = fn ($d, $fallback) => trim((string) ($d->icon ?? '')) ?: $fallback;
+        $features = collect(['natural_resources' => 'fa-solid fa-leaf', 'economic_resources' => 'fa-solid fa-coins', 'industries' => 'fa-solid fa-industry'])
+            ->filter(fn ($icon, $key) => isset($info[$key]));
+        $personImg = fn ($p) => $p->image ? (\Illuminate\Support\Str::startsWith($p->image, ['http://', 'https://']) ? $p->image : Storage::url($p->image)) : null;
+    @endphp
 
-        <div class="container py-5">
-            {{-- قسم النبذة وسبب التسمية --}}
-            <div class="row g-5">
-                <div class="col-lg-8">
-                    @isset($info['history'])
-                        <article class="content-block shadow-sm animate-on-scroll">
-                            <div class="block-header">
-                                <i class="{{ $info['history']->icon }}"></i>
-                                <h3>{{ $info['history']->title }}</h3>
-                            </div>
-                            <div class="block-body">{!! clean($info['history']->content, 'cms') !!}</div>
-                        </article>
-                    @endisset
+    <main class="kab">
+        <x-kfs.page-hero tag="section" title="كفر الشيخ: سلة غذاء مصر" subtitle="حكاية عراقة… ورؤية مستقبل. محافظة بين النيل والبحر والبحيرة."
+            kicker="عن المحافظة" icon="fa-solid fa-landmark-flag" :image="asset('images/places/i3.png')" />
 
-                    @isset($info['naming'])
-                        <article class="content-block naming-block mt-4 shadow-sm">
-                            <div class="block-header gold-border">
-                                <i class="{{ $info['naming']->icon }}"></i>
-                                <h3>{{ $info['naming']->title }}</h3>
-                            </div>
-                            <div class="block-body">{!! clean($info['naming']->content, 'cms') !!}</div>
-                        </article>
-                    @endisset
+        {{-- ===== Key figures ===== --}}
+        @if (count($figures))
+            <section class="kab-figures" aria-label="المحافظة في أرقام">
+                <div class="container">
+                    <div class="kab-figures__grid">
+                        @foreach ($figures as $f)
+                            <x-kfs.stat-counter :value="$f['value']" :label="$f['label']" :icon="$f['icon']" />
+                        @endforeach
+                    </div>
                 </div>
+            </section>
+        @endif
 
-                <div class="col-lg-4">
-                    {{-- سكشن الرؤية والرسالة في سايدبار جانبي مميز --}}
-                    @isset($info['vision'])
-                        <div class="vision-card mb-4 text-center">
-                            <div class="card-icon"><i class="{{ $info['vision']->icon }}"></i></div>
-                            <h4>{{ $info['vision']->title }}</h4>
-                            <p>{{ strip_tags($info['vision']->content) }}</p>
-                        </div>
-                    @endisset
+        {{-- ===== Story: history + naming ===== --}}
+        @if ($block('history') || $block('naming'))
+            <section class="kab-story" aria-labelledby="kabStoryTitle">
+                <div class="container">
+                    <x-kfs.section-title id="kabStoryTitle" title="الحكاية" subtitle="من أين بدأت كفر الشيخ، ولماذا سُمّيت بهذا الاسم." />
 
-                    @isset($info['mission'])
-                        <div class="vision-card mission text-center shadow-sm">
-                            <div class="card-icon"><i class="{{ $info['mission']->icon }}"></i></div>
-                            <h4>{{ $info['mission']->title }}</h4>
-                            <p>{{ strip_tags($info['mission']->content) }}</p>
+                    <ol class="kab-timeline">
+                        @if ($d = $block('history'))
+                            <li class="kab-chapter" data-reveal>
+                                <span class="kab-chapter__marker" aria-hidden="true"><i class="{{ $faIcon($d, 'fa-solid fa-clock-rotate-left') }}"></i></span>
+                                <div class="kab-chapter__card">
+                                    <span class="kab-chapter__num">الفصل الأول</span>
+                                    <h3 class="kab-chapter__title">{{ $d->title }}</h3>
+                                    <div class="kab-prose kab-prose--lead">{!! clean($d->content, 'cms') !!}</div>
+                                </div>
+                            </li>
+                        @endif
+                        @if ($d = $block('naming'))
+                            <li class="kab-chapter kab-chapter--gold" data-reveal>
+                                <span class="kab-chapter__marker" aria-hidden="true"><i class="{{ $faIcon($d, 'fa-solid fa-signature') }}"></i></span>
+                                <div class="kab-chapter__card">
+                                    <span class="kab-chapter__num">{{ $block('history') ? 'الفصل الثاني' : 'الفصل الأول' }}</span>
+                                    <h3 class="kab-chapter__title">{{ $d->title }}</h3>
+                                    <div class="kab-prose">{!! clean($d->content, 'cms') !!}</div>
+                                </div>
+                            </li>
+                        @endif
+                    </ol>
+                </div>
+            </section>
+        @endif
+
+        {{-- ===== Vision & mission ===== --}}
+        @if ($block('vision') || $block('mission'))
+            <section class="kab-vm" aria-label="الرؤية والرسالة">
+                <div class="container">
+                    <div class="kab-vm__grid">
+                        @foreach (['vision' => ['fa-solid fa-eye', 'إلى أين نمضي'], 'mission' => ['fa-solid fa-bullseye', 'كيف نعمل']] as $key => [$icon, $kicker])
+                            @if ($d = $block($key))
+                                <article class="kab-vm__card kab-vm__card--{{ $key }}" data-reveal>
+                                    <span class="kab-vm__icon" aria-hidden="true"><i class="{{ $faIcon($d, $icon) }}"></i></span>
+                                    <span class="kab-vm__kicker">{{ $kicker }}</span>
+                                    <h2 class="kab-vm__title">{{ $d->title }}</h2>
+                                    <div class="kab-vm__text">{!! clean($d->content, 'cms') !!}</div>
+                                </article>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+            </section>
+        @endif
+
+        {{-- ===== What the governorate is known for ===== --}}
+        @if ($features->isNotEmpty())
+            <section class="kab-features" aria-labelledby="kabFeaturesTitle">
+                <div class="container">
+                    <x-kfs.section-title id="kabFeaturesTitle" title="ما تمتاز به كفر الشيخ" subtitle="موارد طبيعية واقتصادية وصناعات تصنع هوية المحافظة." />
+                    <div class="kab-features__grid">
+                        @foreach ($features as $key => $icon)
+                            @php $d = $info[$key]; @endphp
+                            <article class="kab-feature" data-reveal>
+                                <span class="kab-feature__num" aria-hidden="true">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
+                                <span class="kab-feature__icon" aria-hidden="true"><i class="{{ $faIcon($d, $icon) }}"></i></span>
+                                <h3 class="kab-feature__title">{{ $d->title }}</h3>
+                                <div class="kab-prose kab-prose--sm">{!! clean($d->content, 'cms') !!}</div>
+                            </article>
+                        @endforeach
+                    </div>
+                </div>
+            </section>
+        @endif
+
+        {{-- ===== Famous people (tabbed gallery) ===== --}}
+        @if ($famousByCat->isNotEmpty())
+            @php $allCount = $famousByCat->flatten()->count(); @endphp
+            <section class="kab-people" aria-labelledby="kabPeopleTitle">
+                <div class="container">
+                    <x-kfs.section-title id="kabPeopleTitle" title="رموز أضاءت تاريخ المحافظة" subtitle="مبدعون من أبناء كفر الشيخ في كل المجالات، نفتخر بهم." />
+
+                    <div class="kab-people__bar">
+                        <div class="kab-tabs" role="tablist" aria-label="مجالات الرموز">
+                            <button type="button" class="kab-tab is-active" role="tab" aria-selected="true" data-cat="all">
+                                الكل <small>{{ $allCount }}</small>
+                            </button>
+                            @foreach ($famousByCat as $category => $people)
+                                <button type="button" class="kab-tab" role="tab" aria-selected="false" data-cat="c{{ $loop->index }}">
+                                    {{ $category }} <small>{{ $people->count() }}</small>
+                                </button>
+                            @endforeach
                         </div>
-                    @endisset
+                        <div class="kab-people__search">
+                            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                            <label for="kabPeopleSearch" class="visually-hidden">ابحث بالاسم</label>
+                            <input type="search" id="kabPeopleSearch" placeholder="ابحث بالاسم…" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <ul class="kab-people__grid" id="kabPeopleGrid" role="tabpanel" aria-live="polite">
+                        @foreach ($famousByCat as $category => $people)
+                            @php $catIndex = $loop->index; @endphp
+                            @foreach ($people as $person)
+                                @php $img = $personImg($person); @endphp
+                                <li class="kab-person" data-cat="c{{ $catIndex }}" data-name="{{ $person->name }}">
+                                    <figure class="kab-person__fig">
+                                        @if ($img)
+                                            <img src="{{ $img }}" alt="{{ $person->name }}" loading="lazy"
+                                                onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'kab-person__initial',textContent:this.alt.trim().charAt(0)}))">
+                                        @else
+                                            <span class="kab-person__initial" aria-hidden="true">{{ mb_substr(trim($person->name), 0, 1) }}</span>
+                                        @endif
+                                    </figure>
+                                    <div class="kab-person__body">
+                                        <h3 class="kab-person__name">{{ $person->name }}</h3>
+                                        <span class="kab-person__cat">{{ $category }}</span>
+                                        @if ($person->bio)
+                                            <p class="kab-person__bio">{{ $person->bio }}</p>
+                                        @endif
+                                    </div>
+                                </li>
+                            @endforeach
+                        @endforeach
+                    </ul>
+                    <p class="kab-people__empty" id="kabPeopleEmpty" hidden>لا توجد نتائج مطابقة.</p>
+                </div>
+            </section>
+        @endif
+
+        {{-- ===== Continue exploring ===== --}}
+        <section class="kab-next" aria-label="استكشف المزيد">
+            <div class="container">
+                <div class="kab-next__grid">
+                    @foreach ([
+                        ['governorate.map', 'fa-solid fa-map-location-dot', 'الخريطة التفاعلية', 'المعالم والمشروعات والخدمات على خريطة واحدة'],
+                        ['landmarks.index', 'fa-solid fa-monument', 'السياحة والمعالم', 'اكتشف أجمل الأماكن في المحافظة'],
+                        ['about.governor', 'fa-solid fa-user-tie', 'كلمة المحافظ', 'رسالة من محافظ كفر الشيخ'],
+                    ] as [$route, $icon, $title, $desc])
+                        @if (Route::has($route))
+                            <a href="{{ route($route) }}" class="kab-next__card">
+                                <span class="kab-next__icon" aria-hidden="true"><i class="{{ $icon }}"></i></span>
+                                <span class="kab-next__body"><strong>{{ $title }}</strong><small>{{ $desc }}</small></span>
+                                <i class="fa-solid fa-arrow-left kab-next__go" aria-hidden="true"></i>
+                            </a>
+                        @endif
+                    @endforeach
                 </div>
             </div>
-
-            {{-- بماذا تشتهر المحافظة (نظام تبويبات حديث) --}}
-            <section class="characteristics-section mt-5 py-4">
-                <h2 class="section-title-accent text-center mb-5">ما تمتاز به كفر الشيخ</h2>
-                <div class="row g-4 justify-content-center">
-                    @php $charKeys = ['natural_resources', 'economic_resources', 'industries']; @endphp
-                    @foreach ($charKeys as $key)
-                        @isset($info[$key])
-                            <div class="col-md-4">
-                                <div class="feature-flip-card h-100 shadow-sm">
-                                    <div class="icon-holder"><i class="{{ $info[$key]->icon }}"></i></div>
-                                    <h5>{{ $info[$key]->title }}</h5>
-                                    <div class="feature-text">{!! clean($info[$key]->content, 'cms') !!}</div>
-                                </div>
-                            </div>
-                        @endisset
-                    @endforeach
-                </div>
-            </section>
-
-            {{-- سكشن المشاهير بنظام Accordion أنيق --}}
-            <section class="famous-section mt-5">
-                <div class="section-heading text-center">
-                    <h2>رموز أضاءت تاريخ المحافظة</h2>
-                    <p>مبدعون في كل المجالات نفتخر بهم</p>
-                </div>
-
-                <div class="accordion accordion-flush famous-accordion mt-4" id="famousAccordion">
-                    @foreach ($famousByCat as $category => $people)
-                        <div class="accordion-item shadow-sm border-0 mb-3 rounded-3">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#collapse{{ $loop->index }}">
-                                    <span class="cat-dot ms-3"></span> {{ $category }}
-                                </button>
-                            </h2>
-                            <div id="collapse{{ $loop->index }}" class="accordion-collapse collapse"
-                                data-bs-parent="#famousAccordion">
-                                <div class="accordion-body p-4 bg-white">
-                                    <div class="row row-cols-1 row-cols-md-2 g-4">
-                                        @foreach ($people as $person)
-                                            <div class="col person-row d-flex align-items-start">
-                                                @if ($person->image)
-                                                    <img src="{{ Str::startsWith($person->image, 'http') ? $person->image : Storage::url($person->image) }}"
-                                                        class="p-avatar ms-3">
-                                                @else
-                                                    <div class="p-avatar-placeholder me-3 text-center pt-2">
-                                                        {{ mb_substr($person->name, 0, 1) }}</div>
-                                                @endif
-                                                <div>
-                                                    <h6 class="p-name fw-bold">{{ $person->name }}</h6>
-                                                    <p class="p-bio small mb-0">{{ $person->bio }}</p>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </section>
-        </div>
+        </section>
     </main>
 @endsection
+
+@push('scripts')
+    <script>
+    (function () {
+        // (scroll reveal for [data-reveal] is handled site-wide by kfs-motion.js)
+        // Famous people: category tabs + name search.
+        const grid = document.getElementById('kabPeopleGrid');
+        if (!grid) return;
+        const tabs = document.querySelectorAll('.kab-tab');
+        const people = grid.querySelectorAll('.kab-person');
+        const search = document.getElementById('kabPeopleSearch');
+        const empty = document.getElementById('kabPeopleEmpty');
+        const norm = (s) => (s || '').replace(/[ً-ٰٟـ]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').trim();
+        let cat = 'all';
+
+        function apply() {
+            const q = norm(search.value);
+            let shown = 0;
+            people.forEach(p => {
+                const ok = (cat === 'all' || p.dataset.cat === cat) && (!q || norm(p.dataset.name).includes(q));
+                p.hidden = !ok;
+                if (ok) shown++;
+            });
+            empty.hidden = shown !== 0;
+        }
+        tabs.forEach(t => t.addEventListener('click', () => {
+            cat = t.dataset.cat;
+            tabs.forEach(x => { const on = x === t; x.classList.toggle('is-active', on); x.setAttribute('aria-selected', on ? 'true' : 'false'); });
+            apply();
+        }));
+        search.addEventListener('input', apply);
+    })();
+    </script>
+@endpush

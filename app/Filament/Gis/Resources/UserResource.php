@@ -73,7 +73,7 @@ class UserResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('البيانات الشخصية والوظيفية')
-                    ->description('تأكد من إدخال الرقم القومي الصحيح لربط الموظف بسجل شؤون العاملين.')
+                    ->description('الرقم القومي اختياري؛ إن أُدخل يجب أن يكون 14 رقماً صحيحاً.')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('الاسم الكامل')
@@ -87,10 +87,25 @@ class UserResource extends Resource
                             ->unique(ignoreRecord: true),
 
                         Forms\Components\TextInput::make('national_id')
-                            ->label('الرقم القومي (14 رقم)')
-                            ->required()
+                            ->label('الرقم القومي (14 رقم) — اختياري')
+                            ->nullable()
                             ->length(14)
+                            ->numeric()
                             ->unique(ignoreRecord: true),
+
+                        Forms\Components\TextInput::make('phone')
+                            ->label('رقم الهاتف')
+                            ->tel()
+                            ->maxLength(20),
+
+                        Forms\Components\TextInput::make('job_title')
+                            ->label('المسمى الوظيفي')
+                            ->maxLength(255),
+
+                        Forms\Components\TextInput::make('address')
+                            ->label('العنوان')
+                            ->maxLength(255)
+                            ->columnSpanFull(),
 
                         Forms\Components\TextInput::make('password')
                             ->label('كلمة المرور')
@@ -101,17 +116,16 @@ class UserResource extends Resource
                             ->helperText('اترك الحقل فارغاً في حالة عدم الرغبة في تغيير كلمة المرور الحالية.'),
 
                         Forms\Components\Select::make('roles')
-    ->label('الصفة الوظيفية (الدور)')
-    ->options(
-        \Spatie\Permission\Models\Role::query()
-            ->whereIn('name', static::GIS_ROLES)
-            ->pluck('name', 'id')
-            ->toArray()
-    )
-    ->multiple()
-    ->preload()
-    ->required()
-    ->native(false),
+                            ->label('الصفة الوظيفية (الدور)')
+                            ->relationship(
+                                'roles',
+                                'name',
+                                fn (Builder $query) => $query->whereIn('name', static::GIS_ROLES)
+                            )
+                            ->multiple()
+                            ->preload()
+                            ->required()
+                            ->native(false),
 
                         Forms\Components\Select::make('center')
                             ->label('المركز')
@@ -146,7 +160,7 @@ class UserResource extends Resource
                     'roles',
                     fn(Builder $roleQuery) =>
                     $roleQuery->whereIn('name', static::GIS_ROLES)
-                );
+                )->latest('created_at');
             })
             ->columns([
                 Tables\Columns\TextColumn::make('name')
@@ -165,6 +179,7 @@ class UserResource extends Resource
 
                 Tables\Columns\TextColumn::make('center')
                     ->label('المركز')
+                    ->placeholder('بدون مركز')
                     ->searchable()
                     ->sortable(),
 
@@ -201,6 +216,10 @@ class UserResource extends Resource
                 Tables\Filters\SelectFilter::make('center')
                     ->label('تصفية بالمركز')
                     ->options(GisMarkaz::cachedOptions()),
+                Tables\Filters\Filter::make('without_center')
+                    ->label('موظفون بدون مركز')
+                    ->toggle()
+                    ->query(fn (Builder $query) => $query->where(fn (Builder $q) => $q->whereNull('center')->orWhere('center', ''))),
                 Tables\Filters\SelectFilter::make('status')
                     ->label('تصفية بحالة الحساب')
                     ->options([

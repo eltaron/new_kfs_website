@@ -8,12 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('villages', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('shiakha_code');
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('villages')) {
+            Schema::create('villages', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('shiakha_code');
+                $table->timestamps();
+            });
+        }
     }
 
     public function down(): void

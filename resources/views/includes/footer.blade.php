@@ -56,7 +56,7 @@
             <div class="kfs-footer__brand footer-brand-col">
                 <img src="{{ $kfsFooterLogo }}" alt="شعار {{ $settings['site_name'] ?? 'محافظة كفر الشيخ' }}" class="footer-logo-main" width="76" height="74" loading="lazy">
                 <p class="footer-desc">
-                    {{ $settings['footer_description'] ?? 'البوابة الإلكترونية الرسمية لمحافظة كفر الشيخ — نعمل معاً لخدمة المواطن وتحقيق التنمية المستدامة.' }}
+                    {{ $settings['footer_description'] ?? 'الموقع الرسمي لمحافظة كفر الشيخ — نعمل معاً لخدمة المواطن وتحقيق التنمية المستدامة.' }}
                 </p>
                 <div class="kfs-footer__socials footer-socials">
                     @foreach ($socials as $name => $data)

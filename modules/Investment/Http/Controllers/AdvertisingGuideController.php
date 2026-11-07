@@ -16,6 +16,9 @@ class AdvertisingGuideController extends Controller
 
     public function index()
     {
+        // مخفية من «الإعدادات العامة ← الخدمات الإلكترونية»
+        abort_if(\App\Support\EServices::isRouteHidden('advertising.guide'), 404);
+
         // Lightweight aggregates for the hero / stats strip (the map itself loads /advertising-guide/points).
         $active = Advertisement::where('status', 'active')->get(['street_name', 'type', 'lat', 'lng']);
 

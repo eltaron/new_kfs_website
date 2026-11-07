@@ -1,470 +1,154 @@
 @extends('layouts.app')
-@section('title', 'مشاريع المحافظة')
+@section('title', 'المشروعات القومية | محافظة كفر الشيخ')
+@section('description', 'المشروعات القومية والتنموية في محافظة كفر الشيخ وتوزيعها الجغرافي على المراكز.')
+
+@php
+    $mapData = $projects->getCollection()
+        ->filter(fn ($p) => $p->latitude && $p->longitude && $p->slug)
+        ->map(fn ($p) => [
+            'id' => $p->id,
+            'name' => trim($p->name),
+            'lat' => (float) $p->latitude,
+            'lng' => (float) $p->longitude,
+            'url' => route('projects.show', $p->slug),
+            'thumb' => $p->thumbnail ? Storage::url($p->thumbnail) : null,
+        ])->values();
+    $plain = fn ($html, $n) => \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string) $html), ENT_QUOTES | ENT_HTML5, 'UTF-8'))), $n);
+    $totalImages = $projects->getCollection()->sum('images_count') + $projects->getCollection()->filter(fn ($p) => $p->thumbnail)->count();
+    $programs = collect([
+        ['projects.hay-karima', 'fa-solid fa-hand-holding-heart', 'مبادرة حياة كريمة', $programCounts['حياة كريمة'] ?? null, 'تطوير قرى الريف المصري'],
+        ['investments.index', 'fa-solid fa-chart-line', 'الاستثمار والفرص', ($programCounts['استثماري'] ?? 0) + ($programCounts['صناعي'] ?? 0), 'فرص استثمارية ومناطق صناعية'],
+        ['governorate.map', 'fa-solid fa-map-location-dot', 'الخريطة التفاعلية', null, 'كل المشروعات والمعالم على خريطة واحدة'],
+    ])->filter(fn ($p) => Route::has($p[0]));
+@endphp
 
 @push('css')
-    <link rel="stylesheet" href="{{ asset('css') }}/projects.css">
-    {{-- Leaflet CSS --}}
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        /* الألوان والهوية */
-        :root {
-            --prj-dark: #1e272e;
-            --prj-gold: #e1b12c;
-            --prj-bg: #f7f9fb;
-            --tm-gold: #e1b12c;
-            --tm-navy: #1e272e;
-            --tm-light: #f8fafc;
-        }
-
-        /* سكشن الخريطة والسايدبار */
-        .projects-interactive-grid {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            /* السايدبار على اليمين والخريطة يسارها */
-            direction: rtl;
-            background: #fff;
-            border-radius: 20px;
-            overflow: hidden;
-            height: 600px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .map-sidebar-list {
-            background: #fff;
-            border-left: 1px solid #eee;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .list-header {
-            background: var(--prj-dark);
-            color: #fff;
-            padding: 20px;
-            font-weight: bold;
-            text-align: center;
-            border-bottom: 4px solid var(--prj-gold);
-        }
-
-        .list-body {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 10px;
-        }
-
-        .side-project-card {
-            padding: 12px;
-            margin-bottom: 10px;
-            border: 1px solid #f0f0f0;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .side-project-card:hover,
-        .side-project-card.active {
-            background: #fdfaf2;
-            border-color: var(--prj-gold);
-            box-shadow: 0 5px 15px rgba(225, 177, 44, 0.15);
-        }
-
-        .side-thumb {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-
-        /* الخريطة والتحميل */
-        .map-view-box {
-            position: relative;
-            background: #e5e9ec;
-        }
-
-        #interactiveProjectsMap {
-            height: 100%;
-            width: 100%;
-        }
-
-        .map-loading-overlay {
-            position: absolute;
-            inset: 0;
-            background: #fff;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .text-gold {
-            color: var(--prj-gold) !important;
-        }
-
-        /* للموبايل */
-        @media (max-width: 991px) {
-            .projects-interactive-grid {
-                grid-template-columns: 1fr;
-                height: 800px;
-            }
-
-            .map-sidebar-list {
-                height: 300px;
-                order: 2;
-                /* السايدبار تحت الخريطة في الشاشات الصغيرة */
-            }
-        }
-
-        .project-archive-card:hover {
-            transform: translateY(-5px);
-            transition: 0.3s;
-        }
-
-        .card-image {
-            height: 200px;
-            border-bottom: 1px solid #eee;
-            overflow: hidden;
-        }
-
-        .card-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .card-title a {
-            text-decoration: none;
-            color: #1e272e;
-            transition: 0.3s;
-        }
-
-        .card-title a:hover {
-            color: var(--prj-gold);
-        }
-
-        /* =========================================
-                                       === سكشن كافة المشاريع والأنشطة ===
-                                       ========================================= */
-
-        /* عنوان القسم الرئيسي مع الخط الجانبي */
-        /* Grid Cards Style */
-        .section-title-premium {
-            font-weight: 900;
-            color: var(--tm-navy);
-            position: relative;
-            margin-top: 50px;
-            text-align: center
-        }
-
-        .section-title-premium::after {
-            content: '';
-            display: block;
-            width: 60px;
-            height: 4px;
-            background: var(--tm-gold);
-            margin: 15px auto;
-            border-radius: 10px;
-        }
-
-        /* بطاقة المشروع (Archive Card) */
-        .project-archive-card {
-            background: #ffffff;
-            border-radius: 18px;
-            overflow: hidden;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
-            border: 1px solid #f0f0f0;
-        }
-
-        /* تأثير عند المرور بالماوس على الكارت */
-        .project-archive-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(30, 39, 46, 0.1);
-            border-color: rgba(225, 177, 44, 0.3);
-        }
-
-        /* غلاف الصورة */
-        .card-image-link {
-            position: relative;
-            display: block;
-            width: 100%;
-            height: 220px;
-            /* ارتفاع ثابت للصور لتوحيد الشبكة */
-            overflow: hidden;
-            background-color: #f8f9fa;
-        }
-
-        .project-archive-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            /* لضمان ملء المساحة بدون تشوه */
-            transition: transform 0.6s ease;
-        }
-
-        .project-archive-card:hover img {
-            transform: scale(1.1);
-            /* تأثير الزووم الهادئ */
-        }
-
-        /* حالة المشاريع التي تستخدم لوجو بدل صورة */
-        .card-image.is-logo {
-            padding: 30px;
-        }
-
-        .card-image.is-logo img {
-            object-fit: contain;
-        }
-
-        /* بادج التمييز (مشروع مميز) */
-        .highlight-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: linear-gradient(45deg, #e1b12c, #f1c40f);
-            color: #1e272e;
-            padding: 5px 15px;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            z-index: 2;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* محتوى البطاقة */
-        .card-content {
-            padding: 25px 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .card-content .card-title {
-            margin: 0;
-            font-size: 1.15rem;
-            font-weight: 800;
-            line-height: 1.5;
-        }
-
-        .card-content .card-title a {
-            text-decoration: none;
-            color: var(--prj-dark);
-            transition: color 0.3s;
-        }
-
-        .card-archive-link:hover,
-        .card-title a:hover {
-            color: var(--prj-gold);
-        }
-
-        /* البادج الصغير للتصنيف تحت العنوان */
-        .category-pill {
-            display: inline-block;
-            background-color: #f1f3f5;
-            color: #636e72;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-top: 15px;
-        }
-
-        /* تخصيص زر "التفاصيل" إذا رغبت بإضافته لاحقاً */
-        .project-details-btn {
-            margin-top: 15px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--prj-gold);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-
-        /* تحسين شكل الـ Pagination (أرقام الصفحات) */
-        .pagination-wrapper {
-            margin-top: 50px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .pagination-wrapper .page-link {
-            border-radius: 10px;
-            margin: 0 5px;
-            color: var(--prj-dark);
-            font-weight: bold;
-            border: 1px solid #eee;
-        }
-
-        .pagination-wrapper .page-item.active .page-link {
-            background-color: var(--prj-gold);
-            border-color: var(--prj-gold);
-            color: #fff;
-        }
-
-        /* تحسين التجاوب للهواتف */
-        @media (max-width: 767px) {
-            .section-main-title {
-                font-size: 1.4rem;
-                text-align: center;
-                border-right: none;
-                border-bottom: 3px solid var(--prj-gold);
-                padding-bottom: 10px;
-            }
-
-            .card-image-link {
-                height: 180px;
-            }
-        }
-    </style>
+    @if ($mapData->isNotEmpty())
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    @endif
+    <link rel="stylesheet" href="{{ asset('css/kfs-pages-info.css') }}?v={{ @filemtime(public_path('css/kfs-pages-info.css')) }}">
 @endpush
 
 @section('content')
-    <main class="main-content">
-        {{-- Page Header --}}
-        <x-kfs.page-hero title="خريطة المشروعات القومية" subtitle="استكشف أهم المشاريع التنموية والقومية وتوزيعها الجغرافي بجميع المراكز." icon="fa-solid fa-diagram-project" :image="asset('images/bg/projects.jpg')" />
+    <main class="kpi">
+        <x-kfs.page-hero title="المشروعات القومية" kicker="مشروعات المحافظة" icon="fa-solid fa-flag"
+            subtitle="مشروعات تنموية كبرى تُنفَّذ على أرض كفر الشيخ — تعرّف عليها وعلى مواقعها."
+            :image="asset('images/bg/projects.jpg')" />
 
-        <div class="container pb-5">
-            {{-- سكشن الخريطة التفاعلية والسايدبار --}}
-            <x-kfs.section-title title="المشروعات على الخريطة" subtitle="اختر مشروعاً من القائمة لعرض موقعه." />
-            <div class="projects-interactive-grid mb-5">
-                <div class="map-sidebar-list">
-                    <div class="list-header">
-                        <i class="fas fa-list-check me-2"></i>
-                        قائمة المشاريع القومية
-                    </div>
-                    <div class="list-body custom-scrollbar" id="projectSideList">
-                        {{-- سيتم التعبئة من خلال الـ JavaScript --}}
-                    </div>
-                </div>
+        <div class="container kpi__wrap">
+            {{-- Figures --}}
+            <section class="kpi-figs" aria-label="أرقام المشروعات">
+                <div class="kpi-fig"><strong>{{ $projects->total() }}</strong><span>مشروعاً قومياً</span></div>
+                <div class="kpi-fig"><strong>{{ $mapData->count() }}</strong><span>محدد على الخريطة</span></div>
+                <div class="kpi-fig"><strong>{{ $totalImages }}</strong><span>صورة توثيقية</span></div>
+            </section>
 
-                <div class="map-view-box">
-                    <div id="interactiveProjectsMap"></div>
-                    <div class="map-loading-overlay">
-                        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">جارٍ تحميل الخريطة</span></div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- الأرشيف الشبكي (الكود القديم تحت الخريطة) --}}
-            <x-kfs.section-title title="كافة المشاريع والأنشطة" />
+            {{-- Projects as editorial rows --}}
             @if ($projects->isNotEmpty())
-                <div class="kfs-grid kfs-grid--3" data-stagger>
+                <section class="kprj-list" aria-label="قائمة المشروعات">
                     @foreach ($projects as $project)
-                        <a href="{{ route('projects.show', $project->slug) }}" class="kfs-media">
-                            <span class="kfs-card__media" @if ($project->type == 'logo') style="background:#fff" @endif>
-                                <img src="{{ $project->thumbnail ? Storage::url($project->thumbnail) : asset('images/kfs.png') }}" alt="" loading="lazy"
-                                    @if ($project->type == 'logo') style="object-fit:contain;padding:12%" @endif>
-                            </span>
-                            <span class="kfs-card__body">
-                                <span class="kfs-card__meta">
-                                    @if ($project->category)<span class="kfs-badge {{ $project->category === 'حياة كريمة' ? 'kfs-badge--olive' : '' }}">{{ $project->category }}</span>@endif
-                                    @if ($project->is_highlighted)<span class="kfs-badge kfs-badge--gold"><i class="fa-solid fa-medal" aria-hidden="true"></i> مشروع قومي</span>@endif
-                                </span>
-                                <span class="kfs-card__title">{{ $project->name }}</span>
-                                <span class="kfs-card__more">استعرض الإنجاز <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></span>
-                            </span>
-                        </a>
+                        @php $photos = $project->images_count + ($project->thumbnail ? 1 : 0); @endphp
+                        <article class="kprj {{ $loop->odd ? '' : 'kprj--alt' }}">
+                            <a href="{{ route('projects.show', $project->slug) }}" class="kprj__media" tabindex="-1" aria-hidden="true">
+                                <img src="{{ $project->thumbnail ? Storage::url($project->thumbnail) : asset('images/bg/projects.jpg') }}" alt="" loading="lazy">
+                                @if ($photos > 1)
+                                    <span class="kprj__photos"><i class="fa-solid fa-images"></i> {{ $photos }}</span>
+                                @endif
+                            </a>
+                            <div class="kprj__body">
+                                <div class="kprj__chips">
+                                    <span class="kpi-chip"><i class="fa-solid fa-flag" aria-hidden="true"></i> مشروع قومي</span>
+                                    @if ($project->is_highlighted)
+                                        <span class="kpi-chip kpi-chip--gold"><i class="fa-solid fa-star" aria-hidden="true"></i> مميز</span>
+                                    @endif
+                                    @if ($project->latitude && $project->longitude)
+                                        <button type="button" class="kpi-chip kpi-chip--btn" data-focus-project="{{ $project->id }}">
+                                            <i class="fa-solid fa-location-dot" aria-hidden="true"></i> على الخريطة
+                                        </button>
+                                    @endif
+                                </div>
+                                <h2 class="kprj__title"><a href="{{ route('projects.show', $project->slug) }}">{{ trim($project->name) }}</a></h2>
+                                @if ($project->description)
+                                    <p class="kprj__text">{{ $plain($project->description, 240) }}</p>
+                                @endif
+                                <a href="{{ route('projects.show', $project->slug) }}" class="kpi-btn">
+                                    <span>تفاصيل المشروع</span><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </article>
                     @endforeach
-                </div>
-                <div class="pagination-wrapper mt-5">{{ $projects->links() }}</div>
+                </section>
+                @if ($projects->hasPages())
+                    <div class="pagination-wrapper">{{ $projects->links() }}</div>
+                @endif
             @else
                 <x-kfs.empty-state icon="box" title="لا توجد مشروعات منشورة حالياً" />
             @endif
+
+            {{-- Map --}}
+            @if ($mapData->isNotEmpty())
+                <section class="kprj-map" aria-labelledby="kprjMapTitle">
+                    <x-kfs.section-title id="kprjMapTitle" title="المشروعات على الخريطة" subtitle="اختر مشروعاً لعرض موقعه." />
+                    <div class="kprj-map__grid">
+                        <ul class="kprj-map__list" id="kprjList">
+                            @foreach ($mapData as $p)
+                                <li><button type="button" data-focus-project="{{ $p['id'] }}"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ $p['name'] }}</button></li>
+                            @endforeach
+                        </ul>
+                        <div class="kprj-map__canvas" id="kprjMap" role="region" aria-label="خريطة المشروعات القومية"></div>
+                    </div>
+                </section>
+            @endif
+
+            {{-- Other programs --}}
+            @if ($programs->isNotEmpty())
+                <section aria-labelledby="kprjMoreTitle">
+                    <x-kfs.section-title id="kprjMoreTitle" title="برامج ومشروعات أخرى" />
+                    <div class="kpi-links">
+                        @foreach ($programs as [$route, $icon, $title, $count, $desc])
+                            <a href="{{ route($route) }}" class="kpi-link">
+                                <span class="kpi-link__icon" aria-hidden="true"><i class="{{ $icon }}"></i></span>
+                                <span class="kpi-link__body"><strong>{{ $title }} @if ($count)<small class="kpi-link__count">{{ $count }}</small>@endif</strong><small>{{ $desc }}</small></span>
+                                <i class="fa-solid fa-arrow-left kpi-link__go" aria-hidden="true"></i>
+                            </a>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
         </div>
     </main>
-
-    {{-- تحضير بيانات الجافا سكريبت --}}
-    @php
-        $mapData = $projects
-            ->filter(fn($p) => $p->latitude && $p->longitude)
-            ->map(
-                fn($p) => [
-                    'id' => $p->id,
-                    'name' => $p->name,
-                    'category' => $p->category,
-                    'lat' => $p->latitude,
-                    'lng' => $p->longitude,
-                    'slug' => $p->slug,
-                    'thumb' => Storage::url($p->thumbnail),
-                ],
-            )
-            ->values();
-    @endphp
-
 @endsection
 
 @push('scripts')
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const projectsData = @json($mapData);
-            const projectUrl = @json(route('projects.show', '__SLUG__'));
-            const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-            const mapElement = document.getElementById('interactiveProjectsMap');
-            const sideList = document.getElementById('projectSideList');
+    @if ($mapData->isNotEmpty())
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script type="application/json" id="kprjData">@json($mapData)</script>
+        <script>
+        (function () {
+            const points = JSON.parse(document.getElementById('kprjData').textContent);
+            const map = L.map('kprjMap', { scrollWheelZoom: false });
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+            }).addTo(map);
+            const icon = L.divIcon({ className: 'kprj-pin-wrap', html: '<span class="kprj-pin"><i class="fa-solid fa-flag" aria-hidden="true"></i></span>', iconSize: [36, 44], iconAnchor: [18, 42], popupAnchor: [0, -38] });
+            const markers = {};
+            points.forEach(p => {
+                const box = document.createElement('div'); box.className = 'kprj-pop';
+                if (p.thumb) { const img = document.createElement('img'); img.src = p.thumb; img.alt = ''; box.append(img); }
+                const a = document.createElement('a'); a.href = p.url; a.textContent = p.name; box.append(a);
+                markers[p.id] = L.marker([p.lat, p.lng], { icon, title: p.name }).addTo(map).bindPopup(box);
+            });
+            map.fitBounds(L.latLngBounds(points.map(p => [p.lat, p.lng])).pad(0.25), { maxZoom: 12 });
 
-            if (mapElement && projectsData.length > 0) {
-                // إنشاء الخريطة باستخدام طبقة شوارع احترافية باللغة العربية (Esri World Street)
-                const map = L.map(mapElement, {
-                        scrollWheelZoom: false
-                    })
-                    .setView([31.1143, 30.9416], 10);
-
-                L.tileLayer(
-                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-                        attribution: '&copy; Esri World Street Map'
-                    }).addTo(map);
-
-                const markerGroup = L.featureGroup();
-
-                projectsData.forEach((project) => {
-                    // 1. بناء عنصر السايدبار
-                    const sideItem = document.createElement('div');
-                    sideItem.className = 'side-project-card';
-                    sideItem.innerHTML = `
-                <div class="d-flex align-items-center gap-2">
-                    <img src="${esc(project.thumb)}" class="side-thumb" alt="">
-                    <div class="info">
-                        <h6 class="mb-0 text-dark">${esc(project.name)}</h6>
-                        <small class="text-muted">${esc(project.category)}</small>
-                    </div>
-                </div>
-            `;
-                    sideList.appendChild(sideItem);
-
-                    // 2. إنشاء الماركر
-                    const marker = L.marker([project.lat, project.lng])
-                        .addTo(markerGroup)
-                        .bindPopup(`
-                    <div class="map-popup-premium">
-                        <img src="${esc(project.thumb)}" alt="" style="width:100%; border-radius:8px; margin-bottom:8px">
-                        <strong>${esc(project.name)}</strong><br>
-                        <a href="${esc(projectUrl.replace('__SLUG__', encodeURIComponent(project.slug)))}" class="btn btn-sm btn-dark w-100 mt-2 text-white">عرض التفاصيل</a>
-                    </div>
-                `);
-
-                    // 3. إضافة الحدث عند الضغط في السايدبار
-                    sideItem.addEventListener('click', () => {
-                        document.querySelectorAll('.side-project-card').forEach(i => i.classList
-                            .remove('active'));
-                        sideItem.classList.add('active');
-                        map.flyTo([project.lat, project.lng], 15);
-                        marker.openPopup();
-                    });
-                });
-
-                markerGroup.addTo(map);
-                map.fitBounds(markerGroup.getBounds().pad(0.1));
-
-                // إخفاء الـ loading
-                document.querySelector('.map-loading-overlay').style.display = 'none';
-            }
-        });
-    </script>
+            document.querySelectorAll('[data-focus-project]').forEach(btn => btn.addEventListener('click', () => {
+                const m = markers[btn.dataset.focusProject];
+                if (!m) return;
+                document.getElementById('kprjMap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                map.flyTo(m.getLatLng(), 14, { duration: .8 });
+                setTimeout(() => m.openPopup(), 850);
+                document.querySelectorAll('#kprjList button').forEach(b => b.classList.toggle('is-active', b.dataset.focusProject === btn.dataset.focusProject));
+            }));
+        })();
+        </script>
+    @endif
 @endpush

@@ -1,362 +1,298 @@
 @extends('layouts.app')
-@section('title', 'تقديم بلاغ طارئ')
+@section('title', 'تقديم بلاغ عاجل')
+@section('description', 'سجّل بلاغاً عن حالة طارئة في محافظة كفر الشيخ ليُحوَّل فوراً إلى الجهة المختصة.')
+
 @push('css')
-<style>
-.emergency-body { padding: 40px 0 50px; background: var(--kfs-bg); min-height: 400px; }
-
-.form-card {
-    background: #fff;
-    border-radius: 20px;
-    padding: 35px 40px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
-    border: 1px solid #eef0f5;
-    position: relative;
-    overflow: hidden;
-}
-.form-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #c0392b, #e74c3c, #c0392b);
-}
-.form-card-title {
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: #1a1a2e;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #f0f0f5;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.form-card-title i {
-    width: 36px; height: 36px;
-    background: linear-gradient(135deg, #c0392b, #e74c3c);
-    border-radius: 10px;
-    display: inline-flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 0.9rem;
-}
-.form-card .form-label { font-weight: 700; color: #2d3436; font-size: 0.9rem; margin-bottom: 6px; }
-.form-card .form-control,
-.form-card .form-select {
-    border-radius: 12px;
-    border: 2px solid #e8eaef;
-    padding: 12px 16px;
-    transition: all 0.3s ease;
-    font-size: 0.95rem;
-    background: #fafbfc;
-}
-.form-card .form-control:focus,
-.form-card .form-select:focus {
-    border-color: #c0392b;
-    box-shadow: 0 0 0 4px rgba(192,57,43,0.1);
-    background: #fff;
-}
-.form-card .form-check-input:checked {
-    background-color: #c0392b;
-    border-color: #c0392b;
-}
-
-.type-toggle {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-.type-toggle .form-check {
-    padding: 0;
-    margin: 0;
-}
-.type-toggle .form-check-input {
-    display: none;
-}
-.type-toggle .form-check-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 24px;
-    border-radius: 12px;
-    border: 2px solid #e8eaef;
-    background: #fafbfc;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #636e72;
-}
-.type-toggle .form-check-input:checked + .form-check-label {
-    border-color: #c0392b;
-    background: #fff5f5;
-    color: #c0392b;
-}
-.type-toggle .form-check-input:checked + .form-check-label i {
-    color: #c0392b;
-}
-
-.submit-btn {
-    background: linear-gradient(135deg, #c0392b, #e74c3c);
-    color: #fff;
-    border: none;
-    padding: 16px 60px;
-    border-radius: 50px;
-    font-size: 1.1rem;
-    font-weight: 800;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-}
-.submit-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 40px rgba(192,57,43,0.3);
-    color: #fff;
-}
-.submit-btn:active { transform: translateY(0); }
-
-.location-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border-radius: 12px;
-    border: 2px dashed #b2bec3;
-    background: transparent;
-    color: #636e72;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-.location-btn:hover {
-    border-color: #c0392b;
-    color: #c0392b;
-    background: #fff5f5;
-}
-.location-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-@media (max-width: 767px) {
-    .form-card { padding: 25px 20px; }
-    .type-toggle .form-check-label { padding: 8px 16px; font-size: 0.85rem; }
-}
-</style>
+    <link rel="stylesheet" href="{{ asset('css/kfs-help.css') }}?v={{ @filemtime(public_path('css/kfs-help.css')) }}">
 @endpush
+
 @section('content')
-    <main class="main-content">
+    @php
+        $typeIcons = [
+            'حريق' => 'fa-solid fa-fire',
+            'حادث مروري' => 'fa-solid fa-car-burst',
+            'تلوث بيئي' => 'fa-solid fa-smog',
+            'انهيار مبنى' => 'fa-solid fa-house-crack',
+            'تسريب غاز' => 'fa-solid fa-wind',
+            'انقطاع مرافق' => 'fa-solid fa-plug-circle-xmark',
+            'أخرى' => 'fa-solid fa-circle-exclamation',
+        ];
+        $hotlines = [['123', 'الإسعاف'], ['122', 'شرطة النجدة'], ['180', 'الحماية المدنية']];
+        $success = session('success');
+        $trackingNo = $success && preg_match('/(\d+)\s*$/u', $success, $m) ? $m[1] : null;
+    @endphp
+
+    <main class="kh kh--emergency">
         {{-- .emergency-hero kept as a hook for the dark-theme layer --}}
-        <x-kfs.page-hero size="compact" class="emergency-hero mb-0" title="مركز سيطرة الشبكة الوطنية للطوارئ" kicker="بلاغات الطوارئ"
-            icon="fa-solid fa-triangle-exclamation" wave-fill="var(--kfs-bg)"
-            subtitle="نظام الإبلاغ الموحد للحالات الطارئة — يتم تحويل بلاغك فورًا إلى الجهة المختصة" />
-        <section class="emergency-body">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-10">
-                        <form action="{{ route('emergency.store') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <input type="hidden" name="latitude" id="latitude">
-                            <input type="hidden" name="longitude" id="longitude">
+        <x-kfs.page-hero size="compact" class="emergency-hero" title="تقديم بلاغ عاجل" kicker="مركز سيطرة الطوارئ"
+            icon="fa-solid fa-triangle-exclamation" :crumbs="['الشكاوى والبلاغات' => route('requests.index')]"
+            subtitle="املأ البيانات التالية — يُحوَّل بلاغك فوراً إلى الجهة المختصة." />
 
-                            {{-- Card 1: Personal Info --}}
-                            <div class="form-card">
-                                <h4 class="form-card-title"><i class="fas fa-user"></i> بيانات مقدم البلاغ</h4>
-                                <div class="row g-4">
-                                    <div class="col-md-6">
-                                        <label for="reporter_name" class="form-label">الاسم بالكامل <span class="text-danger">*</span></label>
-                                        <input type="text" id="reporter_name" name="reporter_name" class="form-control"
-                                            value="{{ old('reporter_name') }}" required placeholder="أدخل الاسم">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="reporter_phone" class="form-label">رقم الهاتف <span class="text-danger">*</span></label>
-                                        <input type="tel" id="reporter_phone" name="reporter_phone" class="form-control"
-                                            value="{{ old('reporter_phone') }}" required placeholder="01XXXXXXXXX">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="reporter_national_id" class="form-label">الرقم القومي <span class="text-danger">*</span></label>
-                                        <input type="text" id="reporter_national_id" name="reporter_national_id"
-                                            class="form-control" pattern="\d{14}" title="يجب إدخال 14 رقمًا"
-                                            value="{{ old('reporter_national_id') }}" required placeholder="14 رقم">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="report_type" class="form-label">نوع البلاغ <span class="text-danger">*</span></label>
-                                        <select class="form-select" id="report_type" name="report_type" required>
-                                            <option value="" disabled selected>-- اختر نوع البلاغ --</option>
-                                            @foreach ($reportTypes as $type)
-                                                <option value="{{ $type }}" {{ old('report_type') == $type ? 'selected' : '' }}>
-                                                    {{ $type }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Card 2: Location Info --}}
-                            <div class="form-card">
-                                <h4 class="form-card-title"><i class="fas fa-map-marker-alt"></i> موقع الحادث</h4>
-                                <div class="row g-4">
-                                    <div class="col-12">
-                                        <label class="form-label">نوع المكان <span class="text-danger">*</span></label>
-                                        <div class="type-toggle">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="location_type"
-                                                    id="loc_type_city" value="مدينة"
-                                                    {{ old('location_type', 'مدينة') == 'مدينة' ? 'checked' : '' }} required>
-                                                <label class="form-check-label" for="loc_type_city">
-                                                    <i class="fas fa-city"></i> مدينة
-                                                </label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="location_type"
-                                                    id="loc_type_village" value="قرية"
-                                                    {{ old('location_type') == 'قرية' ? 'checked' : '' }} required>
-                                                <label class="form-check-label" for="loc_type_village">
-                                                    <i class="fas fa-home"></i> قرية
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="center" class="form-label">المركز <span class="text-danger">*</span></label>
-                                        <select class="form-select" id="center" name="center" required>
-                                            <option value="" disabled selected>-- اختر المركز --</option>
-                                            @foreach ($centers as $center)
-                                                <option value="{{ $center->name }}" data-id="{{ $center->id }}"
-                                                    {{ old('center') == $center->name ? 'selected' : '' }}>
-                                                    {{ $center->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="area" class="form-label">القرية / المدينة <span class="text-danger">*</span></label>
-                                        <select class="form-select" id="area" name="area" required>
-                                            <option value="" disabled selected>-- اختر المركز أولاً --</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-12">
-                                        <label for="location_description" class="form-label">وصف تفصيلي للموقع <span class="text-danger">*</span></label>
-                                        <textarea id="location_description" name="location_description" class="form-control" rows="3"
-                                            placeholder="مثال: بجوار مدرسة X، خلف مستشفى Y..." required>{{ old('location_description') }}</textarea>
-                                    </div>
-                                    <div class="col-12">
-                                        <button type="button" id="getLocationBtn" class="location-btn">
-                                            <i class="fas fa-map-marker-alt"></i> تحديد موقعي الحالي تلقائيًا
-                                        </button>
-                                        <small class="d-block text-muted mt-2">
-                                            <i class="fas fa-info-circle"></i> سيتم إرفاق إحداثيات الموقع لمساعدة فرق الطوارئ
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Card 3: Details --}}
-                            <div class="form-card">
-                                <h4 class="form-card-title"><i class="fas fa-file-alt"></i> تفاصيل البلاغ</h4>
-                                <div class="row g-4">
-                                    <div class="col-12">
-                                        <label for="details" class="form-label">بيان تفصيلي للبلاغ</label>
-                                        <textarea name="details" id="details" class="form-control" rows="5"
-                                            placeholder="اشرح تفاصيل الحادث بشكل دقيق...">{{ old('details') }}</textarea>
-                                    </div>
-                                    <div class="col-12">
-                                        <label for="attachments" class="form-label">مرفقات (صور، فيديو، مستندات)</label>
-                                        <input type="file" name="attachments[]" id="attachments" class="form-control" multiple>
-                                        <small class="text-muted">الحد الأقصى 10MB لكل ملف — صيغ JPG, PNG, PDF, MP4</small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="text-center mt-4">
-                                <button type="submit" class="submit-btn">
-                                    <i class="fas fa-paper-plane"></i> إرسال البلاغ فورًا
-                                </button>
-                                <p class="text-muted mt-3 mb-0">
-                                    <i class="fas fa-shield-alt"></i> جميع البيانات مؤمنة ويتم التعامل معها بسرية تامة
-                                </p>
-                            </div>
-                        </form>
+        <div class="container kh__wrap">
+            @if ($success)
+                <section class="kh-done" role="status" aria-live="polite">
+                    <span class="kh-done__icon" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+                    <div class="kh-done__body">
+                        <h2>تم استلام بلاغك بنجاح</h2>
+                        @if ($trackingNo)
+                            <p>رقم المتابعة: <strong class="kh-done__no">{{ $trackingNo }}</strong> — احتفظ به للمتابعة.</p>
+                        @else
+                            <p>{{ $success }}</p>
+                        @endif
+                        <p class="kh-done__hint">إذا كانت الحالة تهدد الحياة، اتصل أيضاً بالرقم المختص من القائمة الجانبية.</p>
                     </div>
-                </div>
+                    <a href="{{ route('home') }}" class="kh-btn kh-btn--ghost">العودة للرئيسية</a>
+                </section>
+            @endif
+
+            @if ($errors->any())
+                <section class="kh-errors" role="alert">
+                    <h2><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i> يرجى مراجعة البيانات التالية</h2>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </section>
+            @endif
+
+            <div class="kh-form-layout">
+                <form action="{{ route('emergency.store') }}" method="POST" enctype="multipart/form-data" class="kh-form" id="khForm" novalidate>
+                    @csrf
+                    <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude') }}">
+                    <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude') }}">
+
+                    {{-- 1. Type --}}
+                    <fieldset class="kh-card">
+                        <legend class="kh-card__title"><span class="kh-card__num">1</span> ما نوع الحالة؟ <span class="kh-req">*</span></legend>
+                        <div class="kh-types" role="radiogroup" aria-label="نوع البلاغ">
+                            @foreach ($reportTypes as $type)
+                                <label class="kh-type">
+                                    <input type="radio" name="report_type" value="{{ $type }}" required @checked(old('report_type') === $type)>
+                                    <span class="kh-type__box">
+                                        <i class="{{ $typeIcons[$type] ?? 'fa-solid fa-circle-exclamation' }}" aria-hidden="true"></i>
+                                        <span>{{ $type }}</span>
+                                    </span>
+                                </label>
+                            @endforeach
+                        </div>
+                        @error('report_type')<p class="kh-field-error">{{ $message }}</p>@enderror
+                    </fieldset>
+
+                    {{-- 2. Location --}}
+                    <fieldset class="kh-card">
+                        <legend class="kh-card__title"><span class="kh-card__num">2</span> أين تقع الحالة؟</legend>
+
+                        <div class="kh-loc-btn-row">
+                            <button type="button" id="getLocationBtn" class="kh-loc-btn">
+                                <i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i>
+                                <span>تحديد موقعي الحالي تلقائياً</span>
+                            </button>
+                            <small class="kh-loc-status" id="locStatus" aria-live="polite">
+                                {{ old('latitude') ? 'تم إرفاق الإحداثيات' : 'يساعد فرق الطوارئ على الوصول بدقة' }}
+                            </small>
+                        </div>
+
+                        <div class="kh-grid">
+                            <div class="kh-field kh-field--full">
+                                <span class="kh-label">نوع المكان <span class="kh-req">*</span></span>
+                                <div class="kh-seg" role="radiogroup" aria-label="نوع المكان">
+                                    <label><input type="radio" name="location_type" value="مدينة" required @checked(old('location_type', 'مدينة') === 'مدينة')><span><i class="fa-solid fa-city" aria-hidden="true"></i> مدينة</span></label>
+                                    <label><input type="radio" name="location_type" value="قرية" required @checked(old('location_type') === 'قرية')><span><i class="fa-solid fa-house-chimney" aria-hidden="true"></i> قرية</span></label>
+                                </div>
+                            </div>
+                            <div class="kh-field">
+                                <label for="center" class="kh-label">المركز <span class="kh-req">*</span></label>
+                                <select class="kh-input" id="center" name="center" required>
+                                    <option value="" disabled @selected(! old('center'))>اختر المركز</option>
+                                    @foreach ($centers as $center)
+                                        <option value="{{ $center->name }}" data-id="{{ $center->id }}" @selected(old('center') === $center->name)>{{ $center->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('center')<p class="kh-field-error">{{ $message }}</p>@enderror
+                            </div>
+                            <div class="kh-field">
+                                <label for="area" class="kh-label">القرية / المدينة <span class="kh-req">*</span></label>
+                                <select class="kh-input" id="area" name="area" required data-old="{{ old('area') }}">
+                                    <option value="" disabled selected>اختر المركز أولاً</option>
+                                </select>
+                                @error('area')<p class="kh-field-error">{{ $message }}</p>@enderror
+                            </div>
+                            <div class="kh-field kh-field--full">
+                                <label for="location_description" class="kh-label">وصف الموقع بالتفصيل <span class="kh-req">*</span></label>
+                                <textarea id="location_description" name="location_description" class="kh-input" rows="3" required
+                                    placeholder="مثال: الشارع الرئيسي بجوار مدرسة …، أمام محطة الوقود">{{ old('location_description') }}</textarea>
+                                @error('location_description')<p class="kh-field-error">{{ $message }}</p>@enderror
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    {{-- 3. Details --}}
+                    <fieldset class="kh-card">
+                        <legend class="kh-card__title"><span class="kh-card__num">3</span> تفاصيل ومرفقات</legend>
+                        <div class="kh-grid">
+                            <div class="kh-field kh-field--full">
+                                <label for="details" class="kh-label">ماذا يحدث؟ <span class="kh-opt">(اختياري)</span></label>
+                                <textarea name="details" id="details" class="kh-input" rows="4"
+                                    placeholder="صف الحالة: عدد المصابين إن وُجد، مدى الخطورة، منذ متى بدأت…">{{ old('details') }}</textarea>
+                            </div>
+                            <div class="kh-field kh-field--full">
+                                <span class="kh-label">صور أو فيديو أو مستندات <span class="kh-opt">(اختياري)</span></span>
+                                <label class="kh-drop" for="attachments">
+                                    <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
+                                    <strong>اضغط لاختيار الملفات</strong>
+                                    <small>JPG · PNG · PDF · MP4 — حتى 10 ميجابايت للملف</small>
+                                </label>
+                                <input type="file" name="attachments[]" id="attachments" class="kh-drop__input" multiple accept=".jpg,.jpeg,.png,.pdf,.mp4">
+                                <ul class="kh-files" id="khFiles" aria-live="polite"></ul>
+                                @error('attachments.*')<p class="kh-field-error">{{ $message }}</p>@enderror
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    {{-- 4. Reporter --}}
+                    <fieldset class="kh-card">
+                        <legend class="kh-card__title"><span class="kh-card__num">4</span> بيانات مقدم البلاغ</legend>
+                        <div class="kh-grid">
+                            <div class="kh-field">
+                                <label for="reporter_name" class="kh-label">الاسم بالكامل <span class="kh-req">*</span></label>
+                                <input type="text" id="reporter_name" name="reporter_name" class="kh-input" value="{{ old('reporter_name', auth()->user()?->name) }}" required autocomplete="name">
+                                @error('reporter_name')<p class="kh-field-error">{{ $message }}</p>@enderror
+                            </div>
+                            <div class="kh-field">
+                                <label for="reporter_phone" class="kh-label">رقم الهاتف <span class="kh-req">*</span></label>
+                                <input type="tel" id="reporter_phone" name="reporter_phone" class="kh-input" dir="ltr" inputmode="tel" autocomplete="tel"
+                                    value="{{ old('reporter_phone', auth()->user()?->phone) }}" required placeholder="01XXXXXXXXX">
+                                @error('reporter_phone')<p class="kh-field-error">{{ $message }}</p>@enderror
+                            </div>
+                            <div class="kh-field">
+                                <label for="reporter_national_id" class="kh-label">الرقم القومي <span class="kh-req">*</span></label>
+                                <input type="text" id="reporter_national_id" name="reporter_national_id" class="kh-input" dir="ltr" inputmode="numeric"
+                                    pattern="\d{14}" maxlength="14" title="14 رقماً" value="{{ old('reporter_national_id', auth()->user()?->national_id) }}" required placeholder="14 رقماً">
+                                @error('reporter_national_id')<p class="kh-field-error">{{ $message }}</p>@enderror
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <div class="kh-submit">
+                        <button type="submit" class="kh-btn kh-btn--danger kh-btn--lg" id="khSubmit">
+                            <i class="fa-solid fa-paper-plane" aria-hidden="true"></i><span>إرسال البلاغ الآن</span>
+                        </button>
+                        <p><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> بياناتك مؤمّنة ويتم التعامل معها بسرية تامة.</p>
+                    </div>
+                </form>
+
+                {{-- Side panel --}}
+                <aside class="kh-side" aria-label="أرقام الطوارئ ونصائح">
+                    <div class="kh-side__card kh-side__card--hot">
+                        <h2><i class="fa-solid fa-phone-volume" aria-hidden="true"></i> خطر على الحياة؟ اتصل الآن</h2>
+                        <div class="kh-side__nums">
+                            @foreach ($hotlines as [$num, $label])
+                                <a href="tel:{{ $num }}"><strong>{{ $num }}</strong><span>{{ $label }}</span></a>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="kh-side__card">
+                        <h2><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> بلاغ أوضح = استجابة أسرع</h2>
+                        <ul>
+                            <li>اضغط «تحديد موقعي» إذا كنت في مكان الحادث.</li>
+                            <li>اذكر علامة مميزة قريبة من الموقع.</li>
+                            <li>صورة واحدة واضحة تكفي — لا تعرّض نفسك للخطر.</li>
+                            <li>اكتب رقم هاتف متاح للتواصل معك.</li>
+                        </ul>
+                    </div>
+                </aside>
             </div>
-        </section>
+        </div>
     </main>
 @endsection
+
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+(function () {
     const centerSelect = document.getElementById('center');
     const areaSelect = document.getElementById('area');
-    const getLocationBtn = document.getElementById('getLocationBtn');
-    const latInput = document.getElementById('latitude');
-    const lonInput = document.getElementById('longitude');
+    const oldArea = areaSelect.dataset.old || '';
+    const opt = (value, label, opts = {}) => { const o = new Option(label, value); if (opts.disabled) o.disabled = true; if (opts.selected) o.selected = true; return o; };
 
-    // --- Dependent dropdown: Villages by Center ---
-    centerSelect.addEventListener('change', function() {
+    // Villages / cities of the selected centre
+    centerSelect.addEventListener('change', function () {
         const centerId = this.options[this.selectedIndex]?.dataset?.id;
-        if (!centerId) {
-            areaSelect.innerHTML = '<option value="" disabled selected>-- اختر المركز أولاً --</option>';
-            return;
-        }
-
-        areaSelect.innerHTML = '<option value="" disabled selected>جاري التحميل...</option>';
-
-        fetch(`/emergency-report/villages/${centerId}`)
-            .then(res => res.json())
-            .then(data => {
-                if (!data.length) {
-                    areaSelect.innerHTML = '<option value="" disabled selected>-- لا توجد قرى مضافه --</option>';
-                    return;
-                }
-                let html = '<option value="" disabled selected>-- اختر القرية / المدينة --</option>';
-                data.forEach(v => {
-                    const label = v.type === 'city' ? '🏙️ ' : '🏡 ';
-                    html += `<option value="${v.name}">${label}${v.name}</option>`;
+        areaSelect.replaceChildren(opt('', centerId ? 'جاري التحميل…' : 'اختر المركز أولاً', { disabled: true, selected: true }));
+        if (!centerId) return;
+        fetch(`{{ url('emergency-report/villages') }}/${encodeURIComponent(centerId)}`, { headers: { 'Accept': 'application/json' } })
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(list => {
+                areaSelect.replaceChildren(opt('', list.length ? 'اختر القرية / المدينة' : 'لا توجد قرى مضافة لهذا المركز', { disabled: true, selected: true }));
+                const groups = { city: 'المدن', village: 'القرى' };
+                Object.keys(groups).forEach(type => {
+                    const items = list.filter(v => (v.type || 'village') === type);
+                    if (!items.length) return;
+                    const g = document.createElement('optgroup'); g.label = groups[type];
+                    items.forEach(v => g.append(opt(v.name, v.name, { selected: v.name === oldArea })));
+                    areaSelect.append(g);
                 });
-                areaSelect.innerHTML = html;
             })
-            .catch(() => {
-                areaSelect.innerHTML = '<option value="" disabled selected>فشل التحميل</option>';
-            });
+            .catch(() => areaSelect.replaceChildren(opt('', 'تعذر التحميل — أعد اختيار المركز', { disabled: true, selected: true })));
+    });
+    if (centerSelect.value) centerSelect.dispatchEvent(new Event('change'));
+
+    // Geolocation
+    const btn = document.getElementById('getLocationBtn');
+    const status = document.getElementById('locStatus');
+    const lat = document.getElementById('latitude');
+    const lng = document.getElementById('longitude');
+    if (lat.value) btn.classList.add('is-done');
+    btn.addEventListener('click', () => {
+        if (!navigator.geolocation) { status.textContent = 'المتصفح لا يدعم تحديد الموقع.'; return; }
+        btn.disabled = true; btn.classList.remove('is-done', 'is-error');
+        btn.querySelector('span').textContent = 'جاري تحديد الموقع…';
+        navigator.geolocation.getCurrentPosition(pos => {
+            lat.value = pos.coords.latitude.toFixed(7);
+            lng.value = pos.coords.longitude.toFixed(7);
+            btn.disabled = false; btn.classList.add('is-done');
+            btn.querySelector('span').textContent = 'تم تحديد الموقع';
+            status.textContent = 'الدقة التقريبية: ' + Math.round(pos.coords.accuracy) + ' متر';
+        }, () => {
+            btn.disabled = false; btn.classList.add('is-error');
+            btn.querySelector('span').textContent = 'إعادة المحاولة';
+            status.textContent = 'تعذر الوصول للموقع — فعّل خدمة الموقع في المتصفح، أو اكتب الوصف يدوياً.';
+        }, { enableHighAccuracy: true, timeout: 15000 });
     });
 
-    // Trigger on page load if old center is selected (after validation error)
-    if (centerSelect.value) {
-        centerSelect.dispatchEvent(new Event('change'));
-    }
-
-    // --- Geolocation ---
-    if (getLocationBtn && navigator.geolocation) {
-        getLocationBtn.addEventListener('click', () => {
-            getLocationBtn.disabled = true;
-            getLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تحديد الموقع...';
-
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    latInput.value = position.coords.latitude;
-                    lonInput.value = position.coords.longitude;
-
-                    getLocationBtn.innerHTML = '<i class="fas fa-check-circle" style="color:#27ae60"></i> تم تحديد الموقع بنجاح!';
-                    getLocationBtn.style.borderColor = '#27ae60';
-                    getLocationBtn.style.color = '#27ae60';
-                },
-                () => {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'تعذر الوصول للموقع',
-                        text: 'يرجى التأكد من تفعيل خدمات الموقع في متصفحك',
-                        confirmButtonText: 'حسناً',
-                        confirmButtonColor: '#c0392b'
-                    });
-                    getLocationBtn.disabled = false;
-                    getLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> تحديد موقعي الحالي تلقائيًا';
-                    getLocationBtn.style.borderColor = '#b2bec3';
-                    getLocationBtn.style.color = '#636e72';
-                }
-            );
+    // Attachments list + 10MB check
+    const input = document.getElementById('attachments');
+    const list = document.getElementById('khFiles');
+    const MAX = 10 * 1024 * 1024;
+    input.addEventListener('change', () => {
+        list.replaceChildren();
+        let tooBig = false;
+        Array.from(input.files).forEach(f => {
+            const li = document.createElement('li');
+            const big = f.size > MAX; tooBig = tooBig || big;
+            li.className = big ? 'is-error' : '';
+            const i = document.createElement('i');
+            i.className = f.type.startsWith('image/') ? 'fa-solid fa-image' : f.type.startsWith('video/') ? 'fa-solid fa-film' : 'fa-solid fa-file';
+            const name = document.createElement('span'); name.textContent = f.name;
+            const size = document.createElement('small'); size.textContent = (f.size / 1048576).toFixed(1) + ' MB' + (big ? ' — أكبر من المسموح' : '');
+            li.append(i, name, size); list.append(li);
         });
-    }
-});
+        input.setCustomValidity(tooBig ? 'أحد الملفات أكبر من 10 ميجابايت' : '');
+    });
+
+    // Client-side check before submit: report type + required fields
+    const form = document.getElementById('khForm');
+    form.addEventListener('submit', (e) => {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            const first = form.querySelector(':invalid');
+            first?.closest('.kh-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            setTimeout(() => first?.reportValidity(), 350);
+            return;
+        }
+        const b = document.getElementById('khSubmit');
+        b.disabled = true; b.querySelector('span').textContent = 'جاري الإرسال…';
+    });
+})();
 </script>
 @endpush

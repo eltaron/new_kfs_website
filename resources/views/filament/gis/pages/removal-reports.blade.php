@@ -14,6 +14,7 @@
             'pdf_ready' => 'مراجعة المركز الرئيسي',
             'systems_processing' => 'التحليل المكاني',
             'local_unit_approval' => 'الاعتماد من الوحدة المحلية',
+            'gis_pending' => 'التوجيه للاعتماد',
             'visa_pending' => 'الاعتماد من السلطة المختصة',
             'completed' => 'منتهية',
         ];
@@ -59,6 +60,7 @@
                         'engineering_review' => 'warning',
                         'systems_processing' => 'violet',
                         'local_unit_approval' => 'teal',
+                        'gis_pending' => 'violet',
                         'visa_pending' => 'indigo',
                         'created' => 'gray',
                         default => 'primary',
@@ -189,6 +191,7 @@
                                             'engineering_review' => 'warning',
                                             'systems_processing' => 'violet',
                                             'local_unit_approval' => 'teal',
+                                            'gis_pending' => 'violet',
                                             'visa_pending' => 'indigo',
                                             'created' => 'gray',
                                             default => 'primary',

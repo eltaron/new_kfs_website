@@ -11,8 +11,8 @@
                 @if ($services->isNotEmpty())
                     <div class="kfs-grid kfs-grid--4" data-stagger>
                         @foreach ($services as $service)
-                            <a href="{{ $service->link ? $service->link : route('services.show', $service) }}"
-                                @if ($service->link) target="_blank" rel="noopener" @endif
+                            <a href="{{ $service->publicUrl() }}"
+                                @if ($service->opensExternally()) target="_blank" rel="noopener" @endif
                                 class="kfs-svc {{ $service->is_highlighted ? 'kfs-svc--gold' : '' }}">
                                 <span class="kfs-svc__icon" aria-hidden="true"><i class="{{ $service->icon ?: 'fa-solid fa-file-lines' }}"></i></span>
                                 <span class="kfs-svc__body">

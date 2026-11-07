@@ -1,6 +1,7 @@
 @php
     $kfsLogo = !empty($settings['site_logo_header']) ? Storage::url($settings['site_logo_header']) : asset('logo.png');
-    $kfsHas = fn (string $name) => \Illuminate\Support\Facades\Route::has($name);
+    // Route exists and is not hidden from «الإعدادات العامة ← الخدمات الإلكترونية».
+    $kfsHas = fn (string $name) => \App\Support\EServices::visible($name);
     $kfsActive = fn (...$patterns) => request()->routeIs(...$patterns);
 @endphp
 <!-- ======================= Header Start ======================= -->
@@ -11,7 +12,7 @@
             <p class="kfs-govbar__title">
                 <strong>جمهورية مصر العربية</strong>
                 <span class="sep" aria-hidden="true">|</span>
-                <span>محافظة كفر الشيخ<span class="kfs-govbar__long"> — البوابة الإلكترونية الرسمية</span></span>
+                <span>محافظة كفر الشيخ<span class="kfs-govbar__long"> — الموقع الرسمي</span></span>
             </p>
             <div class="kfs-govbar__date d-none d-xxl-block" id="date-time-container"></div>
             <ul class="kfs-govbar__tools">
@@ -76,7 +77,7 @@
                 <img src="{{ $kfsLogo }}" alt="شعار محافظة كفر الشيخ" class="logo-img" width="70" height="54" />
                 <span class="kfs-brand__text">
                     <span class="kfs-brand__name">محافظة كفر الشيخ</span>
-                    <span class="kfs-brand__sub">البوابة الإلكترونية الرسمية</span>
+                    <span class="kfs-brand__sub">الموقع الرسمي</span>
                 </span>
             </a>
 
@@ -119,16 +120,16 @@
                             @if ($kfsHas('gis.index'))
                                 <li><a class="dropdown-item" href="{{ route('gis.index') }}"><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>بوابة الخدمات الجغرافية</a></li>
                             @endif
-                            @if ($kfsHas('site-validity.landing'))
+                            @if (\App\Support\EServices::visible('site-validity.landing'))
                                 <li><a class="dropdown-item" href="{{ route('site-validity.landing') }}"><i class="fa-solid fa-ruler-combined" aria-hidden="true"></i>طلب صلاحية الموقع</a></li>
                             @endif
                             @if ($kfsHas('estidama.index'))
                                 <li><a class="dropdown-item" href="{{ route('estidama.index') }}"><i class="fa-solid fa-seedling" aria-hidden="true"></i>برنامج استدامة</a></li>
                             @endif
-                            @if ($kfsHas('market.home'))
+                            @if (\App\Support\EServices::visible('market.home'))
                                 <li><a class="dropdown-item" href="{{ route('market.home') }}"><i class="fa-solid fa-store" aria-hidden="true"></i>المتجر الإلكتروني</a></li>
                             @endif
-                            @if ($kfsHas('syndicate.verify.form'))
+                            @if (\App\Support\EServices::visible('syndicate.verify.form'))
                                 <li><a class="dropdown-item" href="{{ route('syndicate.verify.form') }}"><i class="fa-solid fa-helmet-safety" aria-hidden="true"></i>التحقق من شهادة الإشراف الهندسي</a></li>
                             @endif
                             @if ($kfsHas('lms.certificates.verify'))
@@ -202,19 +203,7 @@
                                 @if ($kfsHas('lms.dashboard'))
                                     <li><a class="dropdown-item" href="{{ route('lms.dashboard') }}"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> تعلّمي (استدامة)</a></li>
                                 @endif
-                                @if ($kfsHas('syndicate.my-projects'))
-                                    <li><a class="dropdown-item" href="{{ route('syndicate.my-projects') }}"><i class="fa-solid fa-helmet-safety" aria-hidden="true"></i> مشروعاتي (الإشراف الهندسي)</a></li>
-                                @endif
-                                @if ($kfsHas('market.orders.index'))
-                                    <li><a class="dropdown-item" href="{{ route('market.orders.index') }}"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i> طلباتي من المتجر</a></li>
-                                @endif
-                                @if (auth()->user()->isEmployee())
-                                    <li>
-                                        <a class="dropdown-item fw-bold" href="{{ route('employee.erp.index') }}">
-                                            <i class="fa-solid fa-briefcase" aria-hidden="true"></i> بوابة الموظفين (ERP)
-                                        </a>
-                                    </li>
-                                @endif
+                                {{-- «مشروعاتي (الإشراف الهندسي)» و«طلباتي من المتجر» و«بوابة الموظفين (ERP)» أُزيلت من القائمة بطلب الإدارة. --}}
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item text-danger" href="{{ route('logout') }}"
@@ -280,13 +269,6 @@
                 <i class="fa-solid fa-circle-user" aria-hidden="true"></i>
                 <span>مرحباً، <span class="user-name">{{ Str::words(Auth::user()->name, 2, '') }}</span></span>
             </div>
-            @if (auth()->user()->isEmployee())
-                <div class="user-actions">
-                    <a href="{{ route('employee.erp.index') }}" class="btn-gold-sm">
-                        <i class="fa-solid fa-briefcase" aria-hidden="true"></i> ERP
-                    </a>
-                </div>
-            @endif
         @endguest
     </div>
 
@@ -327,16 +309,16 @@
                     @if ($kfsHas('gis.index'))
                         <li><a href="{{ route('gis.index') }}"><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i> بوابة الخدمات الجغرافية</a></li>
                     @endif
-                    @if ($kfsHas('site-validity.landing'))
+                    @if (\App\Support\EServices::visible('site-validity.landing'))
                         <li><a href="{{ route('site-validity.landing') }}"><i class="fa-solid fa-ruler-combined" aria-hidden="true"></i> طلب صلاحية الموقع</a></li>
                     @endif
                     @if ($kfsHas('estidama.index'))
                         <li><a href="{{ route('estidama.index') }}"><i class="fa-solid fa-seedling" aria-hidden="true"></i> برنامج استدامة</a></li>
                     @endif
-                    @if ($kfsHas('market.home'))
+                    @if (\App\Support\EServices::visible('market.home'))
                         <li><a href="{{ route('market.home') }}"><i class="fa-solid fa-store" aria-hidden="true"></i> المتجر الإلكتروني</a></li>
                     @endif
-                    @if ($kfsHas('syndicate.verify.form'))
+                    @if (\App\Support\EServices::visible('syndicate.verify.form'))
                         <li><a href="{{ route('syndicate.verify.form') }}"><i class="fa-solid fa-helmet-safety" aria-hidden="true"></i> التحقق من شهادة الإشراف الهندسي</a></li>
                     @endif
                 </ul>

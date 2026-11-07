@@ -59,7 +59,8 @@ class HomeController extends Controller
             ->get();
 
         // 6. Services
-        $services = Service::whereNull('parent_id')
+        $services = Service::active()->ordered()
+            ->whereNull('parent_id')
             ->take(3)
             ->get();
 

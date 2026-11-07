@@ -39,7 +39,19 @@ class ServiceResource extends Resource
                     Forms\Components\TextInput::make('icon')
                         ->label('أيقونة (مثل fas fa-ad)')
                         ->placeholder('fas fa-ad'),
-                    Forms\Components\TextInput::make('link')->label('رابط خارجي للخدمة')->url(),
+                    Forms\Components\TextInput::make('link')
+                        ->label('رابط الخدمة')
+                        ->helperText('رابط خارجي كامل (https://…) أو مسار داخل الموقع يبدأ بـ «/» مثل ‎/gis-portal. اتركه فارغاً لفتح صفحة تفاصيل الخدمة.')
+                        ->rule('regex:/^(https?:\/\/\S+|\/(?!\/)\S*)$/i')
+                        ->validationMessages(['regex' => 'أدخل رابطاً يبدأ بـ https:// أو مساراً داخلياً يبدأ بـ /']),
+                    Forms\Components\TextInput::make('sort_order')
+                        ->label('ترتيب العرض')
+                        ->helperText('الأصغر يظهر أولاً في الصفحة الرئيسية ودليل الخدمات.')
+                        ->numeric()->minValue(0)->default(0),
+                    Forms\Components\Toggle::make('is_active')
+                        ->label('الخدمة مفعّلة')
+                        ->helperText('عند الإيقاف لا تظهر الخدمة (ولا خدماتها الفرعية) في الخدمات الإلكترونية ولا يمكن التقديم عليها.')
+                        ->default(true),
                     Forms\Components\RichEditor::make('description')->label('الوصف التفصيلي')->columnSpanFull(),
                 ])->columns(2),
 
@@ -112,12 +124,22 @@ class ServiceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')->label('الخدمة')->searchable(),
+                Tables\Columns\TextColumn::make('sort_order')->label('الترتيب')->sortable(),
+                Tables\Columns\TextColumn::make('title')->label('الخدمة')->searchable()->html(false)->formatStateUsing(fn ($state) => trim(strip_tags((string) $state))),
                 Tables\Columns\TextColumn::make('pricing_type')
                     ->label('نظام التسعير')->badge()
                     ->formatStateUsing(fn($state) => $state === 'fixed' ? 'ثابت' : 'فئات'),
                 Tables\Columns\TextColumn::make('base_price')->label('السعر الأساسي')->money('EGP'),
-                Tables\Columns\IconColumn::make('link')->label('رابط')->url(fn($record) => $record->link)->openUrlInNewTab()->icon('heroicon-o-link'),
+                Tables\Columns\ToggleColumn::make('is_active')->label('مفعّلة'),
+                Tables\Columns\IconColumn::make('link')->label('رابط')->url(fn($record) => $record->link ? $record->publicUrl() : null)->openUrlInNewTab()->icon('heroicon-o-link'),
+            ])
+            ->defaultSort('sort_order')
+            ->reorderable('sort_order')
+            ->filters([
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('الحالة')
+                    ->trueLabel('المفعّلة')
+                    ->falseLabel('الموقوفة'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

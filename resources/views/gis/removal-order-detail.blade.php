@@ -134,6 +134,11 @@
             color: #721c24;
         }
 
+        .stage-badge.gis_pending {
+            background: #ede4fb;
+            color: #5b2a9a;
+        }
+
         .stage-badge.visa_pending {
             background: #e2d5f0;
             color: #4a1a6b;
@@ -432,7 +437,10 @@
                         ],
                         'spatial_pending' => ['label' => 'بإنتظار الكشف المساحي', 'user' => $record->spatialManager],
                         'spatial_dimensioned' => ['label' => 'تم الكشف المساحي', 'user' => $record->spatialMember],
-                        'pdf_ready' => ['label' => 'بإنتظار اعتماد القرار', 'user' => $record->systemsSpecialist],
+                        'pdf_ready' => ['label' => 'بإنتظار اعتماد القرار', 'user' => null],
+                        'systems_processing' => ['label' => 'التحليل المكاني', 'user' => $record->systemsSpecialist],
+                        'local_unit_approval' => ['label' => 'الاعتماد من الوحدة المحلية', 'user' => null],
+                        'gis_pending' => ['label' => 'التوجيه للاعتماد', 'user' => null],
                         'visa_pending' => ['label' => 'بإنتظار التصديق النهائي', 'user' => null],
                         'completed' => ['label' => 'تم تنفيذ القرار', 'user' => null],
                     ];

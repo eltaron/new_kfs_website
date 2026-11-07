@@ -16,6 +16,7 @@ use App\Services\Payments\PaymentException;
 use App\Services\Payments\PaymentService;
 use App\Services\Payments\Pricing\GisPricing;
 use Illuminate\Support\Facades\Log;
+use App\Support\EServices;
 
 class GisPortalController extends Controller
 {
@@ -34,10 +35,30 @@ class GisPortalController extends Controller
     public function showService($slug, GisPricing $pricing)
     {
         $service = GisSubService::where('slug', $slug)->with('serviceType')->firstOrFail();
+        if (! EServices::gisServicesOpen()) {
+            return $this->comingSoon($service);
+        }
         // أقل مبلغ (بدون مدخلات) — نفس حساب الخادم عند التقديم.
         $quote = $pricing->quote($service, []);
 
         return view('gis.services.show', compact('service', 'quote'));
+    }
+
+    /**
+     * صفحة «قريباً» لخدمة مكانية لم تُتح بعد (الإتاحة من الإعدادات العامة ← الخدمات الإلكترونية).
+     */
+    private function comingSoon(GisSubService $service)
+    {
+        return response()->view('home.wait', [
+            'context' => [
+                'name' => trim($service->name),
+                'group' => trim((string) $service->serviceType?->name),
+                'icon' => 'fa-solid fa-map-location-dot',
+                'back' => route('gis.index'),
+                'backLabel' => 'العودة إلى منظومة الخدمات المكانية',
+                'crumbs' => ['منظومة الخدمات المكانية' => route('gis.index')],
+            ],
+        ]);
     }
 
     /**
@@ -64,6 +85,9 @@ class GisPortalController extends Controller
     public function createApplication($slug, GisPricing $pricing)
     {
         $service = GisSubService::where('slug', $slug)->with('serviceType')->firstOrFail();
+        if (! EServices::gisServicesOpen()) {
+            return $this->comingSoon($service);
+        }
         $markazs = GisMarkaz::all();
         $reasons = GisStudyReason::all();
         // الحقول التي تغذي حاسبة الرسوم (تختلف أسماؤها من خدمة لأخرى).
@@ -78,6 +102,9 @@ class GisPortalController extends Controller
     public function storeApplication(Request $request, $slug, GisPricing $pricing, PaymentService $payments, ArcGisService $arcGis)
     {
         $service = GisSubService::where('slug', $slug)->with('serviceType')->firstOrFail();
+        if (! EServices::gisServicesOpen()) {
+            return redirect()->route('gis.service.show', $service->slug);
+        }
 
         $documentRule = ['file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:5120'];
 

@@ -39,7 +39,8 @@ class GisPanelProvider extends PanelProvider
             ])
             ->discoverPages(in: app_path('Filament/Gis/Pages'), for: 'App\\Filament\\Gis\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                // لوحة GIS المخصصة (ودجات حسب الدور) بدل لوحة Filament الافتراضية
+                \App\Filament\Gis\Pages\Dashboard::class,
                 \App\Filament\Gis\Pages\RemovalReportsPage::class,
             ])
 
@@ -82,6 +83,15 @@ class GisPanelProvider extends PanelProvider
             ->globalSearch(true)
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->sidebarCollapsibleOnDesktop()
+            // ترتيب مجموعات الشريط الجانبي: حوكمة القرارات أولاً
+            ->navigationGroups([
+                'حوكمة قرارات الإزالة',
+                'البيانات المرجعية',
+                'الخدمات المكانية والمساحية',
+                'منظومة إدارة الخدمات',
+                'إعدادات النظام والأمان',
+                'إدارة الوصول',
+            ])
             ->databaseNotifications()
             ->profile(\App\Filament\Gis\Pages\GisEditProfile::class)
             ->darkMode(true) // دعم الوضع الليلي والنهاري تلقائياً
@@ -94,35 +104,48 @@ class GisPanelProvider extends PanelProvider
                 'panels::head.end',
                 fn (): string => '<style>' . file_get_contents(resource_path('css/gis-tabs.css')) . '</style>'
             )
+            // 6b. هوية لوحة GIS: لوحة مسار القرارات + تبويبات المراحل كمسار مرقّم + جدول أوضح
+            ->renderHook(
+                'panels::head.end',
+                fn (): string => '<link rel="stylesheet" href="' . asset('css/kfs-gis-panel.css') . '?v=' . @filemtime(public_path('css/kfs-gis-panel.css')) . '">'
+            )
 
-            // 7. إضافة معلومات المستخدم في أعلى الشريط الجانبي
+            // 7. بطاقة المستخدم أعلى الشريط الجانبي (الاسم + الدور + المركز)
             ->renderHook(
                 'panels::sidebar.nav.start',
                 fn (): string => Blade::render('
-                    @php $user = auth()->user(); @endphp
-                    <div class="fi-sidebar-user-info border-b border-gray-200 dark:border-gray-700 px-4 py-4">
-                        {{-- expanded state --}}
-                        <div x-show="$store.sidebar.isOpen"
-                             x-transition:enter="lg:transition lg:delay-100"
-                             x-transition:enter-start="opacity-0"
-                             x-transition:enter-end="opacity-100">
-                            <div class="flex items-center gap-3">
-                                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary-600 dark:bg-primary-500 flex items-center justify-center text-white font-bold text-lg shadow-sm">
-                                    {{ mb_substr($user->name, 0, 1) }}
-                                </div>
-                                <div class="min-w-0 flex-1">
-                                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate leading-tight">{{ $user->name }}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate leading-tight mt-0.5">{{ $user->email }}</p>
-                                </div>
+                    @php
+                        $user = auth()->user();
+                        $role = $user?->roles->pluck("name")->reject(fn ($r) => $r === "super_admin")->first()
+                            ?? ($user?->hasRole("super_admin") ? "مدير النظام" : null);
+                        $initial = mb_substr(trim(preg_replace("/^[^\/]*\//u", "", (string) $user?->name)), 0, 1);
+                    @endphp
+                    @if ($user)
+                        <div class="kgs-user">
+                            <div class="kgs-user__card" x-show="$store.sidebar.isOpen">
+                                <span class="kgs-user__avatar">{{ $initial }}</span>
+                                <span class="kgs-user__body">
+                                    <strong class="kgs-user__name">{{ $user->name }}</strong>
+                                    @if ($role)<span class="kgs-user__role">{{ $role }}</span>@endif
+                                </span>
+                            </div>
+                            <div class="kgs-user__meta" x-show="$store.sidebar.isOpen">
+                                <span><x-filament::icon icon="heroicon-m-map-pin" class="kgs-i" /> {{ $user->center ?: "كل المراكز" }}</span>
+                            </div>
+                            <div class="kgs-user__mini" x-show="! $store.sidebar.isOpen" title="{{ $user->name }}">
+                                <span class="kgs-user__avatar">{{ $initial }}</span>
                             </div>
                         </div>
-                        {{-- collapsed state --}}
-                        <div x-show="!$store.sidebar.isOpen"
-                             class="flex justify-center">
-                            <div class="w-9 h-9 rounded-full bg-primary-600 dark:bg-primary-500 flex items-center justify-center text-white font-bold text-sm shadow-sm">
-                                {{ mb_substr($user->name, 0, 1) }}
-                            </div>
-                        </div>
+                    @endif
+                ')
+            )
+            // 7b. تذييل الشريط الجانبي
+            ->renderHook(
+                'panels::sidebar.footer',
+                fn (): string => Blade::render('
+                    <div class="kgs-foot" x-show="$store.sidebar.isOpen">
+                        <span class="kgs-foot__mark"></span>
+                        <span>منظومة حوكمة قرارات الإزالة<br><small>محافظة كفر الشيخ</small></span>
                     </div>
                 ')
             )

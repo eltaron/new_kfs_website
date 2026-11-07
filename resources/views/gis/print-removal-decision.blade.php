@@ -330,7 +330,7 @@
     </div>
     <div class="workflow-steps">
         @php
-            $allStages = ["created"=>["label"=>"إنشاء المحضر",""],"engineering_review"=>["label"=>"المراجعة الهندسية",""],"spatial_pending"=>["label"=>"انتظار الكشف المساحي",""],"spatial_dimensioned"=>["label"=>"تم الكشف المساحي",""],"pdf_ready"=>["label"=>"انتظار اعتماد القرار",""],"visa_pending"=>["label"=>"انتظار التصديق",""],"completed"=>["label"=>"تم التنفيذ",""]];
+            $allStages = ["created"=>["label"=>"إنشاء المحضر",""],"engineering_review"=>["label"=>"المراجعة الهندسية",""],"spatial_pending"=>["label"=>"انتظار الكشف المساحي",""],"spatial_dimensioned"=>["label"=>"تم الكشف المساحي",""],"pdf_ready"=>["label"=>"انتظار اعتماد القرار",""],"systems_processing"=>["label"=>"التحليل المكاني",""],"local_unit_approval"=>["label"=>"اعتماد الوحدة المحلية",""],"gis_pending"=>["label"=>"التوجيه للاعتماد",""],"visa_pending"=>["label"=>"انتظار التصديق",""],"completed"=>["label"=>"تم التنفيذ",""]];
             $stageKeys = array_keys($allStages);
             $currentIndex = array_search($record->stage, $stageKeys);
         @endphp

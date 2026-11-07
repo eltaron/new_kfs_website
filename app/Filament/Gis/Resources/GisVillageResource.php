@@ -22,7 +22,7 @@ class GisVillageResource extends Resource
     protected static ?string $modelLabel = 'قرية أو عزبة';
     protected static ?string $pluralModelLabel = 'قاعدة بيانات القرى والعزب';
     protected static ?int $navigationSort = 3;
-    // protected static ?string $navigationGroup = 'الخدمات المكانية والمساحية';
+    protected static ?string $navigationGroup = 'البيانات المرجعية';
 
     public static function canAccess(): bool
     {

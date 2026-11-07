@@ -20,27 +20,33 @@ class ListRemovalOrders extends ListRecords
         ];
     }
 
+    /** نفس نطاق الجدول (المركز حسب الدور) حتى تطابق أعداد التبويبات ما يظهر فعلاً */
     private function scopeByCenter(): Builder
     {
-        $query = RemovalOrder::query();
-        $user = auth()->user();
-        if ($user->hasRole('مهندس التنظيم') && $user->center) {
-            $query->where('center', $user->center);
-        }
-        return $query;
+        return RemovalOrderResource::getEloquentQuery();
     }
+
+    /** قرار منتهٍ رُفعت له الإخطارات الثلاثة (المواطن، الشرطة، الإيرادات 1%) */
+    private const LEGAL_DONE_SQL = "(COALESCE(citizen_notification_file, '') <> ''
+        AND COALESCE(police_notification_file, '') <> ''
+        AND COALESCE(notification_to_the_revenue_department_file, '') <> '')";
 
     /** @var array<string, int>|null عدد القرارات لكل مرحلة — استعلام واحد (GROUP BY) بدل COUNT لكل تبويب */
     private ?array $stageCounts = null;
 
     private function countByStage(string $stage): int
     {
-        $this->stageCounts ??= $this->scopeByCenter()
-            ->selectRaw('stage, COUNT(*) as aggregate')
-            ->groupBy('stage')
-            ->pluck('aggregate', 'stage')
-            ->map(fn ($count) => (int) $count)
-            ->all();
+        if ($this->stageCounts === null) {
+            $rows = $this->scopeByCenter()
+                ->selectRaw('stage, COUNT(*) as aggregate, SUM(CASE WHEN ' . self::LEGAL_DONE_SQL . ' THEN 1 ELSE 0 END) as legal_done')
+                ->groupBy('stage')
+                ->get();
+
+            $this->stageCounts = $rows->mapWithKeys(fn ($r) => [$r->stage => (int) $r->aggregate])->all();
+            $completed = $rows->firstWhere('stage', RemovalOrder::STAGE_COMPLETED);
+            $this->stageCounts['completed:legal_done'] = (int) ($completed->legal_done ?? 0);
+            $this->stageCounts['completed:legal_pending'] = (int) ($completed->aggregate ?? 0) - (int) ($completed->legal_done ?? 0);
+        }
 
         return $this->stageCounts[$stage] ?? 0;
     }
@@ -93,16 +99,31 @@ class ListRemovalOrders extends ListRecords
                 ->badge(fn() => $this->countByStage(RemovalOrder::STAGE_LOCAL_UNIT_APPROVAL))
                 ->badgeColor('teal'),
 
+            'gis_pending' => Tab::make('التوجيه للاعتماد')
+                ->icon('heroicon-m-arrow-up-on-square')
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('stage', RemovalOrder::STAGE_GIS_PENDING))
+                ->badge(fn() => $this->countByStage(RemovalOrder::STAGE_GIS_PENDING))
+                ->badgeColor('purple'),
+
             'visa_pending' => Tab::make('الاعتماد من السلطة المختصة')
                 ->icon('heroicon-m-academic-cap')
                 ->modifyQueryUsing(fn(Builder $query) => $query->where('stage', RemovalOrder::STAGE_VISA_PENDING))
                 ->badge(fn() => $this->countByStage(RemovalOrder::STAGE_VISA_PENDING))
                 ->badgeColor('indigo'),
 
+            // منتهية لكن لم تُرفع كل الإخطارات (المواطن / الشرطة / الإيرادات 1%)
+            'completed_pending_legal' => Tab::make('بانتظار الإجراءات القانونية')
+                ->icon('heroicon-m-clock')
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('stage', RemovalOrder::STAGE_COMPLETED)
+                    ->whereRaw('NOT ' . self::LEGAL_DONE_SQL))
+                ->badge(fn() => $this->countByStage('completed:legal_pending'))
+                ->badgeColor('warning'),
+
             'completed' => Tab::make('منتهية')
                 ->icon('heroicon-m-check-circle')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('stage', RemovalOrder::STAGE_COMPLETED))
-                ->badge(fn() => $this->countByStage(RemovalOrder::STAGE_COMPLETED))
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('stage', RemovalOrder::STAGE_COMPLETED)
+                    ->whereRaw(self::LEGAL_DONE_SQL))
+                ->badge(fn() => $this->countByStage('completed:legal_done'))
                 ->badgeColor('success'),
         ];
     }

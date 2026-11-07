@@ -186,6 +186,7 @@ class RemovalOrderResource extends Resource
                         RemovalOrder::STAGE_PDF_READY => 'secondary',
                         RemovalOrder::STAGE_SYSTEMS_PROCESSING => 'purple',
                         RemovalOrder::STAGE_LOCAL_UNIT_APPROVAL => 'teal',
+                        RemovalOrder::STAGE_GIS_PENDING => 'purple',
                         RemovalOrder::STAGE_VISA_PENDING => 'indigo',
                         RemovalOrder::STAGE_COMPLETED => 'success',
                         default => 'gray',
@@ -213,23 +214,49 @@ class RemovalOrderResource extends Resource
                         auth()->user()->hasRole('رؤوساء الاقسام') && !empty($record->visa_file)
                     ),
 
+                // رؤساء الأقسام: بعد اعتماد الوحدة المحلية يوجّهون القرار لمكتب المحافظ
+                Action::make('forward_for_approval')
+                    ->label('التوجيه للاعتماد')
+                    ->icon('heroicon-o-check-badge')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('التوجيه للاعتماد')
+                    ->modalDescription('بمجرد التأكيد، سيتم تحويل القرار إلى مكتب المحافظ للتصديق النهائي.')
+                    ->action(function (RemovalOrder $record) {
+                        $record->update([
+                            'stage' => RemovalOrder::STAGE_VISA_PENDING,
+                            'status' => 'تم التوجيه للاعتماد',
+                        ]);
+
+                        Notification::make()
+                            ->success()
+                            ->title('تم التوجيه بنجاح')
+                            ->body('القرار الآن بانتظار تصديق مكتب المحافظ.')
+                            ->send();
+                    })
+                    ->visible(
+                        fn(RemovalOrder $record) =>
+                        auth()->user()->hasRole('رؤوساء الاقسام') &&
+                            $record->stage === RemovalOrder::STAGE_GIS_PENDING
+                    ),
+
                 Action::make('approve_local_unit')
                     ->label(' الاعتماد من الوحدة المحلية')
                     ->icon('heroicon-o-check-badge')
                     ->color('success')
                     ->requiresConfirmation()
                     ->modalHeading('اعتماد الوحدة المحلية')
-                    ->modalDescription('بمجرد التأكيد، سيتم تحويل القرار إلى مكتب المحافظ للتصديق النهائي.')
+                    ->modalDescription('بمجرد التأكيد، سيتم تحويل القرار لرؤساء الأقسام للتوجيه للاعتماد.')
                     ->action(function (RemovalOrder $record) {
                         $record->update([
-                            'stage' => RemovalOrder::STAGE_VISA_PENDING, // تحويله لمرحلة انتظار التأشيرة
-                            'status' => 'تم اعتماد الوحدة المحلية', // تحديث الحالة النصية
+                            'stage' => RemovalOrder::STAGE_GIS_PENDING, // بانتظار توجيه رؤساء الأقسام
+                            'status' => 'تم اعتماد الوحدة المحلية',
                         ]);
 
                         Notification::make()
                             ->success()
                             ->title('تم الاعتماد بنجاح')
-                            ->body('القرار الآن بانتظار تصديق مكتب المحافظ.')
+                            ->body('القرار الآن بانتظار التوجيه للاعتماد من رؤساء الأقسام.')
                             ->send();
                     })
                     ->visible(
@@ -313,6 +340,7 @@ class RemovalOrderResource extends Resource
                     })
                     ->visible(
                         fn(RemovalOrder $record) =>
+                        auth()->user()->hasRole('رؤوساء الاقسام') &&
                         in_array($record->stage, [
                             RemovalOrder::STAGE_SYSTEMS_PROCESSING,
                             RemovalOrder::STAGE_PDF_READY,
@@ -321,8 +349,43 @@ class RemovalOrderResource extends Resource
 
                 Tables\Actions\DeleteAction::make(),
             ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('center')->label('المركز')->options(fn () => GisMarkaz::cachedOptions()),
+            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    BulkAction::make('assign_systems_specialist_bulk')
+                        ->label('تعيين محلل نظم للمختار')
+                        ->icon('heroicon-o-user-group')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('تعيين محلل نظم للقرارات المختارة')
+                        ->modalDescription('سيتم تعيين محلل النظم المختار لكل القرارات المحددة وتحويلها لمرحلة التحليل المكاني.')
+                        ->visible(fn () => auth()->user()->hasRole('رؤوساء الاقسام'))
+                        ->form([
+                            Forms\Components\Select::make('systems_specialist_id')
+                                ->label('اختر محلل النظم')
+                                ->options(fn () => User::whereHas('roles', fn ($q) => $q->where('name', 'محللي النظم'))->pluck('name', 'id'))
+                                ->searchable()
+                                ->required(),
+                        ])
+                        ->action(function (Collection $records, array $data) {
+                            // لا يُرجع القرارات المتقدمة للخلف: «مراجعة المركز الرئيسي» أو إعادة إسناد «التحليل المكاني» فقط
+                            $eligible = $records->filter(fn (RemovalOrder $r) => in_array($r->stage, [RemovalOrder::STAGE_PDF_READY, RemovalOrder::STAGE_SYSTEMS_PROCESSING], true));
+                            $eligible->each(fn (RemovalOrder $r) => $r->update([
+                                'systems_specialist_id' => $data['systems_specialist_id'],
+                                'stage' => RemovalOrder::STAGE_SYSTEMS_PROCESSING,
+                            ]));
+
+                            $skipped = $records->count() - $eligible->count();
+                            Notification::make()
+                                ->title('تم تعيين محلل النظم لـ ' . $eligible->count() . ' قرار')
+                                ->body($skipped ? ('تم تجاهل ' . $skipped . ' قرار ليس في مرحلة «مراجعة المركز الرئيسي» أو «التحليل المكاني».') : null)
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
+
                     BulkAction::make('export_excel_all_data')
                         ->label('تصدير كافة بيانات المختار (Excel)')
                         ->icon('heroicon-o-document-arrow-down')
@@ -333,36 +396,6 @@ class RemovalOrderResource extends Resource
                                 'قرارات_الازالة_' . now()->format('Y-m-d_H-i') . '.xlsx'
                             );
                         }),
-
-                    // الأكشن الجماعي لتعيين محلل النظم
-                    BulkAction::make('assign_systems_specialist_bulk')
-                        ->label('تعيين محلل نظم للمختار')
-                        ->icon('heroicon-o-user-group')
-                        ->color('success')
-                        ->requiresConfirmation()
-                        // يظهر فقط لرؤوساء الأقسام
-                        ->visible(fn() => auth()->user()->hasRole('رؤوساء الاقسام'))
-                        ->form([
-                            Forms\Components\Select::make('systems_specialist_id')
-                                ->label('اختر محلل النظم')
-                                ->options(fn () => User::whereHas('roles', fn ($q) => $q->where('name', 'محللي النظم'))->pluck('name', 'id')) // جلب الموظفين
-                                ->searchable()
-                                ->required(),
-                        ])
-                        ->action(function (Collection $records, array $data) {
-                            // تحديث جميع السجلات المختارة مرة واحدة
-                            $records->each(function ($record) use ($data) {
-                                $record->update([
-                                    'systems_specialist_id' => $data['systems_specialist_id'],
-                                ]);
-                            });
-
-                            Notification::make()
-                                ->title('تم تعيين محلل النظم لـ ' . $records->count() . ' قرار بنجاح')
-                                ->success()
-                                ->send();
-                        })
-                        ->deselectRecordsAfterCompletion(), // إلغاء تحديد المربعات بعد الانتهاء
 
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
@@ -402,6 +435,12 @@ class RemovalOrderResource extends Resource
         // مهندس التنظيم يشوف فقط قرارات مركزه
         if ($user->hasRole('مهندس التنظيم') && $user->center) {
             $query->where('center', $user->center);
+        }
+
+        // مدير الادارة الهندسية / مدير المتغيرات / عضو المتغيرات: قرارات مركزهم فقط،
+        // ولو مفيش مركز مسجل للمستخدم -> مفيش قرارات تظهر
+        if ($user->hasAnyRole(['مدير الادارة الهندسية', 'مدير المتغيرات', 'عضو المتغيرات'])) {
+            $user->center ? $query->where('center', $user->center) : $query->whereRaw('1 = 0');
         }
 
         return $query;

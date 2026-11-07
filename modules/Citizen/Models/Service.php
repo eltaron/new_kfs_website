@@ -34,14 +34,62 @@ class Service extends Model
         'link',
         'icon',
         'is_highlighted',
+        'is_active',
+        'sort_order',
     ];
 
     protected $casts = [
         'is_highlighted' => 'boolean',
+        'is_active' => 'boolean',
+        'sort_order' => 'integer',
         'form_fields' => 'array',
         'category_pricing' => 'array', // ضروري جداً للتعامل مع الفئات كـ JSON
         'has_vat' => 'boolean',
     ];
+
+    protected $attributes = [
+        'is_active' => true,
+    ];
+
+    /** الخدمات المفعّلة فقط (الظاهرة للمواطنين). */
+    public function scopeActive($query)
+    {
+        return $query->where($query->qualifyColumn('is_active'), true);
+    }
+
+    /** ترتيب العرض المحدد من لوحة التحكم (الأصغر أولاً). */
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy($query->qualifyColumn('sort_order'))->orderBy($query->qualifyColumn('created_at'));
+    }
+
+    /**
+     * رابط الخدمة: رابط داخلي يبدأ بـ «/» (مثل /gis-portal) يُفتح على نفس الموقع أياً كان
+     * الدومين، والرابط الخارجي كما هو، وإلا صفحة تفاصيل الخدمة.
+     */
+    public function publicUrl(): string
+    {
+        $link = trim((string) $this->link);
+        if ($link === '') {
+            return route('services.show', $this);
+        }
+
+        return str_starts_with($link, '/') && ! str_starts_with($link, '//') ? url($link) : $link;
+    }
+
+    /** الروابط الخارجية فقط تُفتح في تبويب جديد. */
+    public function opensExternally(): bool
+    {
+        $link = trim((string) $this->link);
+
+        return $link !== '' && ! (str_starts_with($link, '/') && ! str_starts_with($link, '//'));
+    }
+
+    /** هل الخدمة متاحة للمواطنين؟ (مفعّلة وفئتها الرئيسية مفعّلة) */
+    public function isAvailable(): bool
+    {
+        return $this->is_active && (! $this->parent_id || (bool) $this->parent?->is_active);
+    }
 
     public function parent()
     {

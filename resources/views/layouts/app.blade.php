@@ -17,7 +17,7 @@
 
     {{-- ===== 3. Open Graph / Twitter ===== --}}
     <meta property="og:title" content="@yield('title', $settings['site_name'] ?? 'محافظة كفر الشيخ')" />
-    <meta property="og:description" content="@yield('description', $settings['site_description'] ?? 'البوابة الإلكترونية الرسمية لمحافظة كفر الشيخ')" />
+    <meta property="og:description" content="@yield('description', $settings['site_description'] ?? 'الموقع الرسمي لمحافظة كفر الشيخ')" />
     <meta property="og:image" content="@yield('og_image', !empty($settings['site_logo_header']) ? asset(Storage::url($settings['site_logo_header'])) : asset('images/pwa/icon-512.png'))" />
     <meta property="og:url" content="{{ url()->current() }}" />
     <meta property="og:type" content="website" />
@@ -235,7 +235,7 @@
                 <path pathLength="1" stroke="#D8B03E" d="M2 9 C30 1 58 1 86 9 S142 17 170 9 S214 3 228 9" />
                 <path pathLength="1" stroke="#00BFD8" opacity=".7" d="M2 14 C30 6 58 6 86 14 S142 22 170 14 S214 8 228 14" />
             </svg>
-            <p class="kl-sub">البوابة الإلكترونية الرسمية لمحافظة كفر الشيخ</p>
+            <p class="kl-sub">الموقع الرسمي لمحافظة كفر الشيخ</p>
             <div class="kl-bar" aria-hidden="true"><i></i></div>
             <span class="visually-hidden">جارٍ تحميل البوابة…</span>
         </div>
@@ -314,7 +314,7 @@
         ];
         $kfsVoiceRoutes = [];
         foreach ($kfsVoiceRouteNames as $kfsKey => $kfsRoute) {
-            if (\Illuminate\Support\Facades\Route::has($kfsRoute)) {
+            if (\App\Support\EServices::visible($kfsRoute)) {
                 try { $kfsVoiceRoutes[$kfsKey] = route($kfsRoute); } catch (\Throwable $e) { }
             }
         }

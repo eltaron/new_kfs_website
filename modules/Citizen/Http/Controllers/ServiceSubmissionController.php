@@ -16,6 +16,9 @@ class ServiceSubmissionController extends Controller
 {
     public function store(Request $request, Service $service, ServicePricing $pricing, PaymentService $payments)
     {
+        // لا يمكن التقديم على خدمة موقوفة من لوحة التحكم
+        abort_unless($service->isAvailable(), 404);
+
         $fields = collect($service->form_fields ?? [])->filter(fn ($f) => is_array($f) && ! empty($f['name']));
 
         // The public form posts fields at the top level (name="area"); older

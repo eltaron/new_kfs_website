@@ -53,6 +53,7 @@ class RemovalOrdersAdminResource extends Resource
                         RemovalOrder::STAGE_PDF_READY => 'secondary',
                         RemovalOrder::STAGE_SYSTEMS_PROCESSING => 'purple',
                         RemovalOrder::STAGE_LOCAL_UNIT_APPROVAL => 'teal',
+                        RemovalOrder::STAGE_GIS_PENDING => 'purple',
                         RemovalOrder::STAGE_VISA_PENDING => 'indigo',
                         RemovalOrder::STAGE_COMPLETED => 'success',
                         default => 'gray',

@@ -37,7 +37,7 @@ class SearchController extends Controller
                 ->get();
 
             // Search in Services based on title or description
-            $services = Service::where(function ($q) use ($query) {
+            $services = Service::active()->where(function ($q) use ($query) {
                 $q->where('title_line_1', 'like', "%{$query}%")
                     ->orWhere('title_line_2', 'like', "%{$query}%")
                     ->orWhere('description', 'like', "%{$query}%");

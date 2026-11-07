@@ -18,11 +18,11 @@ class GisMarkazResource extends Resource
 
     // إعدادات واجهة المستخدم والقوائم
     protected static ?string $navigationIcon = 'heroicon-o-map';
-    protected static ?string $navigationLabel = 'االمراكز والمدن ';
+    protected static ?string $navigationLabel = 'المراكز والمدن';
     protected static ?string $modelLabel = 'مركز ';
     protected static ?string $pluralModelLabel = 'المراكز والمناطق';
     protected static ?int $navigationSort = 1;
-    // protected static ?string $navigationGroup = 'الخدمات المكانية والمساحية';
+    protected static ?string $navigationGroup = 'البيانات المرجعية';
 
     public static function canAccess(): bool
     {

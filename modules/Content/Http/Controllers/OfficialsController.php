@@ -36,11 +36,20 @@ class OfficialsController extends Controller
             ->orderBy('start_year', 'desc')
             ->get();
 
+        // Chronological order for the archive timeline (newest first), grouped by decade.
+        $previousOfficials = $previousOfficials
+            ->sortByDesc(fn ($r) => sprintf('%04d-%04d', (int) $r->start_year, (int) ($r->end_year ?: $r->start_year)))
+            ->values();
+        $byDecade = $previousOfficials->groupBy(fn ($r) => $r->start_year ? (intdiv((int) $r->start_year, 10) * 10) : 0);
+
         return view('officials.show', [
             'pageTitle' => $target['title'],
             'description' => $target['description'],
             'currentOfficial' => $currentOfficial,
             'previousOfficials' => $previousOfficials,
+            'byDecade' => $byDecade,
+            'roleKey' => $role,
+            'roles' => collect($roleMap)->map(fn ($r) => $r['title']),
         ]);
     }
 }
