@@ -19,6 +19,7 @@ class MapController extends Controller
     public const GROUPS = [
         'landmark' => ['label' => 'معالم سياحية', 'icon' => 'fa-solid fa-monument'],
         'project' => ['label' => 'مشروعات وفرص استثمارية', 'icon' => 'fa-solid fa-city'],
+        'hayah' => ['label' => 'حياة كريمة', 'icon' => 'fa-solid fa-hand-holding-heart'],
         'guide' => ['label' => 'دليل الخدمات', 'icon' => 'fa-solid fa-hospital'],
     ];
 
@@ -26,6 +27,7 @@ class MapController extends Controller
     {
         $points = $this->landmarks()
             ->concat($this->projects())
+            ->concat($this->hayahKarima())
             ->concat($this->locations())
             ->filter(fn ($p) => $this->validCoords($p['lat'], $p['lng']))
             ->values()
@@ -67,12 +69,33 @@ class MapController extends Controller
             'type' => 'project',
             'category' => $p->category ?: 'مشروع',
             'name' => $p->name,
-            'address' => Str::limit($this->plain($p->description), 90),
+            'address' => Str::limit((string) $this->plain($p->description), 90) ?: null,
             'lat' => (float) $p->latitude,
             'lng' => (float) $p->longitude,
             'image' => $p->thumbnail ? Storage::url($p->thumbnail) : null,
             'url' => $p->slug ? route('projects.show', $p->slug) : null,
         ]);
+    }
+
+    /** مواقع تنفيذ «حياة كريمة» — التصنيف = القطاع، والرابط = صفحة القطاع. */
+    private function hayahKarima(): Collection
+    {
+        if (! \Illuminate\Support\Facades\Schema::hasTable('hayah_karima_locations')) {
+            return collect();
+        }
+
+        return \Modules\Investment\Models\HayahKarimaLocation::with('project:id,sector_name,slug,image')
+            ->whereNotNull('latitude')->whereNotNull('longitude')->get()
+            ->map(fn ($l) => [
+                'type' => 'hayah',
+                'category' => $l->project?->sector_name ?: 'حياة كريمة',
+                'name' => $l->name,
+                'address' => trim(collect([$l->village, $l->center, $l->status])->filter()->implode(' — ')) ?: null,
+                'lat' => (float) $l->latitude,
+                'lng' => (float) $l->longitude,
+                'image' => $l->project?->image ? Storage::url($l->project->image) : null,
+                'url' => $l->project?->slug ? route('projects.hay-karima.show', $l->project->slug) : route('projects.hay-karima'),
+            ]);
     }
 
     private function locations(): Collection

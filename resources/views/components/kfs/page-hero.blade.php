@@ -89,3 +89,21 @@
         <x-kfs.wave class="kfs-page-hero__wave" :fill="$waveFill" :animated="false" :gold="true" />
     @endif
 </{{ $tag }}>
+@unless ($hasCustomTrail)
+    @php
+        // BreadcrumbList structured data mirroring the visible trail (Home › … › current page).
+        $kfsCrumbItems = collect([['الرئيسية', route('home')]])
+            ->concat(collect($trail)->filter(fn ($c) => filled($c[0])))
+            ->push([$currentLabel, url()->current()])
+            ->values()
+            ->map(fn ($c, $i) => array_filter([
+                '@type' => 'ListItem',
+                'position' => $i + 1,
+                'name' => trim(strip_tags((string) $c[0])),
+                'item' => $c[1] ?: null,
+            ]));
+    @endphp
+    @push('seo')
+        <script type="application/ld+json">{!! json_encode(['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => $kfsCrumbItems->all()], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    @endpush
+@endunless

@@ -67,6 +67,13 @@ class HayahKarimaProjectResource extends Resource
             ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()]);
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            HayahKarimaProjectResource\RelationManagers\LocationsRelationManager::class,
+        ];
+    }
+
     public static function getPages(): array
     {
         return [

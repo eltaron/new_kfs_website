@@ -51,7 +51,15 @@ class Settings extends Page implements HasForms
                         Forms\Components\Tabs\Tab::make('معلومات الموقع الأساسية')
                             ->schema([
                                 Forms\Components\TextInput::make('site_name')->label('اسم الموقع')->required(),
-                                Forms\Components\Textarea::make('site_description')->label('وصف الموقع (لمحركات البحث)')->rows(3),
+                                Forms\Components\Textarea::make('site_description')->label('وصف الموقع (لمحركات البحث)')->rows(3)
+                                    ->helperText('يظهر في نتائج جوجل وعند المشاركة للصفحات التي ليس لها وصف خاص. يُفضّل 120–160 حرفاً.')
+                                    ->maxLength(300),
+                                Forms\Components\FileUpload::make('og_default_image')
+                                    ->label('صورة المشاركة الافتراضية (فيسبوك / واتساب / إكس)')
+                                    ->helperText('المقاس المثالي 1200×630 بكسل (JPG أو PNG، أقل من 1 ميجابايت). اتركها فارغة لاستخدام الصورة الافتراضية للموقع.')
+                                    ->image()->imageEditor()->imageCropAspectRatio('1.91:1')
+                                    ->maxSize(1024)
+                                    ->directory('settings'),
                                 Forms\Components\FileUpload::make('site_logo_header')->label('شعار الهيدر')->image()->directory('settings'),
                                 Forms\Components\FileUpload::make('site_logo_footer')->label('شعار الفوتر')->image()->directory('settings'),
                                 Forms\Components\FileUpload::make('site_favicon')->label('أيقونة الموقع (Favicon)')->image()->directory('settings'),

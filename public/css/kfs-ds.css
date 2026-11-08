@@ -1092,7 +1092,11 @@ body.body-no-scroll { overflow: hidden; }
 }
 @media (max-width: 991.98px) {
     .mobile-bottom-nav { display: block; }
+    /* Room for the fixed bottom nav lives INSIDE the footer, so its dark background runs to the
+       very bottom (no light strip under the footer). Pages without a footer keep the body padding. */
     body { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+    body:has(.kfs-footer) { padding-bottom: 0; }
+    .kfs-footer .kfs-footer__bottom { padding-bottom: calc(1.1rem + 60px + env(safe-area-inset-bottom)); }
 }
 
 /* =====================================================================
@@ -2254,6 +2258,18 @@ html.kfs-offline .kfs-offline-badge { display: inline-flex; }
     .kfs-nav .nav-link::before { inset-inline: .55rem; }
     .kfs-nav .auth-links .btn-kfs { padding: .45rem .8rem; font-size: .9rem; }
     .kfs-user-toggle { max-width: 150px; }
+}
+/* ≥1400: the brand text is back but the container stays 1320px — tighten the menu so the
+   user/login button never runs into the theme/search buttons. */
+@media (min-width: 1400px) {
+    .kfs-nav.navbar { --bs-navbar-nav-link-padding-x: .6rem; }
+    .kfs-nav .nav-link { font-size: .95rem; }
+    .kfs-nav .nav-link::before { inset-inline: .6rem; }
+    .kfs-user-toggle { max-width: 170px; }
+}
+@media (min-width: 1200px) {
+    .kfs-nav .auth-links { margin-inline-start: .5rem; }
+    .kfs-nav__actions { flex-shrink: 0; margin-inline-start: .5rem; }
 }
 
 

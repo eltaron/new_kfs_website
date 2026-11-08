@@ -23,6 +23,7 @@ Route::get('/center-guides', [CenterGuideController::class, 'create'])->name('ce
 Route::post('/center-guides', [CenterGuideController::class, 'store'])->name('center-guides.store')->middleware(['auth', 'throttle:5,10']);
 
 Route::get('/hayah-karima-projects', [HayahKarimaController::class, 'index'])->name('projects.hay-karima');
+Route::get('/hayah-karima-projects/{slug}', [HayahKarimaController::class, 'show'])->name('projects.hay-karima.show');
 
 Route::get('/investments/contact/message', [InvestmentContactController::class, 'create'])->name('investment.contact');
 Route::post('/investments/contact/message', [InvestmentContactController::class, 'store'])->name('investment.contact.store')->middleware('throttle:5,10');

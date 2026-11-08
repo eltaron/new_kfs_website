@@ -361,8 +361,15 @@
             }, () => btn.classList.remove('is-busy'), { enableHighAccuracy: true, timeout: 10000 });
         });
 
+        // Deep link: /interactive-map?group=hayah&category=التعليم (e.g. from a «حياة كريمة» sector page)
+        const qs = new URLSearchParams(location.search);
+        const qGroup = qs.get('group'), qCat = qs.get('category');
+        if (qGroup && GROUPS[qGroup]) {
+            state.group = qGroup;
+            if (qCat && GROUPS[qGroup].categories && GROUPS[qGroup].categories[qCat] !== undefined) state.cat = qCat;
+        }
         update(false);
-        fitTo(POINTS);
+        fitTo(filtered().length ? filtered() : POINTS);
         window.addEventListener('resize', () => map.invalidateSize());
     })();
     </script>

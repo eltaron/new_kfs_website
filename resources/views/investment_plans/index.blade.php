@@ -34,7 +34,7 @@
                 <section class="kip-latest" aria-labelledby="kipLatestTitle">
                     <div class="kip-latest__badge"><i class="fa-solid fa-star" aria-hidden="true"></i> أحدث خطة</div>
                     <div class="kip-latest__year" dir="ltr">{{ $label($latest) }}</div>
-                    <h2 class="kip-latest__title" id="kipLatestTitle">الخطة الاستثمارية لعام {{ $label($latest) }}</h2>
+                    <h2 class="kip-latest__title" id="kipLatestTitle">الخطة الاستثمارية لعام <bdi dir="ltr">{{ $label($latest) }}</bdi></h2>
                     <p class="kip-latest__meta"><i class="fa-regular fa-calendar" aria-hidden="true"></i> نُشرت في {{ $latest->created_at?->format('Y/m/d') }}</p>
                     <div class="kip-docs">
                         <div class="kip-doc">
@@ -63,7 +63,7 @@
                                 <li class="kip-row">
                                     <span class="kip-row__year" dir="ltr">{{ $label($plan) }}</span>
                                     <div class="kip-row__card">
-                                        <h3 class="kip-row__title">الخطة الاستثمارية لعام {{ $label($plan) }}</h3>
+                                        <h3 class="kip-row__title">الخطة الاستثمارية لعام <bdi dir="ltr">{{ $label($plan) }}</bdi></h3>
                                         <div class="kip-row__actions">
                                             <a href="{{ Storage::url($plan->file_path) }}" target="_blank" rel="noopener" class="kip-pill"><i class="fa-solid fa-file-pdf" aria-hidden="true"></i> الخطة</a>
                                             @if ($plan->final_file_path)

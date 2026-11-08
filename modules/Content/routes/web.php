@@ -10,6 +10,7 @@ use Modules\Content\Http\Controllers\DirectoryController;
 use Modules\Content\Http\Controllers\ErpController;
 use Modules\Content\Http\Controllers\ExamResultController;
 use Modules\Content\Http\Controllers\GovernorateController;
+use Modules\Content\Http\Controllers\SeoController;
 use Modules\Content\Http\Controllers\HomeController;
 use Modules\Content\Http\Controllers\OfficialsController;
 use Modules\Content\Http\Controllers\PostController;
@@ -17,6 +18,11 @@ use Modules\Content\Http\Controllers\SearchController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/wait', [HomeController::class, 'wait'])->name('wait');
+
+// SEO / AEO endpoints (dynamic: built from the current host)
+Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('seo.sitemap');
+Route::get('/robots.txt', [SeoController::class, 'robots'])->name('seo.robots');
+Route::get('/llms.txt', [SeoController::class, 'llms'])->name('seo.llms');
 
 Route::get('/search', SearchController::class)->name('search');
 

@@ -10,6 +10,9 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\User;
+use Filament\Forms;
+use Filament\Notifications\Notification;
 
 class RemovalOrdersAdminResource extends Resource
 {
@@ -59,6 +62,7 @@ class RemovalOrdersAdminResource extends Resource
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('systemsSpecialist.name')->label('أخصائي النظم')->searchable()->placeholder('غير معيّن'),
+                Tables\Columns\TextColumn::make('spatialMember.name')->label('مسئول البعد المكاني')->searchable()->placeholder('غير معيّن')->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')->label('تاريخ الإنشاء')->dateTime('Y-m-d')->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
@@ -66,7 +70,50 @@ class RemovalOrdersAdminResource extends Resource
                 Tables\Actions\ViewAction::make()
                     ->label('تفاصيل القرار')
                     ->icon('heroicon-o-eye'),
+
+                // رؤساء الأقسام: تعديل المسؤولين عن القرار فقط (بدون تغيير المرحلة)
+                Tables\Actions\Action::make('reassign')
+                    ->label('تعديل')
+                    ->icon('heroicon-o-pencil-square')
+                    ->color('warning')
+                    ->visible(fn () => auth()->user()?->hasRole('رؤوساء الاقسام'))
+                    ->modalHeading(fn (RemovalOrder $record) => 'تعديل المسؤولين — القرار ' . ($record->stop_order_number ?: '#' . $record->id))
+                    ->modalDescription('يغيّر أخصائي النظم ومسئول البعد المكاني فقط، ولا يغيّر مرحلة القرار.')
+                    ->modalSubmitActionLabel('حفظ التعديل')
+                    ->fillForm(fn (RemovalOrder $record) => [
+                        'systems_specialist_id' => $record->systems_specialist_id,
+                        'spatial_member_id' => $record->spatial_member_id,
+                    ])
+                    ->form([
+                        Forms\Components\Select::make('systems_specialist_id')
+                            ->label('أخصائي النظم')
+                            ->options(fn () => static::staffOptions('محللي النظم'))
+                            ->searchable()
+                            ->placeholder('غير معيّن'),
+                        Forms\Components\Select::make('spatial_member_id')
+                            ->label('مسئول البعد المكاني (عضو المتغيرات)')
+                            ->options(fn () => static::staffOptions('عضو المتغيرات'))
+                            ->searchable()
+                            ->placeholder('غير معيّن'),
+                    ])
+                    ->action(function (array $data, RemovalOrder $record) {
+                        $record->update([
+                            'systems_specialist_id' => ($data['systems_specialist_id'] ?? null) ?: null,
+                            'spatial_member_id' => ($data['spatial_member_id'] ?? null) ?: null,
+                        ]);
+                        Notification::make()->success()->title('تم تعديل المسؤولين عن القرار')->send();
+                    }),
             ]);
+    }
+
+    /** Staff with a given role, labelled «name — center» for easier picking. */
+    public static function staffOptions(string $role): array
+    {
+        return User::whereHas('roles', fn ($q) => $q->where('name', $role))
+            ->orderBy('center')->orderBy('name')
+            ->get(['id', 'name', 'center'])
+            ->mapWithKeys(fn ($u) => [$u->id => trim($u->name) . ($u->center ? ' — ' . $u->center : '')])
+            ->all();
     }
 
     public static function infolist(Infolist $infolist): Infolist

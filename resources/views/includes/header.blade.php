@@ -76,7 +76,7 @@
             <a class="navbar-brand kfs-brand" href="{{ route('home') }}" aria-label="الصفحة الرئيسية — محافظة كفر الشيخ">
                 <img src="{{ $kfsLogo }}" alt="شعار محافظة كفر الشيخ" class="logo-img" width="70" height="54" />
                 <span class="kfs-brand__text">
-                    <span class="kfs-brand__name">محافظة كفر الشيخ</span>
+                    <span class="kfs-brand__name d-none d-md-block">محافظة كفر الشيخ</span>
                     <span class="kfs-brand__sub">الموقع الرسمي</span>
                 </span>
             </a>

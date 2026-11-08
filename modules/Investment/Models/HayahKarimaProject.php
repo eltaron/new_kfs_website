@@ -19,6 +19,11 @@ class HayahKarimaProject extends Model
         'image'
     ];
 
+    public function locations(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(HayahKarimaLocation::class, 'hayah_karima_project_id')->orderBy('sort_order')->orderBy('id');
+    }
+
     // توليد السلج تلقائياً عند الحفظ
     protected static function boot()
     {

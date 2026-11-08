@@ -1,5 +1,38 @@
 @extends('layouts.app')
 @section('title', $post->title)
+@php
+    $kfsPostText = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags(preg_replace('/<(br|\/p|\/div|\/li|\/h\d)[^>]*>/i', ' ', (string) $post->content)), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+    $kfsPostImage = $post->thumbnail ? asset(Storage::url($post->thumbnail)) : null;
+    $kfsPostDate = $post->published_at ?? $post->created_at;
+@endphp
+@section('description', \Illuminate\Support\Str::limit($kfsPostText, 160, '…'))
+@section('og_type', 'article')
+@if ($kfsPostImage)
+    @section('og_image', $kfsPostImage)
+@endif
+@push('seo')
+    @if ($kfsPostDate)
+        <meta property="article:published_time" content="{{ \Illuminate\Support\Carbon::parse($kfsPostDate)->toIso8601String() }}" />
+    @endif
+    <meta property="article:modified_time" content="{{ $post->updated_at?->toIso8601String() }}" />
+    @if ($post->category)
+        <meta property="article:section" content="{{ $post->category->name }}" />
+    @endif
+    <script type="application/ld+json">{!! json_encode(array_filter([
+        '@context' => 'https://schema.org',
+        '@type' => 'NewsArticle',
+        'headline' => \Illuminate\Support\Str::limit(trim(strip_tags($post->title)), 110, ''),
+        'description' => \Illuminate\Support\Str::limit($kfsPostText, 200, '…'),
+        'image' => $kfsPostImage ? [$kfsPostImage] : [asset('images/og/kfs-share.jpg')],
+        'datePublished' => $kfsPostDate ? \Illuminate\Support\Carbon::parse($kfsPostDate)->toIso8601String() : null,
+        'dateModified' => $post->updated_at?->toIso8601String(),
+        'inLanguage' => 'ar',
+        'mainEntityOfPage' => url()->current(),
+        'articleSection' => $post->category?->name,
+        'author' => ['@type' => 'GovernmentOrganization', 'name' => 'محافظة كفر الشيخ', 'url' => url('/')],
+        'publisher' => ['@id' => url('/') . '#organization'],
+    ]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+@endpush
 @push('css')
     <style>
         .kfs-share { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; }

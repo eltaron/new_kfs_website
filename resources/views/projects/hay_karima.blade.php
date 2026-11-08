@@ -133,10 +133,14 @@
                             </div>
 
                             <div class="mt-4 pt-3 border-top d-flex justify-content-between">
-                                <small class="text-muted"><i class="far fa-calendar-alt me-1"></i> التحديث الأخير:
-                                    2025</small>
-                                <a href="#" class="fw-bold text-success text-decoration-none">التفاصيل <i
-                                        class="fas fa-arrow-left fa-xs ms-1"></i></a>
+                                <small class="text-muted">
+                                    <i class="fa-solid fa-location-dot me-1" aria-hidden="true"></i>
+                                    {{ $item->locations_count ? $item->locations_count . ' موقع تنفيذ' : 'المواقع قيد الإضافة' }}
+                                </small>
+                                @if ($item->slug)
+                                    <a href="{{ route('projects.hay-karima.show', $item->slug) }}" class="fw-bold text-success text-decoration-none">التفاصيل والمواقع <i
+                                            class="fas fa-arrow-left fa-xs ms-1" aria-hidden="true"></i></a>
+                                @endif
                             </div>
                         </div>
                     </div>

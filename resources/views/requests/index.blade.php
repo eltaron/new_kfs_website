@@ -2,6 +2,24 @@
 @section('title', 'الشكاوى والبلاغات')
 @section('description', 'قدّم شكوى عبر منظومة الشكاوى الحكومية الموحدة، أو أبلغ عن حالة طارئة في محافظة كفر الشيخ.')
 
+@push('seo')
+    {{-- FAQ structured data (AEO) — every answer mirrors content visible on this page --}}
+    <script type="application/ld+json">{!! json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'FAQPage',
+        'mainEntity' => [
+            ['@type' => 'Question', 'name' => 'كيف أقدم شكوى لمحافظة كفر الشيخ؟',
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'تُقدَّم الشكاوى عن الخدمات الحكومية عبر منظومة الشكاوى الحكومية الموحدة (shakwa.eg)، مع تجهيز الرقم القومي ورقم الهاتف وأي مستند يوضح المشكلة.']],
+            ['@type' => 'Question', 'name' => 'ما أرقام الطوارئ في كفر الشيخ؟',
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'الإسعاف 123، شرطة النجدة 122، الحماية المدنية 180. في الحالات التي تهدد الحياة اتصل فوراً بالرقم المختص.']],
+            ['@type' => 'Question', 'name' => 'كيف أبلغ عن حالة طارئة إلكترونياً؟',
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'من صفحة «تسجيل بلاغ عاجل» تختار نوع الحالة وتحدد الموقع والمركز وتضيف صوراً إن وجدت، ويُحوَّل البلاغ إلى الجهة المختصة مع رقم متابعة.']],
+            ['@type' => 'Question', 'name' => 'ماذا يحدث بعد تسجيل البلاغ العاجل؟',
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'تحصل على رقم متابعة فور الإرسال، ثم يُحوَّل البلاغ للجهة المختصة حسب نوعه والمركز، وقد يتم التواصل معك على رقم هاتفك.']],
+        ],
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+@endpush
+
 @push('css')
     <link rel="stylesheet" href="{{ asset('css/kfs-help.css') }}?v={{ @filemtime(public_path('css/kfs-help.css')) }}">
 @endpush

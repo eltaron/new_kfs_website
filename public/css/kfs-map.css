@@ -8,6 +8,7 @@
     --kmap-landmark: #B88920;   /* gold-dark  */
     --kmap-project: #00788A;    /* primary    */
     --kmap-guide: #657342;      /* olive      */
+    --kmap-hayah: #2E7D4F;      /* حياة كريمة green */
     --kmap-panel-w: 420px;
     --kmap-h: calc(100svh - var(--header-h, 76px));
 }
@@ -15,6 +16,7 @@
     --kmap-landmark: #D6B04A;
     --kmap-project: #2BB7C9;
     --kmap-guide: #9DAE6E;
+    --kmap-hayah: #6CC48F;
 }
 
 /* ---------- layout ---------- */
@@ -107,12 +109,10 @@
 .kmap__groups {
     flex: none;
     display: flex;
+    flex-wrap: wrap;            /* every type stays visible — no hidden overflow */
     gap: 6px;
     padding: 0 var(--sp-4) var(--sp-3);
-    overflow-x: auto;
-    scrollbar-width: none;
 }
-.kmap__groups::-webkit-scrollbar { display: none; }
 .kmap__group {
     --c: var(--kfs-dark-soft);
     flex: none;
@@ -318,6 +318,7 @@
 .kmap-pin--landmark { --c: var(--kmap-landmark); }
 .kmap-pin--project { --c: var(--kmap-project); }
 .kmap-pin--guide { --c: var(--kmap-guide); }
+.kmap-pin--hayah { --c: var(--kmap-hayah); }
 .kmap-pin-wrap:hover .kmap-pin,
 .kmap-pin-wrap:focus-visible .kmap-pin { transform: rotate(-45deg) scale(1.12); }
 .kmap-pin-wrap.is-selected { z-index: 1000 !important; }
@@ -437,6 +438,9 @@
 
     .kmap__head { display: none; }
     .kmap__search { margin-top: 2px; }
+    /* bottom sheet: one swipeable row with a visible thin scrollbar + edge fade hint */
+    .kmap__groups { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; padding-bottom: 8px;
+        -webkit-mask-image: linear-gradient(to left, #000 88%, transparent); mask-image: linear-gradient(to left, #000 88%, transparent); }
     .kmap__group { height: 42px; }
 
     .kmap__card {

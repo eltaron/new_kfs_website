@@ -13,7 +13,7 @@
             'url' => route('projects.show', $p->slug),
             'thumb' => $p->thumbnail ? Storage::url($p->thumbnail) : null,
         ])->values();
-    $plain = fn ($html, $n) => \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string) $html), ENT_QUOTES | ENT_HTML5, 'UTF-8'))), $n);
+    $plain = fn ($html, $n) => \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags(preg_replace('/<(br|\/p|\/div|\/li|\/h\d)[^>]*>/i', ' ', (string) $html)), ENT_QUOTES | ENT_HTML5, 'UTF-8'))), $n);
     $totalImages = $projects->getCollection()->sum('images_count') + $projects->getCollection()->filter(fn ($p) => $p->thumbnail)->count();
     $programs = collect([
         ['projects.hay-karima', 'fa-solid fa-hand-holding-heart', 'مبادرة حياة كريمة', $programCounts['حياة كريمة'] ?? null, 'تطوير قرى الريف المصري'],

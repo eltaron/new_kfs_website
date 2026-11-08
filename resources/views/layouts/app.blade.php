@@ -7,22 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="google" content="notranslate" />
-    <link rel="alternate" href="{{ url()->current() }}" hreflang="ar" />
 
-    {{-- ===== 2. SEO ===== --}}
-    <title>@yield('title', $settings['site_name'] ?? 'محافظة كفر الشيخ - الموقع الرسمي')</title>
-    <meta name="description" content="@yield('description', $settings['site_description'] ?? 'الموقع الرسمي لمحافظة كفر الشيخ، تقدم آخر الأخبار، الخدمات، والمشاريع.')" />
-    <meta name="keywords" content="محافظة كفر الشيخ, كفر الشيخ, خدمات حكومية, أخبار كفر الشيخ, استثمار" />
-    <meta name="author" content="محافظة كفر الشيخ" />
-
-    {{-- ===== 3. Open Graph / Twitter ===== --}}
-    <meta property="og:title" content="@yield('title', $settings['site_name'] ?? 'محافظة كفر الشيخ')" />
-    <meta property="og:description" content="@yield('description', $settings['site_description'] ?? 'الموقع الرسمي لمحافظة كفر الشيخ')" />
-    <meta property="og:image" content="@yield('og_image', !empty($settings['site_logo_header']) ? asset(Storage::url($settings['site_logo_header'])) : asset('images/pwa/icon-512.png'))" />
-    <meta property="og:url" content="{{ url()->current() }}" />
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="ar_EG" />
-    <meta name="twitter:card" content="summary_large_image" />
+    {{-- ===== 2-3. SEO, social share (Open Graph / X) and structured data ===== --}}
+    @include('includes.seo')
 
     {{-- ===== 4. Icons + PWA ===== --}}
     <link rel="icon" href="{{ asset('favicon/favicon.ico') }}" sizes="any" />
@@ -36,7 +23,6 @@
     <meta name="apple-mobile-web-app-title" content="كفر الشيخ" />
     <meta name="application-name" content="بوابة محافظة كفر الشيخ" />
     <meta name="msapplication-TileColor" content="#26302D" />
-    <link rel="canonical" href="{{ url()->current() }}" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @auth
         <meta name="kfs-auth" content="1">
@@ -172,6 +158,12 @@
 
     {{-- SweetAlert2 is loaded early because some views call Swal inline. --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.14.5/dist/sweetalert2.all.min.js" crossorigin="anonymous"></script>
+    <style>
+        .row{
+            margin:0;
+            padding:0
+        }
+    </style>
 </head>
 
 <body>
