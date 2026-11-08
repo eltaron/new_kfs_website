@@ -40,7 +40,13 @@
             ['requests.index', 'fa-solid fa-file-pen', 'الشكاوى والبلاغات', 'قدّم شكواك أو بلاغك وتابع حالتها', null],
             // «الخدمات الجغرافية» card: removed from production, shown only in the test copy.
             config('app.show_hidden')
-                ? ['gis.index', 'fa-solid fa-map-location-dot', 'الخدمات الجغرافية', 'خدمات المساحة والمواقع والتراخيص', null]
+                ? [
+                    'gis.index',
+                    'fa-solid fa-map-location-dot',
+                    'الخدمات الجغرافية',
+                    'خدمات المساحة والمواقع والتراخيص',
+                    null,
+                ]
                 : ['__none__', '', '', '', null],
             [
                 'site-validity.landing',
@@ -656,7 +662,10 @@
                     <div class="kfs-plan" data-reveal>
                         <div class="kfs-plan__body">
                             <span class="kfs-badge kfs-badge--gold">خارطة التنمية</span>
-                            <h2 class="kfs-plan__title" id="kfsPlanTitle">مشروعات الخطة الاستثمارية لمحافظة كفرالشيخ</h2>
+                            <h2 class="kfs-plan__title" id="kfsPlanTitle">مشروعات الخطة الاستثمارية
+                                <br>
+                                لمحافظة كفرالشيخ
+                            </h2>
                             <p class="kfs-plan__text">اطّلع على الخطة الاستثمارية السنوية للمحافظة والتقارير الموثقة للعام
                                 الحالي والأعوام السابقة — رؤية وطنية لتحسين البنية التحتية والخدمات وتوطين التنمية المستدامة
                                 في كافة المراكز.</p>
@@ -1009,7 +1018,7 @@
                         .bindPopup(
                             `<div class="popup-title">${esc(location.name)}</div>
                             <a class="popup-link" href="https://maps.google.com/?q=${encodeURIComponent(location.latitude + ',' + location.longitude)}" target="_blank" rel="noopener">عرض على خرائط جوجل</a>`
-                            );
+                        );
                     (markers[location.city_guide_category_id] = markers[location.city_guide_category_id] || [])
                     .push(marker);
                     all.push(marker);
