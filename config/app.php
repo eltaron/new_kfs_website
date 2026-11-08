@@ -16,6 +16,15 @@ return [
     'name' => env('APP_NAME', 'Laravel'),
 
     /*
+    | KFS: show the items that were removed from the public site at management's
+    | request (header «مشروعاتي / طلباتي من المتجر / بوابة الموظفين», the home
+    | «الخدمات الجغرافية» card, «تواصل معنا» on every project). Off in production;
+    | turned on in the test copy only. (Admin-hidden e-services and the GIS
+    | portal are controlled separately from «الإعدادات العامة».)
+    */
+    'show_hidden' => (bool) env('KFS_SHOW_HIDDEN', false),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------

@@ -62,7 +62,7 @@
                     </a>
                 </li>
                 <li>
-                    <button type="button" class="kfs-govbar__btn" data-pwa-install hidden aria-label="تثبيت تطبيق البوابة">
+                    <button type="button" class="kfs-govbar__btn kfs-govbar__btn--install" data-pwa-install hidden aria-label="تثبيت تطبيق البوابة">
                         <i class="fa-solid fa-download" aria-hidden="true"></i><span class="lbl">تثبيت التطبيق</span>
                     </button>
                 </li>
@@ -203,7 +203,18 @@
                                 @if ($kfsHas('lms.dashboard'))
                                     <li><a class="dropdown-item" href="{{ route('lms.dashboard') }}"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> تعلّمي (استدامة)</a></li>
                                 @endif
-                                {{-- «مشروعاتي (الإشراف الهندسي)» و«طلباتي من المتجر» و«بوابة الموظفين (ERP)» أُزيلت من القائمة بطلب الإدارة. --}}
+                                {{-- «مشروعاتي (الإشراف الهندسي)» و«طلباتي من المتجر» و«بوابة الموظفين (ERP)» أُزيلت من القائمة بطلب الإدارة (تظهر فقط عند تفعيل app.show_hidden — النسخة التجريبية). --}}
+                                @if (config('app.show_hidden'))
+                                    @if ($kfsHas('syndicate.my-projects'))
+                                        <li><a class="dropdown-item" href="{{ route('syndicate.my-projects') }}"><i class="fa-solid fa-helmet-safety" aria-hidden="true"></i> مشروعاتي (الإشراف الهندسي)</a></li>
+                                    @endif
+                                    @if ($kfsHas('market.orders.index'))
+                                        <li><a class="dropdown-item" href="{{ route('market.orders.index') }}"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i> طلباتي من المتجر</a></li>
+                                    @endif
+                                    @if (auth()->user()->isEmployee() && Route::has('employee.erp.index'))
+                                        <li><a class="dropdown-item fw-bold" href="{{ route('employee.erp.index') }}"><i class="fa-solid fa-briefcase" aria-hidden="true"></i> بوابة الموظفين (ERP)</a></li>
+                                    @endif
+                                @endif
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <a class="dropdown-item text-danger" href="{{ route('logout') }}"
@@ -269,6 +280,13 @@
                 <i class="fa-solid fa-circle-user" aria-hidden="true"></i>
                 <span>مرحباً، <span class="user-name">{{ Str::words(Auth::user()->name, 2, '') }}</span></span>
             </div>
+            @if (config('app.show_hidden') && auth()->user()->isEmployee() && Route::has('employee.erp.index'))
+                <div class="user-actions">
+                    <a href="{{ route('employee.erp.index') }}" class="btn-gold-sm">
+                        <i class="fa-solid fa-briefcase" aria-hidden="true"></i> ERP
+                    </a>
+                </div>
+            @endif
         @endguest
     </div>
 

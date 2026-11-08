@@ -8,6 +8,11 @@
         </span>
     </a>
     <div class="top-nav-dash__actions">
+        @if (config('app.show_hidden') && auth()->user()->isEmployee() && Route::has('employee.erp.index'))
+            <a href="{{ route('employee.erp.index') }}" class="btn-dash-ghost">
+                <i class="fa-solid fa-laptop-code" aria-hidden="true"></i> بوابة الموظفين
+            </a>
+        @endif
         <a href="{{ route('home') }}" class="btn-dash-ghost d-none d-md-inline-flex">
             <i class="fa-solid fa-house" aria-hidden="true"></i> الرئيسية
         </a>

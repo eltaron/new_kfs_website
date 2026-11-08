@@ -176,8 +176,8 @@
                         <p class="klm-info__toast" id="klmShareToast" role="status" hidden>تم نسخ الرابط</p>
                     </div>
 
-                    @if ($isInvestment && Route::has('investment.contact'))
-                        {{-- Investment opportunities only --}}
+                    @if (($isInvestment || config('app.show_hidden')) && Route::has('investment.contact'))
+                        {{-- Investment opportunities only (every project when app.show_hidden is on — test copy) --}}
                         <div class="kpj-cta">
                             <span class="kpj-cta__icon" aria-hidden="true"><i class="fa-solid fa-headset"></i></span>
                             <p class="kpj-cta__text">في حالة الرغبة في التقدم لأي فرصة أو وجود أي استفسارات</p>

@@ -121,7 +121,7 @@ html.kfs-motion .is-invalid ~ .invalid-feedback { animation: kfs-fade-up .35s va
 .comment-form-container h3 { color: #fff; }
 
 
-/* Footer «كيف نقدر نساعدك؟» help panel — one teal card: intro + 4 quick channels separated by hairlines */
+/* Footer «كيف يمكننا مساعدتك؟» help panel — one teal card: intro + 4 quick channels separated by hairlines */
 .kfs-footer__help {
     position: relative;
     margin-top: 85px;

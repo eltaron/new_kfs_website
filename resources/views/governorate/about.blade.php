@@ -96,7 +96,27 @@
                                 <span class="kab-feature__num" aria-hidden="true">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
                                 <span class="kab-feature__icon" aria-hidden="true"><i class="{{ $faIcon($d, $icon) }}"></i></span>
                                 <h3 class="kab-feature__title">{{ $d->title }}</h3>
-                                <div class="kab-prose kab-prose--sm">{!! clean($d->content, 'cms') !!}</div>
+                                @php
+                                    // Plain-text content written as "مقدمة: • بند: شرح • بند: شرح" → intro + bulleted list.
+                                    $raw = (string) $d->content;
+                                    $parts = (! preg_match('/<(ul|ol|li)/i', $raw) && str_contains($raw, '•'))
+                                        ? array_values(array_filter(array_map('trim', explode('•', strip_tags($raw))), 'strlen'))
+                                        : null;
+                                    $intro = $parts && ! str_starts_with(ltrim(strip_tags($raw)), '•') ? array_shift($parts) : null;
+                                @endphp
+                                <div class="kab-prose kab-prose--sm">
+                                    @if ($parts)
+                                        @if ($intro)<p>{{ $intro }}</p>@endif
+                                        <ul class="kab-points">
+                                            @foreach ($parts as $pt)
+                                                @php [$lbl, $txt] = str_contains($pt, ':') ? array_map('trim', explode(':', $pt, 2)) : [null, $pt]; @endphp
+                                                <li>@if ($lbl)<strong>{{ $lbl }}:</strong> @endif{{ $txt }}</li>
+                                            @endforeach
+                                        </ul>
+                                    @else
+                                        {!! clean($d->content, 'cms') !!}
+                                    @endif
+                                </div>
                             </article>
                         @endforeach
                     </div>

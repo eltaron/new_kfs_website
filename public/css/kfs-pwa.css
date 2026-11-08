@@ -1,0 +1,81 @@
+/* ==========================================================================
+   KFS — PWA install UI (public/js/pwa.js)
+   · Highlighted «تثبيت التطبيق» button in the gov bar (keeps its label on mobile)
+   · Install card: native prompt (Chrome/Edge/Android) or iOS «Add to Home Screen» steps
+   ========================================================================== */
+
+/* gov-bar button: gold pill that stands out from the other links */
+.kfs-govbar__btn.kfs-govbar__btn--install {
+    gap: .4rem;
+    padding: 0 .8rem;
+    border-radius: 999px;
+    background: var(--kfs-gold, #D8B03E);
+    color: #1D2422;
+    font-weight: 800;
+    box-shadow: 0 0 0 0 rgba(216, 176, 62, .55);
+    animation: kfs-pwa-pulse 2.6s ease-out 3;
+}
+.kfs-govbar__btn.kfs-govbar__btn--install i { color: #1D2422; }
+.kfs-govbar__btn.kfs-govbar__btn--install:hover { background: var(--kfs-gold-light, #F0D878); color: #1D2422; }
+.kfs-govbar__btn.kfs-govbar__btn--install[hidden] { display: none; }
+@keyframes kfs-pwa-pulse { 70% { box-shadow: 0 0 0 8px rgba(216, 176, 62, 0); } 100% { box-shadow: 0 0 0 0 rgba(216, 176, 62, 0); } }
+@media (max-width: 767.98px) {
+    /* other gov-bar buttons collapse to icons here; the install button keeps a short label */
+    .kfs-govbar__btn.kfs-govbar__btn--install { width: auto; padding: 0 .7rem; }
+    .kfs-govbar__btn.kfs-govbar__btn--install .lbl { display: inline; font-size: .8rem; }
+}
+
+/* install card */
+.kfs-pwa-card {
+    position: fixed;
+    z-index: 1080;
+    inset-inline-end: 20px;        /* opposite corner to the accessibility/voice FABs */
+    bottom: 20px;
+    width: min(380px, calc(100vw - 32px));
+    padding: 18px 18px 16px;
+    border-radius: 18px;
+    background: #1D2422;
+    color: #FFFDE1;
+    border: 1px solid rgba(216, 176, 62, .4);
+    box-shadow: 0 24px 60px -16px rgba(0, 0, 0, .55);
+    font-family: inherit;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .3s ease, transform .35s cubic-bezier(.16, 1, .3, 1);
+}
+.kfs-pwa-card.is-open { opacity: 1; transform: none; }
+.kfs-pwa-card__close {
+    position: absolute; top: 10px; inset-inline-end: 10px;
+    width: 32px; height: 32px; border: 0; border-radius: 50%;
+    background: rgba(255, 253, 225, .08); color: rgba(255, 253, 225, .8);
+}
+.kfs-pwa-card__close:hover { background: rgba(255, 253, 225, .16); color: #fff; }
+.kfs-pwa-card__head { display: flex; gap: 14px; align-items: flex-start; padding-inline-end: 30px; }
+.kfs-pwa-card__icon { flex: none; width: 56px; height: 56px; border-radius: 14px; background: #FFFDE1; box-shadow: 0 0 0 3px rgba(216, 176, 62, .35); }
+.kfs-pwa-card__title { margin: 2px 0 4px; font: 800 1.05rem/1.4 var(--ff-head, Tajawal, sans-serif); color: #fff; }
+.kfs-pwa-card__text { margin: 0; font-size: .85rem; line-height: 1.7; color: rgba(255, 253, 225, .78); }
+.kfs-pwa-card__steps { margin: 14px 0 0; padding: 12px 14px 12px 14px; padding-inline-start: 34px; border-radius: 12px; background: rgba(255, 253, 225, .06); display: grid; gap: 8px; font-size: .88rem; line-height: 1.6; }
+.kfs-pwa-card__steps i { color: #F0D878; margin-inline: 2px; }
+.kfs-pwa-card__actions { display: flex; gap: 8px; margin-top: 14px; }
+.kfs-pwa-card__btn {
+    flex: 1;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 44px; padding: 0 16px;
+    border-radius: 12px; border: 1px solid transparent;
+    font-weight: 800; font-size: .95rem;
+    cursor: pointer;
+}
+.kfs-pwa-card__btn--primary { background: #D8B03E; color: #1D2422; }
+.kfs-pwa-card__btn--primary:hover { background: #F0D878; }
+.kfs-pwa-card__btn--ghost { background: transparent; color: #FFFDE1; border-color: rgba(255, 253, 225, .25); }
+.kfs-pwa-card__btn--ghost:hover { background: rgba(255, 253, 225, .08); }
+.kfs-pwa-card :focus-visible { outline: 2px solid #F0D878; outline-offset: 2px; }
+
+@media (max-width: 991.98px) {
+    /* sit above the fixed bottom nav (≈60px) */
+    .kfs-pwa-card { inset-inline: 12px; width: auto; bottom: calc(72px + env(safe-area-inset-bottom)); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .kfs-pwa-card { transition: none; }
+    .kfs-govbar__btn.kfs-govbar__btn--install { animation: none; }
+}

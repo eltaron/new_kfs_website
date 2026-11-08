@@ -187,11 +187,8 @@
     margin: var(--sp-6) 0 var(--sp-5);
 }
 .kab-tabs {
-    display: flex; gap: 6px;
-    flex: 1 1 520px; min-width: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-    padding-bottom: 2px;
+    display: flex; flex-wrap: wrap; gap: 8px;   /* wrap onto several rows so no tab hides behind the search box */
+    flex: 1 1 0; min-width: 0;
 }
 .kab-tabs::-webkit-scrollbar { display: none; }
 .kab-tab {
@@ -210,7 +207,7 @@
 .kab-tab:hover { color: var(--kfs-text); border-color: var(--kfs-text-soft); }
 .kab-tab.is-active { background: var(--kfs-dark); border-color: var(--kfs-dark); color: var(--kfs-on-dark); }
 :root[data-theme="dark"] .kab-tab.is-active { background: var(--kfs-gold); border-color: var(--kfs-gold); color: var(--kfs-ink-on-accent, #0F1C1B); }
-.kab-people__search { position: relative; flex: 0 1 280px; }
+.kab-people__search { position: relative; flex: 0 0 280px; align-self: flex-start; }
 .kab-people__search i { position: absolute; inset-inline-start: 14px; top: 50%; transform: translateY(-50%); color: var(--kfs-muted); }
 .kab-people__search input {
     width: 100%; height: 42px;
@@ -301,9 +298,19 @@
     .kab-chapter { grid-template-columns: 40px 1fr; gap: var(--sp-3); }
     .kab-chapter__marker { width: 40px; height: 40px; font-size: .95rem; }
     .kab-chapter__card, .kab-vm__card { padding: var(--sp-5); }
-    .kab-people__search { flex-basis: 100%; }
     .kab-people__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-3); }
 }
 @media (prefers-reduced-motion: reduce) {
     .kab-feature, .kab-person, .kab-person__fig img, .kab-next__card { transition: none; animation: none; }
+}
+
+/* bulleted points inside the feature cards (e.g. industries) */
+.kab-points { list-style: none; margin: 0; padding: 0 !important; display: grid; gap: 10px; }
+.kab-points li { position: relative; padding-inline-start: 18px; line-height: 1.85; }
+.kab-points li::before { content: ""; position: absolute; inset-inline-start: 0; top: .75em; width: 7px; height: 7px; border-radius: 50%; background: var(--kfs-gold); }
+.kab-points strong { color: var(--kfs-text); font-weight: 800; }
+
+@media (max-width: 767.98px) {
+    .kab-people__bar { flex-direction: column; align-items: stretch; }
+    .kab-people__search { flex-basis: auto; width: 100%; }
 }

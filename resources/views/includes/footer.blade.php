@@ -33,7 +33,7 @@
             <div class="kfs-footer__help-intro">
                 <span class="kfs-footer__help-ico" aria-hidden="true"><i class="fa-solid fa-hand-holding-heart"></i></span>
                 <div>
-                    <h2 class="kfs-footer__help-title">كيف نقدر نساعدك؟</h2>
+                    <h2 class="kfs-footer__help-title">كيف يمكننا مساعدتك؟</h2>
                     <p class="kfs-footer__help-sub">وصول سريع لأهم قنوات خدمة المواطنين.</p>
                 </div>
             </div>

@@ -146,6 +146,7 @@
         crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.1.15/swiper-bundle.min.css" crossorigin="anonymous" />
     <link rel="stylesheet" href="{{ asset('css/kfs-ds.css') }}?v={{ @filemtime(public_path('css/kfs-ds.css')) }}" />
+    <link rel="stylesheet" href="{{ asset('css/kfs-pwa.css') }}?v={{ @filemtime(public_path('css/kfs-pwa.css')) }}" />
     <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ @filemtime(public_path('css/style.css')) }}" />
     <link rel="stylesheet" href="{{ asset('css/index.css') }}?v={{ @filemtime(public_path('css/index.css')) }}" />
     <link rel="stylesheet" href="{{ asset('css/kfs-motion.css') }}?v={{ @filemtime(public_path('css/kfs-motion.css')) }}" />
