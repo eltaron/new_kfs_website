@@ -25,6 +25,12 @@
 .kfs-footer ul.footer-links a { transition: color .3s, transform .3s var(--ease); }
 .kfs-footer__socials a { transition: background-color .3s, color .3s, transform .35s var(--ease), border-color .3s; }
 
+.kfs-footer__bottom a.kfs-footer__credit { color: var(--kfs-on-dark, #ECE8D6); font-size: .85rem; text-decoration: none; display: inline-flex; align-items: center; gap: .35rem; }
+.kfs-footer__bottom a.kfs-footer__credit i { color: #E8968D; }
+.kfs-footer__bottom a.kfs-footer__credit strong { color: var(--kfs-gold); font-weight: 700; }
+.kfs-footer__bottom a.kfs-footer__credit:hover strong,
+.kfs-footer__bottom a.kfs-footer__credit:focus-visible strong { color: var(--kfs-gold-light, #F0D878); text-decoration: underline; text-underline-offset: 3px; }
+
 .kfs-footer__tools button[aria-pressed="true"] { background: rgba(216, 176, 62, .16); border-color: var(--kfs-gold); color: #fff; }
 .kfs-govbar__btn[data-motion-toggle][aria-pressed="true"] { color: #fff; border-color: rgba(216, 176, 62, .45); background: rgba(216, 176, 62, .12); }
 

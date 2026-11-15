@@ -19,4 +19,10 @@ class AboutPageController extends Controller
 
         return view('about.governor', ['governor' => $governor]);
     }
+
+    /** Standalone interactive deck by the Digital Transformation department (own full-screen layout). */
+    public function digitalTransformation()
+    {
+        return view('digital-transformation.presentation');
+    }
 }

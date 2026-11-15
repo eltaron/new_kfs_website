@@ -37,7 +37,9 @@ Route::get('/directory', [DirectoryController::class, 'index'])->name('directory
 
 Route::get('/about/governor-message', [AboutPageController::class, 'governorMessage'])->name('about.governor');
 
-Route::get('/officials/{role}', [OfficialsController::class, 'show'])->name('officials.show');
+Route::get('/digital-transformation', [AboutPageController::class, 'digitalTransformation'])->name('digital-transformation');
+
+Route::get('/officials/{role}',[OfficialsController::class, 'show'])->name('officials.show');
 
 Route::get('/about-us', [GovernorateController::class, 'about'])->name('about');
 

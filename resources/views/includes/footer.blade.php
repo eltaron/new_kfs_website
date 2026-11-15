@@ -110,6 +110,9 @@
                 {!! clean($settings['copyright_text'] ?? 'جميع الحقوق محفوظة &copy; محافظة كفر الشيخ', "cms") !!}
                 <span class="footer-year-badge" id="footer-year"></span>
             </span>
+            <a href="{{ route('digital-transformation') }}" class="kfs-footer__credit" target="_blank" rel="noopener">
+                صُنع بكل <i class="fa-solid fa-heart" aria-hidden="true"></i><span class="visually-hidden">حب</span> بواسطة <strong>إدارة التحول الرقمي</strong>
+            </a>
             <div class="kfs-footer__tools">
                 <button type="button" data-a11y-open><i class="fa-solid fa-universal-access" aria-hidden="true"></i> أدوات الإتاحة</button>
                 <button type="button" data-voice-help><i class="fa-solid fa-microphone-lines" aria-hidden="true"></i> الأوامر الصوتية</button>
