@@ -235,6 +235,15 @@ class UserResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('export_selected_excel')
+                        ->label('تصدير المحدد (Excel)')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('success')
+                        ->deselectRecordsAfterCompletion()
+                        ->action(fn (\Illuminate\Database\Eloquent\Collection $records) => \Maatwebsite\Excel\Facades\Excel::download(
+                            new \App\Exports\GisUsersExport($records->load('roles')),
+                            'gis-users-selected-' . now()->format('Y-m-d_H-i') . '.xlsx'
+                        )),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
